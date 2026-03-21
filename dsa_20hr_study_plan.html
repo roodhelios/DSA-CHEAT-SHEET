@@ -1,0 +1,343 @@
+
+<style>
+  :root { --accent: #534AB7; --accent-light: #EEEDFE; --accent-mid: #AFA9EC; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+
+  .plan { padding: 1rem 0; }
+  .header { margin-bottom: 1.5rem; }
+  .header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+
+  .progress-bar-wrap { background: var(--color-background-secondary); border-radius: 4px; height: 6px; margin: 12px 0 4px; overflow: hidden; }
+  .progress-bar-fill { height: 6px; border-radius: 4px; background: var(--accent); transition: width .4s; }
+  .progress-label { font-size: 12px; color: var(--color-text-secondary); }
+
+  .sessions { display: flex; flex-direction: column; gap: 8px; }
+
+  .session-card {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    background: var(--color-background-primary);
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .session-card:hover { border-color: var(--color-border-secondary); }
+  .session-card.done { border-color: var(--accent-mid); }
+  .session-card.done .session-header { background: var(--accent-light); }
+
+  .session-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; cursor: pointer;
+    user-select: none;
+  }
+
+  .check {
+    width: 22px; height: 22px; min-width: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border-secondary);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s; background: var(--color-background-primary);
+  }
+  .check.checked { background: var(--accent); border-color: var(--accent); }
+  .check svg { display: none; }
+  .check.checked svg { display: block; }
+
+  .session-meta { flex: 1; }
+  .session-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .session-subtitle { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+
+  .badge {
+    font-size: 11px; padding: 3px 8px;
+    border-radius: 20px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge-purple { background: var(--accent-light); color: #3C3489; }
+  .badge-teal { background: #E1F5EE; color: #0F6E56; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-coral { background: #FAECE7; color: #993C1D; }
+
+  .chevron { transition: transform .25s; font-size: 12px; color: var(--color-text-secondary); }
+  .chevron.open { transform: rotate(90deg); }
+
+  .session-body { display: none; padding: 0 16px 14px; }
+  .session-body.open { display: block; }
+
+  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .05em; margin: 12px 0 6px; }
+
+  .topics { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .topic-pill {
+    font-size: 12px; padding: 3px 10px;
+    border-radius: 20px;
+    border: 0.5px solid var(--color-border-tertiary);
+    color: var(--color-text-secondary);
+    background: var(--color-background-secondary);
+  }
+
+  .resource-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .resource-list li { font-size: 13px; color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: 6px; }
+  .resource-list li::before { content: "→"; color: var(--accent); font-size: 11px; margin-top: 2px; min-width: 12px; }
+
+  .review-block {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 10px 12px; margin-top: 12px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .review-icon { font-size: 14px; margin-top: 1px; }
+  .review-content { flex: 1; }
+  .review-content strong { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .review-content p { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; line-height: 1.5; }
+
+  .timer-btn {
+    margin-top: 8px; font-size: 12px; padding: 5px 12px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: transparent; color: var(--color-text-primary);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+    transition: background .15s;
+  }
+  .timer-btn:hover { background: var(--color-background-secondary); }
+  .timer-btn.running { color: var(--accent); border-color: var(--accent-mid); }
+
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 10px 0; }
+</style>
+
+<div class="plan">
+  <div class="header">
+    <h1>20-hour DSA fast track</h1>
+    <p>10 sessions · 2 hours each · 15-min review per session</p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="prog-label">0 of 10 sessions complete</div>
+  </div>
+
+  <div class="sessions" id="sessions-list"></div>
+</div>
+
+<script>
+const sessions = [
+  {
+    num: 1, title: "Big-O & arrays", badge: "badge-purple", badgeText: "Foundation",
+    subtitle: "Time/space complexity · arrays · two-pointer",
+    topics: ["O(n), O(log n), O(n²)", "Array traversal", "Two-pointer technique", "Sliding window intro"],
+    resources: [
+      "NeetCode — Big-O notation (YouTube, 23 min)",
+      "LeetCode #1 Two Sum, #26 Remove Duplicates",
+      "CS Dojo: Arrays crash course (YouTube)"
+    ],
+    review: "Write the complexities of common operations from memory. Solve one two-pointer problem without hints. Can you explain why O(n log n) beats O(n²) for large n?"
+  },
+  {
+    num: 2, title: "Hash maps & sets", badge: "badge-purple", badgeText: "Foundation",
+    subtitle: "O(1) lookup · frequency counting · anagram patterns",
+    topics: ["Hash map internals", "Frequency counting", "Grouping & bucketing", "Set operations"],
+    resources: [
+      "NeetCode — Arrays & Hashing playlist (first 5 problems)",
+      "LeetCode #242 Valid Anagram, #347 Top K Frequent Elements",
+      "Back to Back SWE: Hash Tables (YouTube)"
+    ],
+    review: "When do you reach for a map vs a set? Explain collision handling in one sentence. Re-solve one problem replacing the brute-force with a hash map."
+  },
+  {
+    num: 3, title: "Linked lists", badge: "badge-teal", badgeText: "Linear DS",
+    subtitle: "Singly & doubly linked · fast/slow pointers",
+    topics: ["Singly linked list", "Reversal in-place", "Fast/slow (Floyd's)", "Merge two sorted lists"],
+    resources: [
+      "NeetCode — Linked List playlist (all 11 problems)",
+      "LeetCode #206 Reverse Linked List, #141 Linked List Cycle",
+      "Visualgo.net linked list visualizer"
+    ],
+    review: "Trace a reversal by hand on paper with 5 nodes. Explain Floyd's cycle detection — why does the fast pointer catch the slow one? Complexity of each operation?"
+  },
+  {
+    num: 4, title: "Stacks & queues", badge: "badge-teal", badgeText: "Linear DS",
+    subtitle: "LIFO/FIFO · monotonic stack · bracket matching",
+    topics: ["Stack via array", "Queue via deque", "Monotonic stack", "BFS queue pattern"],
+    resources: [
+      "NeetCode — Stack playlist (all 7 problems)",
+      "LeetCode #20 Valid Parentheses, #739 Daily Temperatures",
+      "CS50: Stacks & Queues lecture (YouTube)"
+    ],
+    review: "Build a stack and queue from scratch in your language without using built-ins. What's a monotonic stack for? Explain the bracket matching algorithm step by step."
+  },
+  {
+    num: 5, title: "Binary search", badge: "badge-amber", badgeText: "Divide & conquer",
+    subtitle: "Search space reduction · rotated arrays · boundaries",
+    topics: ["Classic binary search", "Search on answer space", "Left/right boundary", "Rotated sorted array"],
+    resources: [
+      "NeetCode — Binary Search playlist (all 7 problems)",
+      "LeetCode #704 Binary Search, #153 Find Minimum in Rotated Array",
+      "Errichto: Binary Search tutorial (YouTube, 45 min)"
+    ],
+    review: "Write binary search from memory — nail the off-by-one on lo/hi/mid. Explain 'search on the answer space'. When does rotation break naive binary search?"
+  },
+  {
+    num: 6, title: "Trees & DFS/BFS", badge: "badge-amber", badgeText: "Trees",
+    subtitle: "BST properties · inorder/preorder · level-order BFS",
+    topics: ["Tree traversals (3 types)", "BFS / level order", "BST insert & search", "Lowest common ancestor"],
+    resources: [
+      "NeetCode — Trees playlist (first 10 problems)",
+      "LeetCode #104 Max Depth, #226 Invert Binary Tree, #102 Level Order",
+      "Abdul Bari: Trees full lecture (YouTube)"
+    ],
+    review: "Trace in-order, pre-order, and post-order traversal on a 7-node tree. Implement BFS with a queue from scratch. What makes a valid BST?"
+  },
+  {
+    num: 7, title: "Graphs: BFS & DFS", badge: "badge-coral", badgeText: "Graphs",
+    subtitle: "Adjacency list · connected components · islands pattern",
+    topics: ["Adjacency list/matrix", "DFS iterative & recursive", "BFS shortest path", "Visited tracking"],
+    resources: [
+      "NeetCode — Graphs playlist (first 8 problems)",
+      "LeetCode #200 Number of Islands, #133 Clone Graph, #207 Course Schedule",
+      "WilliamFiset: Graph Theory Algorithms (YouTube playlist)"
+    ],
+    review: "Implement DFS and BFS on a grid graph from scratch. How do you detect a cycle? Islands pattern — why do you mutate the grid vs a visited set?"
+  },
+  {
+    num: 8, title: "Heap / priority queue", badge: "badge-coral", badgeText: "Heap",
+    subtitle: "Min/max heap · top-K · merge K lists",
+    topics: ["Heap operations (log n)", "Min-heap vs max-heap", "Top-K elements", "K-way merge"],
+    resources: [
+      "NeetCode — Heap playlist (all 7 problems)",
+      "LeetCode #215 Kth Largest Element, #23 Merge K Sorted Lists",
+      "Back to Back SWE: Heaps (YouTube)"
+    ],
+    review: "Explain heapify. What's the difference between heapq.nlargest and sorting? When does a heap beat sorting? Trace a heap push and pop on paper."
+  },
+  {
+    num: 9, title: "Dynamic programming I", badge: "badge-purple", badgeText: "DP",
+    subtitle: "1-D DP · Fibonacci pattern · house robber · climbing stairs",
+    topics: ["Memoization vs tabulation", "Fibonacci / climbing stairs", "House robber", "Coin change"],
+    resources: [
+      "NeetCode — 1-D DP playlist (all 12 problems)",
+      "LeetCode #70 Climbing Stairs, #198 House Robber, #322 Coin Change",
+      "MIT 6.006: DP lecture 19 (YouTube)"
+    ],
+    review: "Convert the recursive coin change solution to bottom-up DP. Define 'optimal substructure' in one sentence. What's the time/space trade-off between memo and tabulation?"
+  },
+  {
+    num: 10, title: "Dynamic programming II + review", badge: "badge-purple", badgeText: "DP",
+    subtitle: "2-D DP · LCS · mock interview simulation",
+    topics: ["2-D DP grid", "Longest common subsequence", "0/1 knapsack", "Full mock interview"],
+    resources: [
+      "NeetCode — 2-D DP playlist (first 6 problems)",
+      "LeetCode #1143 LCS, #416 Partition Equal Subset Sum",
+      "Pramp.com — free mock interview (book one now)"
+    ],
+    review: "Do a 25-min timed mock on one unseen medium problem. Rate yourself: approach, code quality, edge cases. What's your weakest session from the 10? Revisit it."
+  }
+];
+
+let completed = JSON.parse(localStorage.getItem('dsa-done') || '[]');
+let timers = {};
+
+function saveCompleted() {
+  try { localStorage.setItem('dsa-done', JSON.stringify(completed)); } catch(e) {}
+}
+
+function updateProgress() {
+  const pct = (completed.length / 10) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = completed.length + ' of 10 sessions complete';
+}
+
+function startTimer(idx) {
+  const btn = document.getElementById('timer-btn-' + idx);
+  const display = document.getElementById('timer-display-' + idx);
+  if (timers[idx]) {
+    clearInterval(timers[idx].interval);
+    delete timers[idx];
+    btn.classList.remove('running');
+    btn.textContent = '▶ Start 15-min review';
+    display.textContent = '';
+    return;
+  }
+  let secs = 15 * 60;
+  btn.classList.add('running');
+  btn.textContent = '■ Stop timer';
+  const tick = () => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    display.textContent = m + ':' + String(s).padStart(2,'0') + ' remaining';
+    if (secs <= 0) {
+      clearInterval(timers[idx].interval);
+      delete timers[idx];
+      btn.classList.remove('running');
+      btn.textContent = '▶ Start 15-min review';
+      display.textContent = '✓ Review complete!';
+    }
+    secs--;
+  };
+  tick();
+  timers[idx] = { interval: setInterval(tick, 1000) };
+}
+
+function toggleCheck(idx) {
+  const pos = completed.indexOf(idx);
+  if (pos === -1) completed.push(idx);
+  else completed.splice(pos, 1);
+  saveCompleted();
+  renderAll();
+}
+
+function toggleBody(idx) {
+  const body = document.getElementById('body-' + idx);
+  const chev = document.getElementById('chev-' + idx);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+function badgeClass(s) {
+  const map = { 'badge-purple': ['#EEEDFE','#3C3489'], 'badge-teal': ['#E1F5EE','#0F6E56'], 'badge-amber': ['#FAEEDA','#854F0B'], 'badge-coral': ['#FAECE7','#993C1D'] };
+  return map[s] || ['#EEEDFE','#3C3489'];
+}
+
+function renderAll() {
+  const list = document.getElementById('sessions-list');
+  list.innerHTML = '';
+  sessions.forEach((s, i) => {
+    const done = completed.includes(i);
+    const [bgC, txtC] = badgeClass(s.badge);
+    const card = document.createElement('div');
+    card.className = 'session-card' + (done ? ' done' : '');
+    card.innerHTML = `
+      <div class="session-header" onclick="toggleBody(${i})">
+        <div class="check ${done ? 'checked' : ''}" onclick="event.stopPropagation();toggleCheck(${i})" title="Mark complete">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="session-meta">
+          <div class="session-title">Session ${s.num} · ${s.title}</div>
+          <div class="session-subtitle">${s.subtitle}</div>
+        </div>
+        <span class="badge" style="background:${bgC};color:${txtC}">${s.badgeText}</span>
+        <span class="chevron" id="chev-${i}">›</span>
+      </div>
+      <div class="session-body" id="body-${i}">
+        <div class="section-label">Core topics</div>
+        <div class="topics">${s.topics.map(t => `<span class="topic-pill">${t}</span>`).join('')}</div>
+        <hr class="divider">
+        <div class="section-label">Best resources</div>
+        <ul class="resource-list">${s.resources.map(r => `<li>${r}</li>`).join('')}</ul>
+        <div class="review-block">
+          <span class="review-icon">⏱</span>
+          <div class="review-content">
+            <strong>15-min review</strong>
+            <p>${s.review}</p>
+            <button class="timer-btn" id="timer-btn-${i}" onclick="startTimer(${i})">▶ Start 15-min review</button>
+            <span id="timer-display-${i}" style="font-size:12px;color:var(--color-text-secondary);margin-left:8px;"></span>
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+  updateProgress();
+}
+
+renderAll();
+</script>

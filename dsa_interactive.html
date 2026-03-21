@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Interactive Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0e1a; --card: #111827; --border: #1e2d45;
+  --a1: #00e5ff; --a2: #ff4081; --a3: #69ff47; --a4: #ffd740;
+  --a5: #f97316; --a6: #c084fc;
+  --text: #e2e8f0; --muted: #64748b; --code: #0d1b2a;
+}
+body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.5; padding: 16px; min-height: 100vh; }
+
+/* HEADER */
+h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 900; background: linear-gradient(90deg, var(--a1), var(--a2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.tag { font-size: 9px; padding: 2px 8px; border-radius: 20px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.section-label { font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+
+/* GRID */
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.span2 { grid-column: span 2; }
+.span4 { grid-column: span 4; }
+
+/* CARDS */
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+  cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s; position: relative;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+.card.clickable::after { content: "click to expand ↗"; position: absolute; bottom: 7px; right: 9px; font-size: 8px; color: var(--muted); opacity: 0; transition: opacity .2s; }
+.card.clickable:hover::after { opacity: 1; }
+.card-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: .5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+ul { list-style: none; }
+ul li { padding: 1px 0; }
+ul li::before { content: "▸ "; color: var(--muted); }
+.hi { font-weight: 700; }
+.c1{color:var(--a1)} .c2{color:var(--a2)} .c3{color:var(--a3)} .c4{color:var(--a4)} .c5{color:var(--a5)} .c6{color:var(--a6)}
+.code { background: var(--code); border-left: 2px solid var(--a1); padding: 4px 7px; border-radius: 3px; margin-top: 6px; font-size: 10px; color: var(--a3); white-space: pre; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 4px; }
+th { color: var(--a1); text-align: left; padding: 2px 4px; border-bottom: 1px solid var(--border); }
+td { padding: 2px 4px; border-bottom: 1px solid #1a2233; }
+.good{color:var(--a3)} .ok{color:var(--a4)} .bad{color:var(--a2)}
+.pat { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.pat span { background: #1a2640; border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-size: 9px; color: var(--a1); }
+.row { display: flex; gap: 6px; margin-top: 5px; align-items: flex-start; }
+.row > div { flex: 1; }
+.trick { background: #0d1f12; border: 1px solid #1a3a1f; border-radius: 4px; padding: 4px 7px; margin-top: 4px; font-size: 10px; color: var(--a3); }
+svg { display: block; margin-top: 6px; }
+
+/* MODAL OVERLAY */
+.overlay {
+  display: none; position: fixed; inset: 0; background: rgba(5,8,18,.88);
+  backdrop-filter: blur(6px); z-index: 100; align-items: center; justify-content: center; padding: 20px;
+}
+.overlay.open { display: flex; }
+
+/* MODAL PANEL */
+.panel {
+  background: #0d1220; border: 1px solid var(--border); border-radius: 14px;
+  width: 100%; max-width: 820px; max-height: 88vh; overflow-y: auto;
+  animation: slideUp .25s cubic-bezier(.22,1,.36,1);
+  position: relative;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(.97); } to { opacity: 1; transform: none; } }
+
+.panel-header {
+  position: sticky; top: 0; background: #0d1220; border-bottom: 1px solid var(--border);
+  padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between; z-index: 10;
+  border-radius: 14px 14px 0 0;
+}
+.panel-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 900; }
+.close-btn { background: #1e2d45; border: none; color: var(--text); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink:0; }
+.close-btn:hover { background: var(--a2); }
+.panel-body { padding: 20px; }
+
+/* TABS */
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { background: #1a2233; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; cursor: pointer; color: var(--muted); transition: all .15s; }
+.tab.active { background: #1a2a40; border-color: var(--a1); color: var(--a1); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* DETAIL SECTIONS */
+.detail-section { margin-bottom: 18px; }
+.detail-section h3 { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; margin-bottom: 8px; border-left: 3px solid var(--a1); padding-left: 8px; }
+.detail-section h3.red { border-color: var(--a2); }
+.detail-section h3.green { border-color: var(--a3); }
+.detail-section h3.yellow { border-color: var(--a4); }
+.detail-section h3.orange { border-color: var(--a5); }
+.detail-section h3.purple { border-color: var(--a6); }
+
+.detail-code { background: var(--code); border: 1px solid #1e2d45; border-radius: 6px; padding: 12px 14px; font-size: 11px; color: var(--a3); white-space: pre; overflow-x: auto; margin-top: 6px; line-height: 1.7; }
+.detail-code .kw { color: var(--a2); } .detail-code .cm { color: #4a6a8a; } .detail-code .st { color: var(--a4); } .detail-code .fn { color: var(--a1); }
+
+.qcard { background: #111827; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.qcard .difficulty { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 10px; letter-spacing: .5px; }
+.easy { background: #0d2010; color: var(--a3); }
+.medium { background: #1a1500; color: var(--a4); }
+.hard { background: #200a0f; color: var(--a2); }
+.qcard-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 800; margin: 6px 0 4px; }
+.qcard p { color: #94a3b8; font-size: 10px; line-height: 1.6; }
+.qcard .hint { margin-top: 8px; background: #0d1b2a; border-left: 2px solid var(--a4); padding: 5px 8px; font-size: 10px; color: var(--a4); border-radius: 0 4px 4px 0; }
+.qa-toggle { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 9px; padding: 3px 8px; border-radius: 4px; cursor: pointer; margin-top: 6px; font-family: 'JetBrains Mono', monospace; transition: all .15s; }
+.qa-toggle:hover { border-color: var(--a4); color: var(--a4); }
+.qa-answer { display: none; margin-top: 8px; }
+.qa-answer.show { display: block; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.complexity-badge { display: inline-block; background: #1a2233; border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 10px; margin: 2px; }
+.warn { background: #1f1206; border: 1px solid #3d2006; border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 10px; color: var(--a5); }
+.tip { background: #0d1f12; border: 1px solid #1a3a1f; border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 10px; color: var(--a3); }
+
+footer { margin-top: 12px; text-align: center; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="section-label">leetcode prep · click any card</div>
+    <h1>DSA Cheat Sheet</h1>
+  </div>
+  <span class="tag" style="background:#1a2a1a;color:var(--a3)">interactive</span>
+</div>
+
+<div class="grid">
+
+  <!-- 1. Big-O -->
+  <div class="card clickable span1" onclick="openPanel('bigo')">
+    <div class="card-title" style="color:var(--a1)"><div class="dot" style="background:var(--a1)"></div>Big-O Complexity</div>
+    <table>
+      <tr><th>Name</th><th>n=100</th></tr>
+      <tr><td class="good">O(1)</td><td class="good">1</td></tr>
+      <tr><td class="good">O(log n)</td><td class="good">7</td></tr>
+      <tr><td class="good">O(n)</td><td class="good">100</td></tr>
+      <tr><td class="ok">O(n log n)</td><td class="ok">700</td></tr>
+      <tr><td class="ok">O(n²)</td><td class="ok">10K</td></tr>
+      <tr><td class="bad">O(2ⁿ)</td><td class="bad">HUGE</td></tr>
+    </table>
+    <div class="trick">💡 n≤10⁸ → O(n) OK<br>n≤10⁴ → O(n²) OK</div>
+  </div>
+
+  <!-- 2. Arrays & Hashing -->
+  <div class="card clickable span1" onclick="openPanel('arrays')">
+    <div class="card-title" style="color:var(--a2)"><div class="dot" style="background:var(--a2)"></div>Arrays & Hashing</div>
+    <ul>
+      <li><span class="hi c2">HashMap</span>: O(1) lookup</li>
+      <li><span class="hi c2">HashSet</span>: O(1) dedup</li>
+      <li>Prefix sum for range queries</li>
+      <li>Sort first → binary search</li>
+    </ul>
+    <div class="pat"><span>Two Sum</span><span>Anagram</span><span>Top K</span></div>
+  </div>
+
+  <!-- 3. Two Pointers -->
+  <div class="card clickable span1" onclick="openPanel('twoptr')">
+    <div class="card-title" style="color:var(--a3)"><div class="dot" style="background:var(--a3)"></div>Two Pointers</div>
+    <ul>
+      <li>Sorted array → shrink window</li>
+      <li>L+R converge → O(n) not O(n²)</li>
+      <li>Fast/Slow: detect cycles</li>
+    </ul>
+    <div class="pat"><span>3Sum</span><span>Container Water</span><span>Cycle</span></div>
+  </div>
+
+  <!-- 4. Sliding Window -->
+  <div class="card clickable span1" onclick="openPanel('sliding')">
+    <div class="card-title" style="color:var(--a4)"><div class="dot" style="background:var(--a4)"></div>Sliding Window</div>
+    <ul>
+      <li>Subarray / substring problems</li>
+      <li>Fixed size: slide both ends</li>
+      <li>Variable: expand R, shrink L</li>
+    </ul>
+    <div class="pat"><span>Max Subarray</span><span>Longest Substr</span></div>
+  </div>
+
+  <!-- 5. Stack -->
+  <div class="card clickable span1" onclick="openPanel('stack')">
+    <div class="card-title" style="color:#a78bfa"><div class="dot" style="background:#a78bfa"></div>Stack & Queue</div>
+    <ul>
+      <li>Stack LIFO, Queue FIFO</li>
+      <li>Monotonic stack: next greater</li>
+      <li>Deque: sliding window max</li>
+    </ul>
+    <div class="pat"><span>Valid Parens</span><span>Min Stack</span><span>BFS</span></div>
+  </div>
+
+  <!-- 6. Binary Search -->
+  <div class="card clickable span1" onclick="openPanel('binsearch')">
+    <div class="card-title" style="color:var(--a1)"><div class="dot" style="background:var(--a1)"></div>Binary Search</div>
+    <ul>
+      <li>Sorted → O(log n)</li>
+      <li>Find first/last variations</li>
+      <li>Search on answer space</li>
+    </ul>
+    <div class="pat"><span>Find Target</span><span>Rotated Array</span><span>Capacity</span></div>
+  </div>
+
+  <!-- 7. Linked List -->
+  <div class="card clickable span1" onclick="openPanel('linkedlist')">
+    <div class="card-title" style="color:var(--a4)"><div class="dot" style="background:var(--a4)"></div>Linked List</div>
+    <ul>
+      <li>Dummy head → edge cases</li>
+      <li>Fast/slow → midpoint, cycle</li>
+      <li>Reverse: prev, curr, next</li>
+    </ul>
+    <div class="pat"><span>Reverse</span><span>Cycle</span><span>Merge K</span></div>
+  </div>
+
+  <!-- 8. Heap -->
+  <div class="card clickable span1" onclick="openPanel('heap')">
+    <div class="card-title" style="color:var(--a5)"><div class="dot" style="background:var(--a5)"></div>Heap / Priority Q</div>
+    <ul>
+      <li>Min-heap: O(log n) push/pop</li>
+      <li>Top K largest → min-heap K</li>
+      <li>Top K smallest → max-heap K</li>
+    </ul>
+    <div class="pat"><span>Top K</span><span>Merge Sorted</span><span>Median</span></div>
+  </div>
+
+  <!-- 9. Trees -->
+  <div class="card clickable span2" onclick="openPanel('trees')">
+    <div class="card-title" style="color:var(--a3)"><div class="dot" style="background:var(--a3)"></div>Trees & BST</div>
+    <div class="row">
+      <div>
+        <svg width="110" height="70" viewBox="0 0 110 70">
+          <line x1="55" y1="14" x2="28" y2="38" stroke="#69ff47" stroke-width="1"/>
+          <line x1="55" y1="14" x2="82" y2="38" stroke="#69ff47" stroke-width="1"/>
+          <line x1="28" y1="38" x2="14" y2="58" stroke="#69ff47" stroke-width="1"/>
+          <line x1="28" y1="38" x2="42" y2="58" stroke="#69ff47" stroke-width="1"/>
+          <line x1="82" y1="38" x2="70" y2="58" stroke="#69ff47" stroke-width="1"/>
+          <circle cx="55" cy="12" r="10" fill="#0d2010" stroke="#69ff47" stroke-width="1.5"/>
+          <circle cx="28" cy="38" r="10" fill="#0d2010" stroke="#69ff47" stroke-width="1.5"/>
+          <circle cx="82" cy="38" r="10" fill="#0d2010" stroke="#69ff47" stroke-width="1.5"/>
+          <circle cx="14" cy="58" r="8" fill="#0d2010" stroke="#69ff47" stroke-width="1"/>
+          <circle cx="42" cy="58" r="8" fill="#0d2010" stroke="#69ff47" stroke-width="1"/>
+          <circle cx="70" cy="58" r="8" fill="#0d2010" stroke="#69ff47" stroke-width="1"/>
+          <text x="55" y="16" fill="#69ff47" font-size="9" text-anchor="middle" font-family="JetBrains Mono">8</text>
+          <text x="28" y="42" fill="#69ff47" font-size="9" text-anchor="middle" font-family="JetBrains Mono">3</text>
+          <text x="82" y="42" fill="#69ff47" font-size="9" text-anchor="middle" font-family="JetBrains Mono">10</text>
+          <text x="14" y="62" fill="#aaa" font-size="8" text-anchor="middle" font-family="JetBrains Mono">1</text>
+          <text x="42" y="62" fill="#aaa" font-size="8" text-anchor="middle" font-family="JetBrains Mono">6</text>
+          <text x="70" y="62" fill="#aaa" font-size="8" text-anchor="middle" font-family="JetBrains Mono">14</text>
+        </svg>
+      </div>
+      <div>
+        <ul>
+          <li><span class="c3">Inorder</span>: L→Root→R</li>
+          <li><span class="c3">Preorder</span>: Root→L→R</li>
+          <li><span class="c3">Postorder</span>: L→R→Root</li>
+          <li>BFS: level order queue</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. Graphs -->
+  <div class="card clickable span2" onclick="openPanel('graphs')">
+    <div class="card-title" style="color:var(--a2)"><div class="dot" style="background:var(--a2)"></div>Graphs</div>
+    <div class="row">
+      <div>
+        <svg width="110" height="70" viewBox="0 0 110 70">
+          <line x1="25" y1="20" x2="85" y2="20" stroke="#ff4081" stroke-width="1"/>
+          <line x1="25" y1="20" x2="55" y2="55" stroke="#ff4081" stroke-width="1"/>
+          <line x1="85" y1="20" x2="55" y2="55" stroke="#ff4081" stroke-width="1"/>
+          <line x1="85" y1="20" x2="100" y2="50" stroke="#ff4081" stroke-width="1" stroke-dasharray="3"/>
+          <circle cx="25" cy="20" r="10" fill="#200a0f" stroke="#ff4081" stroke-width="1.5"/>
+          <circle cx="85" cy="20" r="10" fill="#200a0f" stroke="#ff4081" stroke-width="1.5"/>
+          <circle cx="55" cy="55" r="10" fill="#200a0f" stroke="#ff4081" stroke-width="1.5"/>
+          <circle cx="100" cy="50" r="10" fill="#200a0f" stroke="#ff4081" stroke-width="1.5"/>
+          <text x="25" y="24" fill="#ff4081" font-size="9" text-anchor="middle" font-family="JetBrains Mono">A</text>
+          <text x="85" y="24" fill="#ff4081" font-size="9" text-anchor="middle" font-family="JetBrains Mono">B</text>
+          <text x="55" y="59" fill="#ff4081" font-size="9" text-anchor="middle" font-family="JetBrains Mono">C</text>
+          <text x="100" y="54" fill="#aaa" font-size="9" text-anchor="middle" font-family="JetBrains Mono">D</text>
+        </svg>
+      </div>
+      <div>
+        <ul>
+          <li><span class="c2">BFS</span>: shortest (unweighted)</li>
+          <li><span class="c2">DFS</span>: components, topo sort</li>
+          <li><span class="c2">Dijkstra</span>: weighted shortest</li>
+          <li>Always track <b>visited</b>!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. DP -->
+  <div class="card clickable span2" onclick="openPanel('dp')">
+    <div class="card-title" style="color:var(--a4)"><div class="dot" style="background:var(--a4)"></div>Dynamic Programming</div>
+    <div class="row">
+      <div>
+        <div class="section-label">1D pattern</div>
+        <div class="code">dp[i] = dp[i-1] + dp[i-2]</div>
+        <div class="section-label" style="margin-top:6px">2D pattern</div>
+        <div class="code">dp[i][j] = dp[i-1][j-1]+1</div>
+      </div>
+      <div>
+        <ul>
+          <li>State → Transition → Base</li>
+          <li>Top-down: memo + recursion</li>
+          <li>Bottom-up: tabulation</li>
+        </ul>
+        <div class="pat"><span>Knapsack</span><span>Coin Change</span><span>LCS</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. Backtracking -->
+  <div class="card clickable span1" onclick="openPanel('backtrack')">
+    <div class="card-title" style="color:var(--a6)"><div class="dot" style="background:var(--a6)"></div>Backtracking</div>
+    <ul>
+      <li>Choose → Explore → Unchoose</li>
+      <li>Prune early!</li>
+      <li>O(2ⁿ) or O(n!) worst case</li>
+    </ul>
+    <div class="pat"><span>Subsets</span><span>Permutations</span><span>N-Queens</span></div>
+  </div>
+
+  <!-- 13. Trie -->
+  <div class="card clickable span1" onclick="openPanel('trie')">
+    <div class="card-title" style="color:var(--a1)"><div class="dot" style="background:var(--a1)"></div>Trie</div>
+    <ul>
+      <li>Prefix tree for strings</li>
+      <li>Insert/Search: O(len)</li>
+      <li>children dict + end flag</li>
+    </ul>
+    <div class="pat"><span>Word Search II</span><span>Autocomplete</span></div>
+  </div>
+
+  <!-- 14. Intervals -->
+  <div class="card clickable span1" onclick="openPanel('intervals')">
+    <div class="card-title" style="color:var(--a3)"><div class="dot" style="background:var(--a3)"></div>Intervals</div>
+    <ul>
+      <li>Sort by start time first!</li>
+      <li>Overlap: a.end ≥ b.start</li>
+      <li>Merge: max(prev.end, cur.end)</li>
+    </ul>
+    <div class="pat"><span>Merge</span><span>Insert</span><span>Meeting Rooms</span></div>
+  </div>
+
+  <!-- 15. Pattern Banner -->
+  <div class="card span4" style="border-color:var(--a1);background:#080f1e;cursor:default">
+    <div class="card-title" style="color:var(--a1)">⚡ Pattern Recognition: See This → Think This</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px;font-size:10px">
+      <div><span class="c1 hi">Subarray/substring</span><br>→ Sliding Window / Prefix Sum</div>
+      <div><span class="c2 hi">Top K / Kth largest</span><br>→ Heap (size K)</div>
+      <div><span class="c3 hi">Sorted array, O(log n)</span><br>→ Binary Search</div>
+      <div><span class="c4 hi">Optimal substructure</span><br>→ Dynamic Programming</div>
+      <div><span class="c1 hi">All paths/permutations</span><br>→ Backtracking + pruning</div>
+      <div><span class="c2 hi">Shortest path (graph)</span><br>→ BFS / Dijkstra</div>
+      <div><span class="c3 hi">Parentheses / matching</span><br>→ Stack</div>
+      <div><span class="c4 hi">Two numbers → target</span><br>→ HashMap or Two Pointers</div>
+    </div>
+  </div>
+
+</div>
+<footer>Click any card to drill down · DSA Interactive Cheat Sheet</footer>
+
+<!-- ═══════════════════════════════ OVERLAY ═══════════════════════════════ -->
+<div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="panel" id="panel">
+    <div class="panel-header">
+      <div class="panel-title" id="panel-title"></div>
+      <button class="close-btn" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body" id="panel-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── PANEL DATA ───────────────────────────────────────────────────────────────
+const PANELS = {
+
+bigo: {
+  title: "⏱ Big-O Complexity",
+  color: "#00e5ff",
+  tabs: ["Cheat Table", "Space vs Time", "Interview Q&A"],
+  content: [
+    // TAB 0
+    `<div class="detail-section"><h3>Complexity Reference</h3>
+    <table>
+      <tr><th>Notation</th><th>Name</th><th>Example</th><th>n=10⁶</th></tr>
+      <tr><td class="good">O(1)</td><td>Constant</td><td>Hash lookup, array index</td><td class="good">1</td></tr>
+      <tr><td class="good">O(log n)</td><td>Logarithmic</td><td>Binary search, heap ops</td><td class="good">20</td></tr>
+      <tr><td class="good">O(n)</td><td>Linear</td><td>Loop, linear search</td><td class="good">10⁶</td></tr>
+      <tr><td class="ok">O(n log n)</td><td>Linearithmic</td><td>Merge sort, heap sort</td><td class="ok">2×10⁷</td></tr>
+      <tr><td class="ok">O(n²)</td><td>Quadratic</td><td>Nested loops, bubble sort</td><td class="ok">10¹²</td></tr>
+      <tr><td class="bad">O(2ⁿ)</td><td>Exponential</td><td>Fibonacci brute, subsets</td><td class="bad">∞</td></tr>
+      <tr><td class="bad">O(n!)</td><td>Factorial</td><td>Permutations brute force</td><td class="bad">☠️</td></tr>
+    </table></div>
+    <div class="detail-section"><h3 class="green">Constraint → Complexity Guide</h3>
+    <div class="detail-code">n ≤ 10      → O(n!) backtracking fine
+n ≤ 20      → O(2ⁿ) bitmask DP fine
+n ≤ 500     → O(n³) fine
+n ≤ 5000    → O(n²) fine
+n ≤ 10⁵     → O(n log n) or O(n) needed
+n ≤ 10⁸     → O(n) only
+n ≤ 10¹⁸    → O(log n) or O(1) only</div></div>
+    <div class="tip">💡 Always calculate: operations = n × work_per_step. Keep it under ~10⁸ for 1 second limit.</div>`,
+
+    // TAB 1
+    `<div class="two-col">
+    <div class="detail-section"><h3>Time Complexity of DS ops</h3>
+    <table>
+      <tr><th>Structure</th><th>Access</th><th>Search</th><th>Insert</th></tr>
+      <tr><td>Array</td><td class="good">O(1)</td><td class="ok">O(n)</td><td class="ok">O(n)</td></tr>
+      <tr><td>Linked List</td><td class="ok">O(n)</td><td class="ok">O(n)</td><td class="good">O(1)</td></tr>
+      <tr><td>HashMap</td><td>—</td><td class="good">O(1)</td><td class="good">O(1)</td></tr>
+      <tr><td>BST (balanced)</td><td class="good">O(log n)</td><td class="good">O(log n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Heap</td><td class="good">O(1) top</td><td class="ok">O(n)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Stack/Queue</td><td class="ok">O(n)</td><td class="ok">O(n)</td><td class="good">O(1)</td></tr>
+    </table></div>
+    <div class="detail-section"><h3>Sorting Algorithms</h3>
+    <table>
+      <tr><th>Algorithm</th><th>Best</th><th>Avg</th><th>Worst</th><th>Space</th></tr>
+      <tr><td>Quick Sort</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td class="bad">O(n²)</td><td class="good">O(log n)</td></tr>
+      <tr><td>Merge Sort</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td class="ok">O(n)</td></tr>
+      <tr><td>Heap Sort</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td class="good">O(1)</td></tr>
+      <tr><td>Counting Sort</td><td class="good">O(n+k)</td><td class="good">O(n+k)</td><td class="good">O(n+k)</td><td class="ok">O(k)</td></tr>
+    </table></div></div>`,
+
+    // TAB 2
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">What's the time complexity of this code?</div>
+    <div class="detail-code">for i in range(n):
+    for j in range(i, n):
+        print(i, j)</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Answer ▾</button>
+    <div class="qa-answer"><div class="hint">O(n²) — outer runs n times, inner runs n-i times. Sum = n(n+1)/2 ≈ n²/2 = O(n²)</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">What's the complexity of recursive Fibonacci?</div>
+    <div class="detail-code">def fib(n):
+    if n <= 1: return n
+    return fib(n-1) + fib(n-2)</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Answer ▾</button>
+    <div class="qa-answer"><div class="hint">Time: O(2ⁿ) — each call branches into 2. Space: O(n) call stack depth. Use memoization for O(n) time.</div></div></div>
+    <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
+    <div class="qcard-title">Amortized complexity of dynamic array push?</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Answer ▾</button>
+    <div class="qa-answer"><div class="hint">O(1) amortized. Individual push is O(1), resize is O(n) but happens rarely. Over n pushes total cost is O(n), so per push = O(1).</div></div></div>`
+  ]
+},
+
+arrays: {
+  title: "🗂 Arrays & Hashing",
+  color: "#ff4081",
+  tabs: ["Core Patterns", "Prefix Sum", "Interview Q&A"],
+  content: [
+    `<div class="two-col">
+    <div class="detail-section"><h3 class="red">HashMap Patterns</h3>
+    <ul><li>Count frequencies: <code>count[x] += 1</code></li>
+    <li>Check complement: <code>target-x in seen</code></li>
+    <li>Group by key: <code>groups[key].append(val)</code></li>
+    <li>First occurrence index</li></ul>
+    <div class="detail-code">// Two Sum - O(n)
+seen = {}
+for i, x in enumerate(nums):
+    if target - x in seen:
+        return [seen[target-x], i]
+    seen[x] = i</div></div>
+    <div class="detail-section"><h3 class="red">HashSet Patterns</h3>
+    <ul><li>Deduplication</li><li>O(1) membership test</li><li>Find missing / duplicate</li></ul>
+    <div class="detail-code">// Longest Consecutive Sequence
+s = set(nums)
+for n in s:
+    if n-1 not in s:  # sequence start
+        length = 1
+        while n+length in s:
+            length += 1
+        ans = max(ans, length)</div></div></div>`,
+
+    `<div class="detail-section"><h3>Prefix Sum</h3>
+    <p style="color:#94a3b8;font-size:10px;margin-bottom:8px">Build once in O(n), then answer range queries in O(1)</p>
+    <div class="detail-code">nums  = [2, 3, 1, 4, 5]
+prefix= [0, 2, 5, 6, 10, 15]
+#         ^  ^prefix[i] = prefix[i-1] + nums[i-1]
+
+# Sum from index l to r (inclusive, 0-indexed):
+range_sum = prefix[r+1] - prefix[l]
+# e.g. sum(1..3) = prefix[4]-prefix[1] = 10-2 = 8 ✓</div></div>
+    <div class="detail-section"><h3 class="green">Prefix Sum + HashMap Trick</h3>
+    <div class="detail-code">// Subarray Sum Equals K
+count, curr_sum = {0: 1}, 0
+for num in nums:
+    curr_sum += num
+    ans += count.get(curr_sum - k, 0)
+    count[curr_sum] = count.get(curr_sum, 0) + 1
+# Key insight: sum(i..j) = prefix[j] - prefix[i-1] = k
+# → we want prefix[j] - k in our map!</div>
+    <div class="tip">💡 This pattern solves a huge family of problems. Memorize it!</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty easy">EASY</span></div>
+    <div class="qcard-title">Two Sum</div>
+    <p>Given array nums and target, return indices of two numbers that add to target.</p>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def twoSum(nums, target):
+    seen = {}
+    for i, x in enumerate(nums):
+        if target - x in seen:
+            return [seen[target-x], i]
+        seen[x] = i</div><div class="hint">Time O(n), Space O(n). One pass HashMap.</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Group Anagrams</div>
+    <p>Group strings that are anagrams of each other.</p>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">from collections import defaultdict
+def groupAnagrams(strs):
+    groups = defaultdict(list)
+    for s in strs:
+        key = tuple(sorted(s))  # or count array
+        groups[key].append(s)
+    return list(groups.values())</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Top K Frequent Elements</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">import heapq
+from collections import Counter
+def topKFrequent(nums, k):
+    count = Counter(nums)
+    return heapq.nlargest(k, count.keys(), key=count.get)
+# OR bucket sort O(n): buckets[freq].append(num)</div></div></div>`
+  ]
+},
+
+twoptr: {
+  title: "👆👆 Two Pointers",
+  color: "#69ff47",
+  tabs: ["Templates", "Fast & Slow", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3 class="green">Opposite Direction (sorted array)</h3>
+    <div class="detail-code">l, r = 0, len(nums) - 1
+while l < r:
+    s = nums[l] + nums[r]
+    if s == target:
+        # found!
+        l += 1; r -= 1
+    elif s < target:
+        l += 1   # need bigger
+    else:
+        r -= 1   # need smaller</div></div>
+    <div class="detail-section"><h3 class="green">Same Direction (remove duplicates)</h3>
+    <div class="detail-code">slow = 0
+for fast in range(len(nums)):
+    if nums[fast] != nums[slow]:
+        slow += 1
+        nums[slow] = nums[fast]
+return slow + 1   # length of deduped array</div></div>
+    <div class="warn">⚠️ Always check: does the array need to be sorted first? Two pointers on unsorted arrays usually don't work.</div>`,
+
+    `<div class="detail-section"><h3 class="green">Fast & Slow (Floyd's Algorithm)</h3>
+    <div class="detail-code">// Detect cycle in linked list
+slow = fast = head
+while fast and fast.next:
+    slow = slow.next
+    fast = fast.next.next
+    if slow == fast:
+        return True  # cycle!
+return False</div></div>
+    <div class="detail-section"><h3 class="green">Find Middle of Linked List</h3>
+    <div class="detail-code">slow = fast = head
+while fast and fast.next:
+    slow = slow.next
+    fast = fast.next.next
+# slow is now at middle!</div></div>
+    <div class="detail-section"><h3 class="green">Find Cycle Start</h3>
+    <div class="detail-code">// After detecting cycle, reset one pointer
+slow = head
+while slow != fast:
+    slow = slow.next
+    fast = fast.next
+# They meet at cycle start!</div>
+    <div class="tip">💡 Math: distance to cycle start = distance from meeting point to cycle start.</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">3Sum — Find all triplets summing to zero</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def threeSum(nums):
+    nums.sort()
+    res = []
+    for i in range(len(nums) - 2):
+        if i > 0 and nums[i] == nums[i-1]: continue  # skip dup
+        l, r = i+1, len(nums)-1
+        while l < r:
+            s = nums[i] + nums[l] + nums[r]
+            if s == 0:
+                res.append([nums[i], nums[l], nums[r]])
+                while l < r and nums[l] == nums[l+1]: l += 1
+                while l < r and nums[r] == nums[r-1]: r -= 1
+                l += 1; r -= 1
+            elif s < 0: l += 1
+            else: r -= 1
+    return res</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Container With Most Water</div>
+    <p>Find two lines that together with the x-axis forms a container holding the most water.</p>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def maxArea(height):
+    l, r = 0, len(height) - 1
+    ans = 0
+    while l < r:
+        ans = max(ans, (r-l) * min(height[l], height[r]))
+        if height[l] < height[r]: l += 1
+        else: r -= 1  # move the shorter side
+    return ans</div></div></div>`
+  ]
+},
+
+sliding: {
+  title: "🪟 Sliding Window",
+  color: "#ffd740",
+  tabs: ["Fixed Window", "Variable Window", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3 class="yellow">Fixed Size Window</h3>
+    <p style="color:#94a3b8;font-size:10px;margin-bottom:8px">Window size k stays constant — slide both ends together.</p>
+    <div class="detail-code">// Max sum of subarray of size k
+window_sum = sum(nums[:k])
+max_sum = window_sum
+for i in range(k, len(nums)):
+    window_sum += nums[i] - nums[i - k]
+    max_sum = max(max_sum, window_sum)
+return max_sum   # O(n) time, O(1) space</div></div>
+    <div class="tip">💡 Fixed window = add right element, remove left element every step.</div>`,
+
+    `<div class="detail-section"><h3 class="yellow">Variable Size Window</h3>
+    <p style="color:#94a3b8;font-size:10px;margin-bottom:8px">Expand right until invalid, shrink left until valid again.</p>
+    <div class="detail-code">// Longest substring with at most K distinct chars
+from collections import defaultdict
+def lengthOfLongestSubstringKDistinct(s, k):
+    count = defaultdict(int)
+    l = ans = 0
+    for r in range(len(s)):
+        count[s[r]] += 1
+        while len(count) > k:     # window invalid
+            count[s[l]] -= 1
+            if count[s[l]] == 0:
+                del count[s[l]]
+            l += 1
+        ans = max(ans, r - l + 1) # window valid
+    return ans</div></div>
+    <div class="detail-section"><h3 class="yellow">Minimum Window Template</h3>
+    <div class="detail-code">// Minimum window containing all target chars
+need = Counter(t); have, total = {}, 0
+l = ans_len = float('inf'); ans = ""
+for r, c in enumerate(s):
+    have[c] = have.get(c,0) + 1
+    if c in need and have[c] == need[c]: total += 1
+    while total == len(need):
+        if r-l+1 < ans_len:
+            ans_len = r-l+1; ans = s[l:r+1]
+        have[s[l]] -= 1
+        if s[l] in need and have[s[l]] < need[s[l]]: total -= 1
+        l += 1
+return ans</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Longest Substring Without Repeating Characters</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def lengthOfLongestSubstring(s):
+    seen = {}
+    l = ans = 0
+    for r, c in enumerate(s):
+        if c in seen and seen[c] >= l:
+            l = seen[c] + 1   # shrink past the duplicate
+        seen[c] = r
+        ans = max(ans, r - l + 1)
+    return ans</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Permutation in String</div>
+    <p>Return true if s2 contains a permutation of s1.</p>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">from collections import Counter
+def checkInclusion(s1, s2):
+    need = Counter(s1)
+    k = len(s1)
+    window = Counter(s2[:k])
+    if window == need: return True
+    for i in range(k, len(s2)):
+        window[s2[i]] += 1
+        c = s2[i - k]
+        window[c] -= 1
+        if window[c] == 0: del window[c]
+        if window == need: return True
+    return False</div></div></div>`
+  ]
+},
+
+stack: {
+  title: "📚 Stack & Queue",
+  color: "#a78bfa",
+  tabs: ["Stack", "Monotonic Stack", "Interview Q&A"],
+  content: [
+    `<div class="two-col">
+    <div class="detail-section"><h3 style="border-color:#a78bfa">Stack (LIFO)</h3>
+    <div class="detail-code">// Valid Parentheses
+stack = []
+pairs = {')':'(', ']':'[', '}':'{'}
+for c in s:
+    if c in '([{':
+        stack.append(c)
+    elif not stack or stack[-1] != pairs[c]:
+        return False
+    else:
+        stack.pop()
+return not stack</div></div>
+    <div class="detail-section"><h3 style="border-color:#a78bfa">Queue (FIFO) / BFS</h3>
+    <div class="detail-code">from collections import deque
+// Level-order traversal
+q = deque([root])
+while q:
+    node = q.popleft()
+    process(node)
+    if node.left:  q.append(node.left)
+    if node.right: q.append(node.right)</div></div></div>`,
+
+    `<div class="detail-section"><h3 style="border-color:#a78bfa">Monotonic Stack — Next Greater Element</h3>
+    <p style="color:#94a3b8;font-size:10px;margin-bottom:8px">Stack stays monotonically increasing or decreasing. Pop when invariant breaks.</p>
+    <div class="detail-code">// Next Greater Element to the right
+def nextGreater(nums):
+    res = [-1] * len(nums)
+    stack = []  # stores indices, monotonic decreasing
+    for i, x in enumerate(nums):
+        while stack and nums[stack[-1]] < x:
+            idx = stack.pop()
+            res[idx] = x   # x is the next greater for idx
+        stack.append(i)
+    return res</div></div>
+    <div class="detail-section"><h3 style="border-color:#a78bfa">Sliding Window Maximum (Monotonic Deque)</h3>
+    <div class="detail-code">from collections import deque
+def maxSlidingWindow(nums, k):
+    dq, res = deque(), []  # dq stores indices, decreasing values
+    for i, x in enumerate(nums):
+        while dq and nums[dq[-1]] < x:
+            dq.pop()          # remove smaller elements
+        dq.append(i)
+        if dq[0] == i - k:    # remove out-of-window index
+            dq.popleft()
+        if i >= k - 1:
+            res.append(nums[dq[0]])
+    return res</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Min Stack — O(1) getMin()</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">class MinStack:
+    def __init__(self):
+        self.stack = []
+        self.min_stack = []  # track running minimums
+    def push(self, val):
+        self.stack.append(val)
+        min_val = min(val, self.min_stack[-1] if self.min_stack else val)
+        self.min_stack.append(min_val)
+    def pop(self):
+        self.stack.pop(); self.min_stack.pop()
+    def getMin(self):
+        return self.min_stack[-1]</div></div></div>
+    <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
+    <div class="qcard-title">Largest Rectangle in Histogram</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def largestRectangleArea(heights):
+    stack = []  # (index, height), monotonic increasing
+    max_area = 0
+    for i, h in enumerate(heights):
+        start = i
+        while stack and stack[-1][1] > h:
+            idx, height = stack.pop()
+            max_area = max(max_area, height * (i - idx))
+            start = idx
+        stack.append((start, h))
+    for idx, height in stack:
+        max_area = max(max_area, height * (len(heights) - idx))
+    return max_area</div></div></div>`
+  ]
+},
+
+binsearch: {
+  title: "🔍 Binary Search",
+  color: "#00e5ff",
+  tabs: ["Templates", "Answer Space", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3>Standard — Find Exact Target</h3>
+    <div class="detail-code">def search(nums, target):
+    lo, hi = 0, len(nums) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if nums[mid] == target: return mid
+        elif nums[mid] < target: lo = mid + 1
+        else: hi = mid - 1
+    return -1</div></div>
+    <div class="two-col">
+    <div class="detail-section"><h3>Find First (leftmost)</h3>
+    <div class="detail-code">lo, hi = 0, n - 1
+while lo < hi:
+    mid = (lo + hi) // 2
+    if condition(mid):
+        hi = mid      # keep left
+    else:
+        lo = mid + 1
+return lo</div></div>
+    <div class="detail-section"><h3>Find Last (rightmost)</h3>
+    <div class="detail-code">lo, hi = 0, n - 1
+while lo < hi:
+    mid = (lo + hi + 1) // 2  # +1 avoids inf loop
+    if condition(mid):
+        lo = mid      # keep right
+    else:
+        hi = mid - 1
+return lo</div></div></div>
+    <div class="warn">⚠️ Off-by-one errors are the #1 bug. Decide: lo <= hi or lo < hi? Use the template consistently.</div>`,
+
+    `<div class="detail-section"><h3>Binary Search on Answer Space</h3>
+    <p style="color:#94a3b8;font-size:10px;margin-bottom:8px">Instead of searching an array, search the range of possible answers.</p>
+    <div class="detail-code">// Koko Eating Bananas — min speed to eat all in h hours
+def minEatingSpeed(piles, h):
+    def canFinish(speed):
+        return sum(math.ceil(p / speed) for p in piles) <= h
+
+    lo, hi = 1, max(piles)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if canFinish(mid):
+            hi = mid   # try slower
+        else:
+            lo = mid + 1
+    return lo</div>
+    <div class="tip">💡 Key insight: answer is monotonic. If speed X works, X+1 also works. → Binary search!</div></div>
+    <div class="detail-section"><h3 class="green">When to use Answer Space BS</h3>
+    <ul><li>Problem asks for minimum/maximum value</li>
+    <li>There's a monotonic predicate: if X works, X±1 also works</li>
+    <li>Direct search is O(n), binary search makes it O(log(range) × O(check))</li></ul></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Search in Rotated Sorted Array</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def search(nums, target):
+    lo, hi = 0, len(nums)-1
+    while lo <= hi:
+        mid = (lo+hi)//2
+        if nums[mid] == target: return mid
+        if nums[lo] <= nums[mid]:  # left half sorted
+            if nums[lo] <= target < nums[mid]: hi = mid-1
+            else: lo = mid+1
+        else:                       # right half sorted
+            if nums[mid] < target <= nums[hi]: lo = mid+1
+            else: hi = mid-1
+    return -1</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Find Minimum in Rotated Sorted Array</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def findMin(nums):
+    lo, hi = 0, len(nums)-1
+    while lo < hi:
+        mid = (lo+hi)//2
+        if nums[mid] > nums[hi]:
+            lo = mid + 1   # min is in right half
+        else:
+            hi = mid       # min is mid or left of mid
+    return nums[lo]</div></div></div>`
+  ]
+},
+
+linkedlist: {
+  title: "🔗 Linked List",
+  color: "#ffd740",
+  tabs: ["Core Techniques", "Reversal", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3 class="yellow">Dummy Head Pattern</h3>
+    <div class="detail-code">// Merge two sorted lists
+def mergeTwoLists(l1, l2):
+    dummy = ListNode(0)
+    curr = dummy
+    while l1 and l2:
+        if l1.val <= l2.val:
+            curr.next = l1; l1 = l1.next
+        else:
+            curr.next = l2; l2 = l2.next
+        curr = curr.next
+    curr.next = l1 or l2
+    return dummy.next   # dummy.next is always the head</div>
+    <div class="tip">💡 Use dummy node when the head itself might change. Return dummy.next.</div></div>
+    <div class="detail-section"><h3 class="yellow">Find Middle (Fast/Slow)</h3>
+    <div class="detail-code">slow = fast = head
+while fast and fast.next:
+    slow = slow.next
+    fast = fast.next.next
+# slow = middle (for odd), second middle (for even)</div></div>`,
+
+    `<div class="detail-section"><h3 class="yellow">Reverse a Linked List</h3>
+    <div class="detail-code">// Iterative — O(n) time, O(1) space
+def reverseList(head):
+    prev, curr = None, head
+    while curr:
+        nxt = curr.next    # save next
+        curr.next = prev   # reverse pointer
+        prev = curr        # advance prev
+        curr = nxt         # advance curr
+    return prev   # prev is new head</div></div>
+    <div class="detail-section"><h3 class="yellow">Reverse Sublist (positions left to right)</h3>
+    <div class="detail-code">def reverseBetween(head, left, right):
+    dummy = ListNode(0, head)
+    prev = dummy
+    for _ in range(left - 1): prev = prev.next
+    curr = prev.next
+    for _ in range(right - left):
+        nxt = curr.next
+        curr.next = nxt.next
+        nxt.next = prev.next
+        prev.next = nxt
+    return dummy.next</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty easy">EASY</span></div>
+    <div class="qcard-title">Linked List Cycle Detection</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def hasCycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast: return True
+    return False</div></div></div>
+    <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
+    <div class="qcard-title">Merge K Sorted Lists</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">import heapq
+def mergeKLists(lists):
+    heap = []
+    for i, node in enumerate(lists):
+        if node:
+            heapq.heappush(heap, (node.val, i, node))
+    dummy = curr = ListNode(0)
+    while heap:
+        val, i, node = heapq.heappop(heap)
+        curr.next = node; curr = curr.next
+        if node.next:
+            heapq.heappush(heap, (node.next.val, i, node.next))
+    return dummy.next
+# Time: O(N log k) where N=total nodes, k=number of lists</div></div></div>`
+  ]
+},
+
+heap: {
+  title: "⛰️ Heap / Priority Queue",
+  color: "#f97316",
+  tabs: ["Patterns", "Two Heaps", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3 class="orange">Python heapq (min-heap by default)</h3>
+    <div class="detail-code">import heapq
+h = []
+heapq.heappush(h, 3)
+heapq.heappush(h, 1)
+heapq.heappush(h, 4)
+heapq.heappop(h)    # → 1 (minimum)
+
+# Max-heap trick: negate the values
+heapq.heappush(h, -val)
+max_val = -heapq.heappop(h)
+
+# Heapify existing list in O(n)
+heapq.heapify(my_list)</div></div>
+    <div class="detail-section"><h3 class="orange">Top K Pattern</h3>
+    <div class="detail-code">// Top K largest: use MIN-heap of size K
+// (smallest of top-K is at root → easy to compare)
+def topKLargest(nums, k):
+    heap = []
+    for n in nums:
+        heapq.heappush(heap, n)
+        if len(heap) > k:
+            heapq.heappop(heap)  # remove current minimum
+    return list(heap)   # O(n log k)</div>
+    <div class="tip">💡 Want K largest → min-heap size K. Want K smallest → max-heap size K. Counterintuitive but correct!</div></div>`,
+
+    `<div class="detail-section"><h3 class="orange">Two Heaps — Median of Stream</h3>
+    <p style="color:#94a3b8;font-size:10px;margin-bottom:8px">Keep lower half in max-heap, upper half in min-heap. Median is at their tops.</p>
+    <div class="detail-code">class MedianFinder:
+    def __init__(self):
+        self.lo = []   # max-heap (negate values)
+        self.hi = []   # min-heap
+
+    def addNum(self, num):
+        heapq.heappush(self.lo, -num)
+        # Balance: ensure lo top <= hi top
+        if self.hi and -self.lo[0] > self.hi[0]:
+            heapq.heappush(self.hi, -heapq.heappop(self.lo))
+        # Balance sizes: lo can have at most 1 extra
+        if len(self.lo) > len(self.hi) + 1:
+            heapq.heappush(self.hi, -heapq.heappop(self.lo))
+        elif len(self.hi) > len(self.lo):
+            heapq.heappush(self.lo, -heapq.heappop(self.hi))
+
+    def findMedian(self):
+        if len(self.lo) > len(self.hi):
+            return -self.lo[0]
+        return (-self.lo[0] + self.hi[0]) / 2</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Kth Largest Element in an Array</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def findKthLargest(nums, k):
+    heap = []
+    for n in nums:
+        heapq.heappush(heap, n)
+        if len(heap) > k:
+            heapq.heappop(heap)
+    return heap[0]
+# O(n log k) — better than sorting O(n log n)</div></div></div>
+    <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
+    <div class="qcard-title">Task Scheduler — CPU idle time</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">from collections import Counter
+import heapq
+def leastInterval(tasks, n):
+    count = Counter(tasks)
+    heap = [-c for c in count.values()]
+    heapq.heapify(heap)
+    time = 0
+    q = deque()   # (count, available_at_time)
+    while heap or q:
+        time += 1
+        if heap:
+            cnt = 1 + heapq.heappop(heap)  # use task
+            if cnt: q.append((cnt, time + n))
+        if q and q[0][1] == time:
+            heapq.heappush(heap, q.popleft()[0])
+    return time</div></div></div>`
+  ]
+},
+
+trees: {
+  title: "🌳 Trees & BST",
+  color: "#69ff47",
+  tabs: ["DFS Traversals", "BFS / Level", "BST + Interview Q&A"],
+  content: [
+    `<div class="two-col">
+    <div class="detail-section"><h3 class="green">Inorder (L→Root→R)</h3>
+    <p style="color:#94a3b8;font-size:10px">BST inorder = sorted order!</p>
+    <div class="detail-code">def inorder(root):
+    if not root: return
+    inorder(root.left)
+    visit(root)
+    inorder(root.right)</div></div>
+    <div class="detail-section"><h3 class="green">Preorder (Root→L→R)</h3>
+    <p style="color:#94a3b8;font-size:10px">Serialize tree, copy tree</p>
+    <div class="detail-code">def preorder(root):
+    if not root: return
+    visit(root)
+    preorder(root.left)
+    preorder(root.right)</div></div>
+    <div class="detail-section"><h3 class="green">Postorder (L→R→Root)</h3>
+    <p style="color:#94a3b8;font-size:10px">Delete tree, evaluate expressions</p>
+    <div class="detail-code">def postorder(root):
+    if not root: return
+    postorder(root.left)
+    postorder(root.right)
+    visit(root)</div></div>
+    <div class="detail-section"><h3 class="green">Height / Depth</h3>
+    <div class="detail-code">def height(node):
+    if not node: return 0
+    return 1 + max(height(node.left),
+                   height(node.right))</div></div></div>`,
+
+    `<div class="detail-section"><h3 class="green">BFS — Level Order Traversal</h3>
+    <div class="detail-code">from collections import deque
+def levelOrder(root):
+    if not root: return []
+    res, q = [], deque([root])
+    while q:
+        level = []
+        for _ in range(len(q)):   # process one level at a time
+            node = q.popleft()
+            level.append(node.val)
+            if node.left:  q.append(node.left)
+            if node.right: q.append(node.right)
+        res.append(level)
+    return res</div></div>
+    <div class="detail-section"><h3 class="green">Lowest Common Ancestor</h3>
+    <div class="detail-code">def lowestCommonAncestor(root, p, q):
+    if not root or root == p or root == q:
+        return root
+    left  = lowestCommonAncestor(root.left, p, q)
+    right = lowestCommonAncestor(root.right, p, q)
+    if left and right: return root   # p and q in diff subtrees
+    return left or right</div></div>`,
+
+    `<div class="detail-section"><h3 class="green">BST Operations</h3>
+    <div class="detail-code">// BST Search — O(log n) balanced, O(n) worst
+def search(root, val):
+    if not root or root.val == val: return root
+    if val < root.val: return search(root.left, val)
+    return search(root.right, val)
+
+// Validate BST
+def isValidBST(root, lo=float('-inf'), hi=float('inf')):
+    if not root: return True
+    if not (lo < root.val < hi): return False
+    return (isValidBST(root.left, lo, root.val) and
+            isValidBST(root.right, root.val, hi))</div></div>
+    <div class="qcard"><div><span class="difficulty easy">EASY</span></div>
+    <div class="qcard-title">Maximum Depth of Binary Tree</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def maxDepth(root):
+    if not root: return 0
+    return 1 + max(maxDepth(root.left), maxDepth(root.right))
+# One liner! Time O(n), Space O(h) call stack</div></div></div>
+    <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
+    <div class="qcard-title">Binary Tree Maximum Path Sum</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def maxPathSum(root):
+    res = [root.val]
+    def dfs(node):
+        if not node: return 0
+        l = max(dfs(node.left), 0)   # ignore negatives
+        r = max(dfs(node.right), 0)
+        res[0] = max(res[0], node.val + l + r)  # path through node
+        return node.val + max(l, r)  # return single branch
+    dfs(root)
+    return res[0]</div></div></div>`
+  ]
+},
+
+graphs: {
+  title: "🕸 Graphs",
+  color: "#ff4081",
+  tabs: ["BFS & DFS", "Dijkstra & Topo", "Interview Q&A"],
+  content: [
+    `<div class="two-col">
+    <div class="detail-section"><h3 class="red">BFS (Shortest Path)</h3>
+    <div class="detail-code">from collections import deque
+def bfs(graph, start):
+    visited = {start}
+    q = deque([(start, 0)])  # (node, distance)
+    while q:
+        node, dist = q.popleft()
+        for nei in graph[node]:
+            if nei not in visited:
+                visited.add(nei)
+                q.append((nei, dist+1))
+
+# Grid BFS — 4-directional
+dirs = [(0,1),(0,-1),(1,0),(-1,0)]
+q = deque([(r, c, 0)])
+visited = {(r, c)}
+while q:
+    row, col, dist = q.popleft()
+    for dr, dc in dirs:
+        nr, nc = row+dr, col+dc
+        if valid and (nr,nc) not in visited:
+            visited.add((nr,nc))
+            q.append((nr, nc, dist+1))</div></div>
+    <div class="detail-section"><h3 class="red">DFS (Connected Components)</h3>
+    <div class="detail-code">def dfs(node, visited, graph):
+    visited.add(node)
+    for nei in graph[node]:
+        if nei not in visited:
+            dfs(nei, visited, graph)
+
+# Count islands (grid DFS)
+def numIslands(grid):
+    count = 0
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            if grid[r][c] == '1':
+                dfs(grid, r, c); count += 1
+    return count
+
+def dfs(grid, r, c):
+    if r<0 or r>=len(grid) or c<0 or c>=len(grid[0]) or grid[r][c]!='1': return
+    grid[r][c] = '0'   # mark visited
+    for dr,dc in [(0,1),(0,-1),(1,0),(-1,0)]:
+        dfs(grid, r+dr, c+dc)</div></div></div>`,
+
+    `<div class="detail-section"><h3 class="red">Dijkstra — Weighted Shortest Path</h3>
+    <div class="detail-code">import heapq
+def dijkstra(graph, src, n):
+    dist = [float('inf')] * n
+    dist[src] = 0
+    heap = [(0, src)]   # (distance, node)
+    while heap:
+        d, u = heapq.heappop(heap)
+        if d > dist[u]: continue  # outdated entry
+        for v, w in graph[u]:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                heapq.heappush(heap, (dist[v], v))
+    return dist
+# Time: O((V + E) log V)</div></div>
+    <div class="detail-section"><h3 class="red">Topological Sort (Kahn's BFS)</h3>
+    <div class="detail-code">from collections import deque
+def topoSort(n, edges):
+    in_degree = [0] * n
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v); in_degree[v] += 1
+    q = deque(i for i in range(n) if in_degree[i] == 0)
+    order = []
+    while q:
+        node = q.popleft(); order.append(node)
+        for nei in graph[node]:
+            in_degree[nei] -= 1
+            if in_degree[nei] == 0: q.append(nei)
+    return order if len(order) == n else []  # [] = cycle!</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Number of Islands</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def numIslands(grid):
+    if not grid: return 0
+    count = 0
+    def dfs(r, c):
+        if r<0 or r>=len(grid) or c<0 or c>=len(grid[0]) or grid[r][c]!='1': return
+        grid[r][c]='0'
+        for dr,dc in [(0,1),(0,-1),(1,0),(-1,0)]: dfs(r+dr,c+dc)
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            if grid[r][c]=='1': dfs(r,c); count+=1
+    return count</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Course Schedule (Cycle Detection)</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def canFinish(numCourses, prerequisites):
+    graph = [[] for _ in range(numCourses)]
+    for a, b in prerequisites: graph[b].append(a)
+    # 0=unvisited, 1=visiting, 2=done
+    state = [0] * numCourses
+    def dfs(node):
+        if state[node] == 1: return False  # cycle!
+        if state[node] == 2: return True
+        state[node] = 1
+        for nei in graph[node]:
+            if not dfs(nei): return False
+        state[node] = 2
+        return True
+    return all(dfs(i) for i in range(numCourses))</div></div></div>`
+  ]
+},
+
+dp: {
+  title: "⚡ Dynamic Programming",
+  color: "#ffd740",
+  tabs: ["1D Patterns", "2D Patterns", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3 class="yellow">The DP Framework</h3>
+    <div class="detail-code">1. Define state: dp[i] = "answer for subproblem i"
+2. Recurrence: dp[i] = f(dp[i-1], dp[i-2], ...)
+3. Base case: dp[0], dp[1] = known values
+4. Answer: usually dp[n] or max(dp)</div></div>
+    <div class="two-col">
+    <div class="detail-section"><h3 class="yellow">House Robber Pattern</h3>
+    <div class="detail-code">// Cannot take adjacent houses
+dp[i] = max(dp[i-1],         // skip i
+            dp[i-2] + nums[i])  // take i
+
+# Space-optimized:
+prev2, prev1 = 0, 0
+for n in nums:
+    prev2, prev1 = prev1, max(prev1, prev2+n)
+return prev1</div></div>
+    <div class="detail-section"><h3 class="yellow">Coin Change Pattern</h3>
+    <div class="detail-code">// Min coins to reach amount
+dp = [inf] * (amount + 1)
+dp[0] = 0
+for coin in coins:
+    for a in range(coin, amount+1):
+        dp[a] = min(dp[a], dp[a-coin] + 1)
+return dp[amount] if dp[amount] != inf else -1</div></div></div>
+    <div class="detail-section"><h3 class="yellow">Longest Increasing Subsequence</h3>
+    <div class="detail-code">// O(n²) DP
+dp = [1] * n   # each element alone = LIS of length 1
+for i in range(n):
+    for j in range(i):
+        if nums[j] < nums[i]:
+            dp[i] = max(dp[i], dp[j] + 1)
+return max(dp)
+// O(n log n): patience sorting with binary search</div></div>`,
+
+    `<div class="detail-section"><h3 class="yellow">Knapsack 0/1</h3>
+    <div class="detail-code">// Can take each item at most once
+dp = [[0]*(capacity+1) for _ in range(n+1)]
+for i in range(1, n+1):
+    for c in range(capacity+1):
+        dp[i][c] = dp[i-1][c]   # don't take item i
+        if weights[i-1] <= c:
+            dp[i][c] = max(dp[i][c],
+                           dp[i-1][c-weights[i-1]] + values[i-1])
+return dp[n][capacity]</div></div>
+    <div class="detail-section"><h3 class="yellow">Longest Common Subsequence</h3>
+    <div class="detail-code">def lcs(s1, s2):
+    m, n = len(s1), len(s2)
+    dp = [[0]*(n+1) for _ in range(m+1)]
+    for i in range(1, m+1):
+        for j in range(1, n+1):
+            if s1[i-1] == s2[j-1]:
+                dp[i][j] = dp[i-1][j-1] + 1  # extend
+            else:
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+    return dp[m][n]
+# Same structure → Edit Distance, Interleaving String</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Climbing Stairs (bottom-up DP)</div>
+    <p>Count ways to climb n stairs, taking 1 or 2 steps at a time.</p>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def climbStairs(n):
+    if n <= 2: return n
+    a, b = 1, 2
+    for _ in range(3, n+1):
+        a, b = b, a + b
+    return b
+# Fibonacci! dp[n] = dp[n-1] + dp[n-2]</div></div></div>
+    <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
+    <div class="qcard-title">Word Break</div>
+    <p>Can the string be segmented into dictionary words?</p>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def wordBreak(s, wordDict):
+    words = set(wordDict)
+    dp = [False] * (len(s) + 1)
+    dp[0] = True   # empty string always works
+    for i in range(1, len(s)+1):
+        for j in range(i):
+            if dp[j] and s[j:i] in words:
+                dp[i] = True; break
+    return dp[-1]</div></div></div>`
+  ]
+},
+
+backtrack: {
+  title: "🔄 Backtracking",
+  color: "#c084fc",
+  tabs: ["Template", "Subsets & Perms", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3 style="border-color:var(--a6)">Universal Backtracking Template</h3>
+    <div class="detail-code">def backtrack(path, choices):
+    # ① Base case — solution complete
+    if is_complete(path):
+        results.append(path[:])
+        return
+
+    for choice in choices:
+        # ② Pruning — skip invalid early
+        if is_invalid(choice): continue
+
+        # ③ Choose
+        path.append(choice)
+        mark_used(choice)
+
+        # ④ Explore
+        backtrack(path, remaining_choices)
+
+        # ⑤ Unchoose (restore state)
+        path.pop()
+        unmark_used(choice)</div>
+    <div class="tip">💡 The key is step ⑤: always undo. If you skip it, state bleeds into sibling branches.</div></div>
+    <div class="warn">⚠️ Pruning makes the difference between TLE and AC. Always add constraints as early as possible.</div>`,
+
+    `<div class="detail-section"><h3 style="border-color:var(--a6)">Generate All Subsets</h3>
+    <div class="detail-code">def subsets(nums):
+    res = []
+    def bt(start, path):
+        res.append(path[:])    # add at every level (not just leaf)
+        for i in range(start, len(nums)):
+            path.append(nums[i])
+            bt(i + 1, path)    # i+1: each element used once
+            path.pop()
+    bt(0, [])
+    return res   # 2ⁿ subsets</div></div>
+    <div class="detail-section"><h3 style="border-color:var(--a6)">Generate All Permutations</h3>
+    <div class="detail-code">def permute(nums):
+    res = []
+    def bt(path, used):
+        if len(path) == len(nums):
+            res.append(path[:])
+            return
+        for i, n in enumerate(nums):
+            if used[i]: continue
+            used[i] = True
+            path.append(n)
+            bt(path, used)
+            path.pop()
+            used[i] = False
+    bt([], [False]*len(nums))
+    return res   # n! permutations</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Combination Sum — pick with repeats</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def combinationSum(candidates, target):
+    res = []
+    def bt(start, path, remaining):
+        if remaining == 0: res.append(path[:]); return
+        if remaining < 0: return   # pruning!
+        for i in range(start, len(candidates)):
+            path.append(candidates[i])
+            bt(i, path, remaining - candidates[i])  # i (not i+1) = reuse
+            path.pop()
+    bt(0, [], target)
+    return res</div></div></div>
+    <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
+    <div class="qcard-title">N-Queens</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def solveNQueens(n):
+    cols = set(); diag1 = set(); diag2 = set()
+    board = [['.'] * n for _ in range(n)]
+    res = []
+    def bt(row):
+        if row == n:
+            res.append([''.join(r) for r in board]); return
+        for col in range(n):
+            if col in cols or (row-col) in diag1 or (row+col) in diag2: continue
+            cols.add(col); diag1.add(row-col); diag2.add(row+col)
+            board[row][col] = 'Q'
+            bt(row + 1)
+            board[row][col] = '.'; cols.discard(col); diag1.discard(row-col); diag2.discard(row+col)
+    bt(0); return res</div></div></div>`
+  ]
+},
+
+trie: {
+  title: "🌐 Trie (Prefix Tree)",
+  color: "#00e5ff",
+  tabs: ["Implementation", "Advanced", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3>Full Trie Implementation</h3>
+    <div class="detail-code">class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for c in word:
+            if c not in node.children:
+                node.children[c] = TrieNode()
+            node = node.children[c]
+        node.is_end = True
+
+    def search(self, word):
+        node = self.root
+        for c in word:
+            if c not in node.children: return False
+            node = node.children[c]
+        return node.is_end
+
+    def startsWith(self, prefix):
+        node = self.root
+        for c in prefix:
+            if c not in node.children: return False
+            node = node.children[c]
+        return True   # prefix exists!</div></div>`,
+
+    `<div class="detail-section"><h3>Word Search II (Trie + Backtracking)</h3>
+    <div class="detail-code">def findWords(board, words):
+    root = TrieNode()
+    for w in words:
+        node = root
+        for c in w:
+            node = node.children.setdefault(c, TrieNode())
+        node.word = w   # store word at end node
+
+    res = []
+    def dfs(node, r, c):
+        c_char = board[r][c]
+        if c_char not in node.children: return
+        next_node = node.children[c_char]
+        if next_node.word:
+            res.append(next_node.word)
+            next_node.word = None   # avoid duplicates
+        board[r][c] = '#'   # mark visited
+        for dr, dc in [(0,1),(0,-1),(1,0),(-1,0)]:
+            nr, nc = r+dr, c+dc
+            if 0<=nr<len(board) and 0<=nc<len(board[0]):
+                dfs(next_node, nr, nc)
+        board[r][c] = c_char   # restore
+    for r in range(len(board)):
+        for c in range(len(board[0])):
+            dfs(root, r, c)
+    return res</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Implement Trie (Prefix Tree)</div>
+    <p>Implement insert, search, and startsWith.</p>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="hint">See the full implementation in the Implementation tab. Key: each node has a children dict and an is_end flag. All ops are O(word length).</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Design Add and Search Words (with wildcard .)</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def search(self, word):
+    def dfs(node, i):
+        if i == len(word): return node.is_end
+        c = word[i]
+        if c == '.':   # wildcard: try all children
+            return any(dfs(child, i+1) for child in node.children.values())
+        if c not in node.children: return False
+        return dfs(node.children[c], i+1)
+    return dfs(self.root, 0)</div></div></div>`
+  ]
+},
+
+intervals: {
+  title: "📅 Intervals",
+  color: "#69ff47",
+  tabs: ["Core Patterns", "Meeting Rooms", "Interview Q&A"],
+  content: [
+    `<div class="detail-section"><h3 class="green">Merge Overlapping Intervals</h3>
+    <div class="detail-code">def merge(intervals):
+    intervals.sort(key=lambda x: x[0])   # ALWAYS sort first!
+    res = [intervals[0]]
+    for start, end in intervals[1:]:
+        if start <= res[-1][1]:           # overlap!
+            res[-1][1] = max(res[-1][1], end)
+        else:
+            res.append([start, end])
+    return res</div></div>
+    <div class="detail-section"><h3 class="green">Insert Interval</h3>
+    <div class="detail-code">def insert(intervals, newInterval):
+    res = []
+    for i, (s, e) in enumerate(intervals):
+        if newInterval[1] < s:          # new ends before current
+            res.append(newInterval)
+            return res + intervals[i:]
+        elif newInterval[0] > e:         # new starts after current
+            res.append([s, e])
+        else:                            # overlap: merge
+            newInterval = [min(newInterval[0], s),
+                           max(newInterval[1], e)]
+    res.append(newInterval)
+    return res</div></div>`,
+
+    `<div class="detail-section"><h3 class="green">Meeting Rooms I — Can attend all?</h3>
+    <div class="detail-code">def canAttendMeetings(intervals):
+    intervals.sort(key=lambda x: x[0])
+    for i in range(1, len(intervals)):
+        if intervals[i][0] < intervals[i-1][1]:
+            return False  # overlap found!
+    return True</div></div>
+    <div class="detail-section"><h3 class="green">Meeting Rooms II — Min rooms needed</h3>
+    <div class="detail-code">import heapq
+def minMeetingRooms(intervals):
+    intervals.sort(key=lambda x: x[0])
+    heap = []  # min-heap of end times (= rooms in use)
+    for start, end in intervals:
+        if heap and heap[0] <= start:
+            heapq.heapreplace(heap, end)  # reuse room
+        else:
+            heapq.heappush(heap, end)     # need new room
+    return len(heap)
+# len(heap) = number of rooms needed</div>
+    <div class="tip">💡 Heap holds end times of ongoing meetings. If earliest end ≤ new start, recycle that room.</div></div>`,
+
+    `<div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Non-overlapping Intervals (min removals)</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Solution ▾</button>
+    <div class="qa-answer"><div class="detail-code">def eraseOverlapIntervals(intervals):
+    intervals.sort(key=lambda x: x[1])  # sort by END
+    removals = 0
+    prev_end = float('-inf')
+    for start, end in intervals:
+        if start >= prev_end:
+            prev_end = end      # keep this interval
+        else:
+            removals += 1       # remove it (greedy: keep smaller end)
+    return removals</div><div class="hint">Greedy: always keep the interval with the smallest end time. Sort by end, not start!</div></div></div>
+    <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
+    <div class="qcard-title">Interview: Explain overlap detection</div>
+    <button class="qa-toggle" onclick="toggleAns(this)">Show Answer ▾</button>
+    <div class="qa-answer"><div class="hint">Two intervals [a,b] and [c,d] overlap if and only if a &lt; d AND c &lt; b (or using ≤ if touching counts). Equivalently: they do NOT overlap if b ≤ c or d ≤ a.</div></div></div>`
+  ]
+}
+};
+
+// ─── MODAL LOGIC ─────────────────────────────────────────────────────────────
+function openPanel(id) {
+  const data = PANELS[id];
+  if (!data) return;
+
+  document.getElementById('panel-title').textContent = data.title;
+  document.getElementById('panel-title').style.color = data.color;
+
+  // Build tabs
+  const tabsHtml = data.tabs.map((t, i) =>
+    `<button class="tab ${i===0?'active':''}" onclick="switchTab(this,${i})">${t}</button>`
+  ).join('');
+
+  const contentsHtml = data.content.map((c, i) =>
+    `<div class="tab-content ${i===0?'active':''}" id="tc-${i}">${c}</div>`
+  ).join('');
+
+  document.getElementById('panel-body').innerHTML = `
+    <div class="tabs">${tabsHtml}</div>
+    ${contentsHtml}
+  `;
+
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePanel() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closePanel();
+}
+
+function switchTab(btn, idx) {
+  btn.closest('.panel-body').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.closest('.panel-body').querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`tc-${idx}`).classList.add('active');
+}
+
+function toggleAns(btn) {
+  const ans = btn.nextElementSibling;
+  const showing = ans.classList.toggle('show');
+  btn.textContent = showing ? 'Hide ▲' : 'Show Answer ▾';
+  btn.style.color = showing ? 'var(--a4)' : '';
+  btn.style.borderColor = showing ? 'var(--a4)' : '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+</script>
+</body>
+</html>
