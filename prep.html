@@ -116,6 +116,25 @@ svg { display: block; margin-top: 6px; }
 .warn { background: #1f1206; border: 1px solid #3d2006; border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 10px; color: var(--a5); }
 .tip { background: #0d1f12; border: 1px solid #1a3a1f; border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 10px; color: var(--a3); }
 
+/* INTUITION TAB STYLES */
+.analogy { background: linear-gradient(135deg, #0d1420, #111827); border: 1px solid #2a3a5a; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+.analogy-icon { font-size: 28px; margin-bottom: 6px; }
+.analogy-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; color: var(--a4); margin-bottom: 6px; }
+.analogy p { color: #94a3b8; font-size: 10px; line-height: 1.7; }
+.analogy strong { color: var(--a1); }
+.trap { background: #1f0a0a; border: 1px solid #4a1010; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.trap-title { color: var(--a2); font-weight: 700; font-size: 10px; margin-bottom: 4px; }
+.trap p { color: #c4a0a0; font-size: 10px; line-height: 1.6; }
+.trap .fix { color: var(--a3); margin-top: 4px; font-size: 10px; }
+.brain-box { background: #0f1a0f; border: 1px solid #1e3a1e; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.brain-box-title { color: var(--a3); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; margin-bottom: 6px; }
+.brain-box p { color: #8ab48a; font-size: 10px; line-height: 1.7; }
+.flowchart { background: #0a0f1a; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 10px; }
+.flow-step { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.flow-diamond { background: #1a2640; border: 1px solid var(--a1); border-radius: 4px; padding: 3px 8px; color: var(--a1); font-size: 9px; white-space: nowrap; flex-shrink: 0; }
+.flow-arrow { color: var(--muted); padding-top: 2px; }
+.flow-result { color: var(--a4); font-size: 10px; padding-top: 2px; }
+
 footer { margin-top: 12px; text-align: center; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
 </style>
 </head>
@@ -381,7 +400,7 @@ const PANELS = {
 bigo: {
   title: "⏱ Big-O Complexity",
   color: "#00e5ff",
-  tabs: ["Cheat Table", "Space vs Time", "Interview Q&A"],
+  tabs: ["Cheat Table", "Space vs Time", "Interview Q&A", "🧠 Intuition"],
   content: [
     // TAB 0
     `<div class="detail-section"><h3>Complexity Reference</h3>
@@ -444,14 +463,37 @@ n ≤ 10¹⁸    → O(log n) or O(1) only</div></div>
     <div class="qcard"><div><span class="difficulty hard">HARD</span></div>
     <div class="qcard-title">Amortized complexity of dynamic array push?</div>
     <button class="qa-toggle" onclick="toggleAns(this)">Show Answer ▾</button>
-    <div class="qa-answer"><div class="hint">O(1) amortized. Individual push is O(1), resize is O(n) but happens rarely. Over n pushes total cost is O(n), so per push = O(1).</div></div></div>`
+    <div class="qa-answer"><div class="hint">O(1) amortized. Individual push is O(1), resize is O(n) but happens rarely. Over n pushes total cost is O(n), so per push = O(1).</div></div></div>`,
+
+    // INTUITION TAB
+    `<div class="analogy"><div class="analogy-icon">🏗️</div><div class="analogy-title">The Building Floors Analogy</div>
+    <p>Think of n as the number of <strong>floors in a building</strong>.<br><br>
+    <strong>O(1)</strong> — You press a button and the elevator takes you straight there. Doesn't matter if it's floor 1 or floor 1000.<br><br>
+    <strong>O(log n)</strong> — You use a floor directory. Each page halves the search space. 1000 floors → only ~10 page flips.<br><br>
+    <strong>O(n)</strong> — You walk every floor once. 1000 floors = 1000 steps.<br><br>
+    <strong>O(n²)</strong> — You walk every floor, and on each floor you walk every floor again. 1000 floors = 1,000,000 steps.<br><br>
+    <strong>O(2ⁿ)</strong> — At each floor you split into 2 copies of yourself. Floor 30 = 1 billion copies. ☠️</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 Why does halving give O(log n)?</div>
+    <p>If you have 1000 elements and halve each time: 1000 → 500 → 250 → 125 → 63 → 32 → 16 → 8 → 4 → 2 → 1. That's 10 steps. log₂(1000) ≈ 10. <strong>Every time you double n, you only add ONE more step.</strong> That's why log n is so powerful.</p></div>
+    <div class="detail-section" style="margin-top:12px"><h3>🚨 Common Traps</h3></div>
+    <div class="trap"><div class="trap-title">Trap 1: Hidden O(n) inside a loop</div><p>Looks like O(n) but is actually O(n²):</p>
+    <div class="detail-code" style="margin-top:4px">for i in range(n):
+    if x in my_list:  # ← O(n) hidden here!
+        ...
+# Total: O(n²) not O(n)</div>
+    <div class="fix">✅ Fix: convert list to set first → O(1) lookup</div></div>
+    <div class="trap"><div class="trap-title">Trap 2: String concatenation in a loop</div>
+    <p>In Python, <code>s += char</code> inside a loop is O(n²) because strings are immutable (new string created each time).</p>
+    <div class="fix">✅ Fix: collect chars in a list, join at end → O(n)</div></div>
+    <div class="trap"><div class="trap-title">Trap 3: Forgetting recursion stack space</div>
+    <p>DFS on a tree of height h uses O(h) space on the call stack. For a skewed tree h = n, so space is O(n) even if you think it's O(1).</p></div>`
   ]
 },
 
 arrays: {
   title: "🗂 Arrays & Hashing",
   color: "#ff4081",
-  tabs: ["Core Patterns", "Prefix Sum", "Interview Q&A"],
+  tabs: ["Core Patterns", "Prefix Sum", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="two-col">
     <div class="detail-section"><h3 class="red">HashMap Patterns</h3>
@@ -525,14 +567,30 @@ from collections import Counter
 def topKFrequent(nums, k):
     count = Counter(nums)
     return heapq.nlargest(k, count.keys(), key=count.get)
-# OR bucket sort O(n): buckets[freq].append(num)</div></div></div>`
+# OR bucket sort O(n): buckets[freq].append(num)</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">📖</div><div class="analogy-title">HashMap = A Perfect Index at the Back of a Book</div>
+    <p>A book's index lets you jump to any topic in O(1) — no reading from page 1. A <strong>HashMap is that index</strong> for your data. You trade extra memory (space to store the index) for instant lookup speed.<br><br>
+    The core insight: <strong>instead of searching for the answer, pre-compute where it is.</strong></p></div>
+    <div class="analogy"><div class="analogy-icon">📸</div><div class="analogy-title">Prefix Sum = A Running Total Receipt</div>
+    <p>Imagine a cashier's receipt that shows the <strong>cumulative total</strong> after every item. To find how much items 3–7 cost, you subtract the total before item 3 from the total after item 7. <strong>One subtraction, no re-summing.</strong> That's prefix sum.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 The "complement" mental model for Two Sum</div>
+    <p>Instead of asking "do any two numbers sum to target?", flip the question: "for each number X I see, has (target - X) appeared before?" You're not searching — you're <strong>recognizing a complement you already stored</strong>. This reframe unlocks dozens of HashMap problems.</p></div>
+    <div class="detail-section" style="margin-top:12px"><h3>🚨 Common Traps</h3></div>
+    <div class="trap"><div class="trap-title">Trap: Using index vs value as map key</div>
+    <p>In Two Sum you store <code>seen[value] = index</code>. A common bug is storing <code>seen[index] = value</code> (reversed), then wondering why lookup fails.</p>
+    <div class="fix">✅ Rule: key = what you'll search for later, value = what you want to return.</div></div>
+    <div class="trap"><div class="trap-title">Trap: Off-by-one in prefix sum indexing</div>
+    <p>Prefix array is size n+1 with prefix[0]=0. range sum [l,r] = prefix[r+1] - prefix[l]. Forgetting the +1 offset is the #1 bug.</p>
+    <div class="fix">✅ Always initialize prefix = [0] + [...] so prefix[0] acts as a safe base.</div></div>`
   ]
 },
 
 twoptr: {
   title: "👆👆 Two Pointers",
   color: "#69ff47",
-  tabs: ["Templates", "Fast & Slow", "Interview Q&A"],
+  tabs: ["Templates", "Fast & Slow", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3 class="green">Opposite Direction (sorted array)</h3>
     <div class="detail-code">l, r = 0, len(nums) - 1
@@ -608,14 +666,26 @@ while slow != fast:
         ans = max(ans, (r-l) * min(height[l], height[r]))
         if height[l] < height[r]: l += 1
         else: r -= 1  # move the shorter side
-    return ans</div></div></div>`
+    return ans</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🤸</div><div class="analogy-title">Two Pointers = Two People Walking Toward Each Other</div>
+    <p>Imagine two people starting at opposite ends of a corridor, walking toward each other. They'll meet somewhere in the middle — and together they cover the entire corridor in <strong>O(n) instead of O(n²)</strong>.<br><br>
+    The key insight: <strong>the sorted order lets you reason about which side to move</strong>. If the sum is too small, the left person (smaller number) needs to step right. If too big, the right person steps left. You never need to try every pair.</p></div>
+    <div class="analogy"><div class="analogy-icon">🐇🐢</div><div class="analogy-title">Fast & Slow = The Tortoise and the Hare on a Track</div>
+    <p>If a racetrack is a loop, the fast runner will <strong>always lap the slow runner</strong> — they'll meet again. If it's a straight track with an end, the fast runner just hits the end first. This is exactly Floyd's cycle detection: <strong>meeting = cycle exists, reaching null = no cycle</strong>.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 Why can we safely discard choices?</div>
+    <p>When sum > target and we move right pointer left, we're not missing anything. Every pair with the current right value and any left value ≥ current left is already too big (array is sorted). <strong>We eliminate an entire row of the n×n matrix in one step</strong> — that's the O(n) magic.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Two pointers on unsorted arrays</div>
+    <p>Two pointers only work with sorted data or specific structural guarantees. Applying them to an unsorted array and hoping for correct results is a very common mistake.</p>
+    <div class="fix">✅ Always check: is the array sorted? If not, sort first (O(n log n)) or use a HashMap instead.</div></div>`
   ]
 },
 
 sliding: {
   title: "🪟 Sliding Window",
   color: "#ffd740",
-  tabs: ["Fixed Window", "Variable Window", "Interview Q&A"],
+  tabs: ["Fixed Window", "Variable Window", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3 class="yellow">Fixed Size Window</h3>
     <p style="color:#94a3b8;font-size:10px;margin-bottom:8px">Window size k stays constant — slide both ends together.</p>
@@ -687,14 +757,30 @@ def checkInclusion(s1, s2):
         window[c] -= 1
         if window[c] == 0: del window[c]
         if window == need: return True
-    return False</div></div></div>`
+    return False</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🚂</div><div class="analogy-title">Sliding Window = A Train Moving Along a Track</div>
+    <p>Imagine a train with a fixed number of carriages rolling along a track. The <strong>front carriage (R) picks up a new passenger</strong> each step, and the <strong>back carriage (L) drops one off</strong>. The window always contains exactly the current "view".<br><br>
+    For <strong>variable-length windows</strong>: the train can stretch or shrink. It stretches greedily (add to front) but when a rule is broken, the back gets cut until it's valid again.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 Why is it O(n) even with a while loop inside?</div>
+    <p>Each element is added once (R moves right) and removed at most once (L moves right). Even though there's a while loop, total L movements across the entire loop ≤ n. <strong>Total work = 2n = O(n)</strong>. This is amortized analysis — don't be fooled by nested loops.</p></div>
+    <div class="detail-section" style="margin-top:12px"><h3>🚨 Traps</h3></div>
+    <div class="trap"><div class="trap-title">Trap: Moving L past R</div>
+    <p>If your validity condition is too aggressive you can shrink L past R, making the window size negative. Always guard: <code>while l &lt;= r and invalid</code>.</p></div>
+    <div class="trap"><div class="trap-title">Trap: Forgetting to update the answer inside the while loop</div>
+    <p>If you update the answer only after the while loop, you miss the state right after shrinking to a valid window.</p>
+    <div class="fix">✅ Update answer after the while loop ends (window is now valid), not inside it.</div></div>
+    <div class="flowchart"><b style="color:var(--a4)">🗺 Decision: Fixed or Variable?</b><br><br>
+    <div class="flow-step"><div class="flow-diamond">Is window size given?</div><div class="flow-arrow">→ YES →</div><div class="flow-result">Fixed window. Add right, drop left-k each step.</div></div>
+    <div class="flow-step"><div class="flow-diamond">Maximize/minimize length?</div><div class="flow-arrow">→ YES →</div><div class="flow-result">Variable window. Expand R, shrink L when invalid.</div></div></div>`
   ]
 },
 
 stack: {
   title: "📚 Stack & Queue",
   color: "#a78bfa",
-  tabs: ["Stack", "Monotonic Stack", "Interview Q&A"],
+  tabs: ["Stack", "Monotonic Stack", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="two-col">
     <div class="detail-section"><h3 style="border-color:#a78bfa">Stack (LIFO)</h3>
@@ -775,14 +861,25 @@ def maxSlidingWindow(nums, k):
         stack.append((start, h))
     for idx, height in stack:
         max_area = max(max_area, height * (len(heights) - idx))
-    return max_area</div></div></div>`
+    return max_area</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">📚</div><div class="analogy-title">Stack = A Pile of Plates</div>
+    <p>You can only add or remove from the top — LIFO. The plate you put on last is the first one you take off. <strong>This is perfect for "undo" operations, matching pairs, and tracking the most recent unresolved thing.</strong><br><br>
+    When you see an open parenthesis, you "push a plate" (unresolved). When you see a closing one, you "take off the top plate" (resolve). If no plate to take off → invalid.</p></div>
+    <div class="analogy"><div class="analogy-icon">📉</div><div class="analogy-title">Monotonic Stack = A Queue for a Roller Coaster</div>
+    <p>Imagine everyone in line can only see the first person taller than them to see the coaster. As you walk down the line, anyone who is now <strong>blocked by a taller newcomer gets their answer and leaves</strong>. The stack always holds people still "waiting for their next greater element."</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 The core question a stack answers</div>
+    <p>"What is the most recent unresolved X?" — brackets, temperatures, prices, histogram bars. Whenever a problem asks about the nearest/next thing to the left or right, think monotonic stack first.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Checking empty stack before popping</div>
+    <p>Always check <code>if stack:</code> before <code>stack[-1]</code> or <code>stack.pop()</code>. An empty stack access is an IndexError that only shows up on edge-case inputs.</p></div>`
   ]
 },
 
 binsearch: {
   title: "🔍 Binary Search",
   color: "#00e5ff",
-  tabs: ["Templates", "Answer Space", "Interview Q&A"],
+  tabs: ["Templates", "Answer Space", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3>Standard — Find Exact Target</h3>
     <div class="detail-code">def search(nums, target):
@@ -861,14 +958,34 @@ def minEatingSpeed(piles, h):
             lo = mid + 1   # min is in right half
         else:
             hi = mid       # min is mid or left of mid
-    return nums[lo]</div></div></div>`
+    return nums[lo]</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">📖</div><div class="analogy-title">Binary Search = Guessing a Number 1–1000</div>
+    <p>You guess 500. "Too high." Now you know it's 1–499 — <strong>half the space eliminated in one guess</strong>. Guess 250. "Too low." Now 251–499. Each guess cuts the remaining options in half.<br><br>
+    That's binary search. The sorted order is what makes halving valid — without it, eliminating half would be wrong.</p></div>
+    <div class="analogy"><div class="analogy-icon">🎚️</div><div class="analogy-title">Answer Space BS = Dialing In the Right Setting</div>
+    <p>Imagine a volume knob from 1–100. You want the <strong>minimum setting that's loud enough</strong>. You don't try every setting — you try 50, too quiet → try 75, too loud → try 62… You're binary searching on the <strong>answer itself</strong>, not the array. The trick: the predicate must be monotonic (once it's true, it stays true).</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 The single most important insight</div>
+    <p>Binary search works on any <strong>monotonic function</strong>, not just sorted arrays. If you can write a function <code>check(x)</code> that returns False…False…True…True (or vice versa), binary search finds the boundary in O(log n). This unlocks a huge family of "minimize the maximum" / "maximize the minimum" problems.</p></div>
+    <div class="detail-section" style="margin-top:12px"><h3>🚨 The Off-By-One Trap Map</h3></div>
+    <div class="trap"><div class="trap-title">Trap 1: <code>lo <= hi</code> vs <code>lo < hi</code></div>
+    <p>Use <code>lo &lt;= hi</code> when searching for an exact value (standard search). Use <code>lo &lt; hi</code> when converging on a boundary (find-first/last templates). Mixing them causes infinite loops or missed answers.</p></div>
+    <div class="trap"><div class="trap-title">Trap 2: Forgetting <code>+1</code> when finding rightmost</div>
+    <p>In find-last template: <code>mid = (lo + hi + 1) // 2</code>. Without the +1, when lo+1==hi and condition(lo) is true, mid=lo forever → infinite loop.</p>
+    <div class="fix">✅ Memory trick: "find right → bias mid right → add 1"</div></div>
+    <div class="flowchart"><b style="color:var(--a4)">🗺 Which BS template?</b><br><br>
+    <div class="flow-step"><div class="flow-diamond">Exact value exists?</div><div class="flow-arrow">→ YES →</div><div class="flow-result">Standard: <code>lo &lt;= hi</code>, return mid when found</div></div>
+    <div class="flow-step"><div class="flow-diamond">Find leftmost valid?</div><div class="flow-arrow">→ YES →</div><div class="flow-result">Find-first: <code>lo &lt; hi</code>, hi=mid on true</div></div>
+    <div class="flow-step"><div class="flow-diamond">Find rightmost valid?</div><div class="flow-arrow">→ YES →</div><div class="flow-result">Find-last: <code>lo &lt; hi</code>, mid+=1, lo=mid on true</div></div>
+    <div class="flow-step"><div class="flow-diamond">Min/max answer?</div><div class="flow-arrow">→ YES →</div><div class="flow-result">Answer space: search range of possible answers</div></div></div>`
   ]
 },
 
 linkedlist: {
   title: "🔗 Linked List",
   color: "#ffd740",
-  tabs: ["Core Techniques", "Reversal", "Interview Q&A"],
+  tabs: ["Core Techniques", "Reversal", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3 class="yellow">Dummy Head Pattern</h3>
     <div class="detail-code">// Merge two sorted lists
@@ -940,14 +1057,32 @@ def mergeKLists(lists):
         if node.next:
             heapq.heappush(heap, (node.next.val, i, node.next))
     return dummy.next
-# Time: O(N log k) where N=total nodes, k=number of lists</div></div></div>`
+# Time: O(N log k) where N=total nodes, k=number of lists</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🚂</div><div class="analogy-title">Linked List = A Chain of Train Cars</div>
+    <p>Each car only knows what car is directly behind it (<code>next</code>). There's no way to jump to car #7 directly — you <strong>walk from the engine</strong>. This makes random access O(n), but inserting/removing a car in the middle O(1) — just re-hook the coupling.<br><br>
+    The <strong>dummy head</strong> is like adding a fake locomotive at the front. It means you never have special-case code for "what if we're modifying the head?" — the head always has something before it.</p></div>
+    <div class="analogy"><div class="analogy-icon">🐇🐢</div><div class="analogy-title">Fast/Slow = Two Runners on a Circular Track</div>
+    <p>Fast runs 2× speed. If the track is a loop, fast will lap slow — they <strong>must meet</strong>. If the track has an end, fast hits it first and slow is at the middle. Two problems, one trick.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 Visualizing pointer reversal</div>
+    <p>Draw three boxes: <code>prev | curr | next</code>. Each step: (1) save next, (2) flip curr's arrow to point at prev, (3) slide the window right. The key — <strong>always save next BEFORE you flip</strong>, or you lose the rest of the list.</p>
+    <div class="detail-code">prev=None  curr→1→2→3→None
+Step 1: save nxt=2
+Step 2: 1.next = None  (flip!)
+Step 3: prev=1, curr=2
+...until curr=None, prev is new head</div></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Forgetting <code>fast and fast.next</code> both</div>
+    <p>The fast/slow loop condition must be <code>while fast and fast.next</code>. Just <code>while fast</code> will crash on even-length lists when fast.next.next is called on null.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Returning head instead of dummy.next</div>
+    <p>When using a dummy head, always return <code>dummy.next</code>, not <code>head</code>. If the original head got removed or replaced, <code>head</code> points to the wrong node.</p></div>`
   ]
 },
 
 heap: {
   title: "⛰️ Heap / Priority Queue",
   color: "#f97316",
-  tabs: ["Patterns", "Two Heaps", "Interview Q&A"],
+  tabs: ["Patterns", "Two Heaps", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3 class="orange">Python heapq (min-heap by default)</h3>
     <div class="detail-code">import heapq
@@ -1027,14 +1162,27 @@ def leastInterval(tasks, n):
             if cnt: q.append((cnt, time + n))
         if q and q[0][1] == time:
             heapq.heappush(heap, q.popleft()[0])
-    return time</div></div></div>`
+    return time</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🏆</div><div class="analogy-title">Heap = A Tournament Bracket, Always Updated</div>
+    <p>In a min-heap, every parent beats (is smaller than) both its children — like a tournament where the winner is always at the top. When you remove the top, the bracket re-organizes in O(log n) to crown a new winner.<br><br>
+    You never need to sort everything — just keep track of <strong>who's currently winning</strong>.</p></div>
+    <div class="analogy"><div class="analogy-icon">🎯</div><div class="analogy-title">Top-K with Min-Heap = A VIP Bouncer with a Fixed List</div>
+    <p>Imagine a VIP list of exactly K names. Whenever someone new arrives, you compare them to the <strong>least impressive person on the list</strong> (the min-heap root). If the newcomer is better, the weakest gets booted and newcomer gets in. After processing everyone, the K people remaining are the top K.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 Why use a min-heap to find TOP K largest? (Counterintuitive!)</div>
+    <p>You want to quickly identify and <strong>evict the weakest member of your top-K club</strong>. The weakest = the minimum. A min-heap gives you O(1) access to the minimum. A max-heap would give you the maximum — useless for eviction. <strong>The heap type is determined by what you need to evict, not what you want to keep.</strong></p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Python's max-heap negation with tuples</div>
+    <p>When storing tuples, negate only the priority: <code>heapq.heappush(h, (-priority, item))</code>. A common bug is negating the whole tuple or forgetting to un-negate when popping: <code>neg_p, item = heapq.heappop(h); p = -neg_p</code>.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: heapq doesn't support decrease-key</div>
+    <p>Python's heapq has no "update priority" operation. The standard workaround for Dijkstra: push a new entry and skip it when popped if it's stale (<code>if d > dist[u]: continue</code>).</p></div>`
   ]
 },
 
 trees: {
   title: "🌳 Trees & BST",
   color: "#69ff47",
-  tabs: ["DFS Traversals", "BFS / Level", "BST + Interview Q&A"],
+  tabs: ["DFS Traversals", "BFS / Level", "BST + Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="two-col">
     <div class="detail-section"><h3 class="green">Inorder (L→Root→R)</h3>
@@ -1119,14 +1267,35 @@ def isValidBST(root, lo=float('-inf'), hi=float('inf')):
         res[0] = max(res[0], node.val + l + r)  # path through node
         return node.val + max(l, r)  # return single branch
     dfs(root)
-    return res[0]</div></div></div>`
+    return res[0]</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🌳</div><div class="analogy-title">Tree Traversal = Three Different Ways to Explore a House</div>
+    <p>Imagine a house where each room has a left door and a right door leading to more rooms.<br><br>
+    <strong>Preorder</strong> (Root→L→R): You take a photo of every room <em>as you enter</em>. Great for cloning the house.<br><br>
+    <strong>Inorder</strong> (L→Root→R): You explore the entire left wing first, then the room, then the right wing. In a BST, this produces rooms in alphabetical (sorted) order.<br><br>
+    <strong>Postorder</strong> (L→R→Root): You only photograph a room <em>after fully exploring everything inside it</em>. Great for computing sizes, deleting safely.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 The DFS return-value pattern (most tree problems)</div>
+    <p>Most tree problems follow this shape: <strong>ask each subtree for a value, combine at root, return upward</strong>. The trick is deciding what to return vs what to track globally.</p>
+    <div class="detail-code">def dfs(node):
+    if not node: return BASE_CASE      # ← what does empty mean?
+    left  = dfs(node.left)             # ← ask left subtree
+    right = dfs(node.right)            # ← ask right subtree
+    global_answer = update(global_answer, combine(left, right, node))
+    return value_to_pass_upward        # ← what does parent need?</div></div>
+    <div class="analogy"><div class="analogy-icon">🔍</div><div class="analogy-title">BST = A Sorted Phone Book Organized as a Tree</div>
+    <p>Every page has a name. Names to the left are alphabetically before it, names to the right are after. To find "Smith" — you never read the whole book. You check the middle, go left or right, and <strong>halve the search space</strong> each time. That's why BST search is O(log n) when balanced.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Validating BST with just left < root < right</div>
+    <p>Checking only immediate neighbors misses cases like a node in the right subtree being smaller than the root's ancestor. You must pass <strong>bounds (lo, hi) down</strong> through recursion — not just compare to immediate parent.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Confusing height vs depth</div>
+    <p>Height = edges from node to deepest leaf (measured upward, computed postorder). Depth = edges from root to node (measured downward, computed preorder). Max depth of tree = height of root.</p></div>`
   ]
 },
 
 graphs: {
   title: "🕸 Graphs",
   color: "#ff4081",
-  tabs: ["BFS & DFS", "Dijkstra & Topo", "Interview Q&A"],
+  tabs: ["BFS & DFS", "Dijkstra & Topo", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="two-col">
     <div class="detail-section"><h3 class="red">BFS (Shortest Path)</h3>
@@ -1235,14 +1404,34 @@ def topoSort(n, edges):
             if not dfs(nei): return False
         state[node] = 2
         return True
-    return all(dfs(i) for i in range(numCourses))</div></div></div>`
+    return all(dfs(i) for i in range(numCourses))</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🌊</div><div class="analogy-title">BFS = Dropping a Stone in Water</div>
+    <p>When you drop a stone in water, ripples expand outward in perfect circles — <strong>all nodes at distance 1 first, then distance 2, then 3</strong>. That's BFS. The queue ensures you process each "ring" fully before moving to the next.<br><br>
+    This is why BFS gives you the <strong>shortest path in an unweighted graph</strong> — the first time you reach a node, it's via the fewest hops.</p></div>
+    <div class="analogy"><div class="analogy-icon">🧭</div><div class="analogy-title">DFS = Exploring a Maze by Always Turning Left</div>
+    <p>Pick a direction, commit fully until you hit a dead end, then backtrack. DFS dives <strong>as deep as possible</strong> before exploring siblings. Great for finding <em>any</em> path, detecting cycles, and mapping connected components — not for shortest paths.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 BFS vs DFS: The Decision Rule</div>
+    <p>Ask: <strong>"Do I care about the distance / number of steps?"</strong><br>
+    YES → BFS (it processes by level = by distance)<br>
+    NO → DFS (simpler recursion, good for connectivity, cycles, paths)<br><br>
+    Ask: <strong>"Is the graph weighted?"</strong><br>
+    YES → Dijkstra (BFS + priority queue)<br>
+    NO → plain BFS for shortest path</p></div>
+    <div class="analogy"><div class="analogy-icon">📋</div><div class="analogy-title">Topological Sort = Scheduling Classes with Prerequisites</div>
+    <p>You can't take Calculus 2 before Calculus 1. Topological sort gives you a valid order to take all courses. If there's a <strong>cycle</strong> (A requires B requires A), no valid order exists — Kahn's algorithm detects this: if output has fewer nodes than total, there's a cycle.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap #1: Forgetting the visited set</div>
+    <p>Without tracking visited nodes, BFS/DFS on a graph with cycles will loop infinitely. Unlike trees, graphs can have cycles — <strong>always initialize a visited set before traversal</strong>.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap #2: Building the graph in the wrong direction for Topo Sort</div>
+    <p>If edge means "A must come before B", build <code>graph[A].append(B)</code>. A common mistake is reversing this, producing a valid-looking but incorrect ordering.</p></div>`
   ]
 },
 
 dp: {
   title: "⚡ Dynamic Programming",
   color: "#ffd740",
-  tabs: ["1D Patterns", "2D Patterns", "Interview Q&A"],
+  tabs: ["1D Patterns", "2D Patterns", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3 class="yellow">The DP Framework</h3>
     <div class="detail-code">1. Define state: dp[i] = "answer for subproblem i"
@@ -1324,14 +1513,35 @@ return dp[n][capacity]</div></div>
         for j in range(i):
             if dp[j] and s[j:i] in words:
                 dp[i] = True; break
-    return dp[-1]</div></div></div>`
+    return dp[-1]</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">📝</div><div class="analogy-title">DP = Never Solve the Same Sub-Problem Twice</div>
+    <p>Imagine counting paths through a city grid. Every intersection branches into choices. Without DP you re-count the same sub-paths millions of times — exponential work. DP says: <strong>"I've already counted paths from this intersection. Store the answer, look it up."</strong><br><br>
+    The table (dp array) is just a <strong>memo pad</strong> of already-solved smaller problems.</p></div>
+    <div class="analogy"><div class="analogy-icon">🧗</div><div class="analogy-title">DP State = Describing Exactly Where You Are</div>
+    <p>In a climbing problem, your state is "which stair am I on?" — just one number. In a knapsack problem, your state is "which item am I considering AND how much capacity remains?" — two numbers → 2D table.<br><br>
+    <strong>The number of dimensions in your DP table = the number of things that change between sub-problems.</strong></p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 The 3-Question Framework to crack any DP</div>
+    <p><strong>1. What is the state?</strong> (What information do I need to describe a sub-problem uniquely?)<br>
+    <strong>2. What is the transition?</strong> (How does dp[i] relate to smaller dp values? What choices do I have?)<br>
+    <strong>3. What is the base case?</strong> (What's the answer when the problem is trivially small?)<br><br>
+    If you can answer all three, the code writes itself.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Confusing "choices" with "transitions"</div>
+    <p>The transition is the <em>math</em>: <code>dp[i] = max(dp[i-1], dp[i-2] + nums[i])</code>. The choices are: "rob this house OR skip it." Map choices → transition formula before coding.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Wrong iteration order in bottom-up DP</div>
+    <p>In bottom-up DP, you must compute smaller sub-problems before larger ones. For 1D this usually means left-to-right. For 2D knapsack, the order of loops (items outer, capacity inner) matters — reversing them gives wrong answers.</p></div>
+    <div class="flowchart"><b style="color:var(--a4)">🗺 Is it a DP problem?</b><br><br>
+    <div class="flow-step"><div class="flow-diamond">Asks for max/min/count?</div><div class="flow-arrow">→</div><div class="flow-result">Likely DP</div></div>
+    <div class="flow-step"><div class="flow-diamond">Has overlapping sub-problems?</div><div class="flow-arrow">→</div><div class="flow-result">Definitely DP (not just recursion)</div></div>
+    <div class="flow-step"><div class="flow-diamond">Greedy works (locally optimal = globally optimal)?</div><div class="flow-arrow">→</div><div class="flow-result">Use greedy instead — simpler!</div></div></div>`
   ]
 },
 
 backtrack: {
   title: "🔄 Backtracking",
   color: "#c084fc",
-  tabs: ["Template", "Subsets & Perms", "Interview Q&A"],
+  tabs: ["Template", "Subsets & Perms", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3 style="border-color:var(--a6)">Universal Backtracking Template</h3>
     <div class="detail-code">def backtrack(path, choices):
@@ -1415,14 +1625,30 @@ backtrack: {
             board[row][col] = 'Q'
             bt(row + 1)
             board[row][col] = '.'; cols.discard(col); diag1.discard(row-col); diag2.discard(row+col)
-    bt(0); return res</div></div></div>`
+    bt(0); return res</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🗺️</div><div class="analogy-title">Backtracking = Exploring Every Path in a Maze</div>
+    <p>You're in a maze. You pick a direction, walk until you hit a dead end or the exit. Dead end? <strong>Back up to the last fork and try the next direction</strong>. You systematically explore every possible path without ever being lost — because you always know exactly how to undo your last move.<br><br>
+    The <em>undo step</em> (<code>path.pop()</code>, <code>used[i] = False</code>) is the "backing up." Without it, you can't explore sibling branches.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 Backtracking vs DP: The Core Difference</div>
+    <p>Both explore sub-problems recursively. The difference:<br><br>
+    <strong>DP</strong>: sub-problems <em>overlap</em> — same sub-problem appears in multiple branches → memoize it.<br>
+    <strong>Backtracking</strong>: sub-problems are <em>unique</em> (different paths through the solution space) → no memoization, but <strong>prune aggressively</strong>.<br><br>
+    If you find yourself re-computing the same state in a backtracking solution → switch to DP.</p></div>
+    <div class="analogy"><div class="analogy-icon">✂️</div><div class="analogy-title">Pruning = Cutting Branches Off the Decision Tree</div>
+    <p>Without pruning, backtracking is pure brute force. With pruning, you <strong>skip entire subtrees</strong> the moment you know they can't lead to a solution. In Combination Sum: if remaining < 0, stop immediately — no need to try deeper. This single check can reduce O(2ⁿ) to something tractable.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Appending path directly instead of a copy</div>
+    <p><code>results.append(path)</code> appends a <em>reference</em>. As path changes, all "stored" results change too. Always <code>results.append(path[:])</code> or <code>results.append(list(path))</code> to capture a snapshot.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Duplicate results in subset/combination problems</div>
+    <p>If input has duplicates ([1,1,2]) and you want unique subsets, sort first then skip duplicates at the same recursion level: <code>if i > start and nums[i] == nums[i-1]: continue</code>.</p></div>`
   ]
 },
 
 trie: {
   title: "🌐 Trie (Prefix Tree)",
   color: "#00e5ff",
-  tabs: ["Implementation", "Advanced", "Interview Q&A"],
+  tabs: ["Implementation", "Advanced", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3>Full Trie Implementation</h3>
     <div class="detail-code">class TrieNode:
@@ -1500,14 +1726,28 @@ class Trie:
             return any(dfs(child, i+1) for child in node.children.values())
         if c not in node.children: return False
         return dfs(node.children[c], i+1)
-    return dfs(self.root, 0)</div></div></div>`
+    return dfs(self.root, 0)</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">🌲</div><div class="analogy-title">Trie = A Dictionary Organized by Spelling, Letter by Letter</div>
+    <p>A normal dictionary is sorted by whole word. A Trie organizes by <strong>individual letters</strong>. Every path from root to a marked node spells a word. All words starting with "ca" share the same first two nodes (c → a).<br><br>
+    This means: <strong>searching for a prefix = just walk down the tree</strong>. You never need to look at words that don't share the prefix. 10,000 words starting with "z" don't slow down a search for "apple" at all.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 Why is Trie faster than HashMap for prefix search?</div>
+    <p>A HashMap of words can tell you if "apple" exists in O(1). But "find all words starting with 'app'" requires scanning all keys — O(n × word_length).<br><br>
+    A Trie answers "find all words with prefix 'app'" by walking to the 'p' node and collecting everything below — O(prefix_length + output_size). <strong>The structure itself encodes prefix grouping.</strong></p></div>
+    <div class="analogy"><div class="analogy-icon">🔤</div><div class="analogy-title">is_end Flag = The Difference Between a Path and a Word</div>
+    <p>In a Trie of ["car", "card", "care"], the path c→a→r exists for all three. Only <strong>is_end=True</strong> at a node means "a complete word ends here." Without this flag, you couldn't distinguish between "car" being a word vs just being a prefix of "card".</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Confusing search() and startsWith()</div>
+    <p><code>search("apple")</code> must return True only if "apple" was inserted (check <code>node.is_end</code>). <code>startsWith("app")</code> returns True if ANY inserted word begins with "app" (don't check is_end). Mixing these up is the #1 Trie interview mistake.</p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Sharing nodes mutates other words</div>
+    <p>Since nodes are shared, deleting a word from a Trie is tricky — you can't just remove nodes, as they may be part of other words. In interviews, deletion is rarely asked but worth knowing: only remove nodes that have no other children and aren't an end of another word.</p></div>`
   ]
 },
 
 intervals: {
   title: "📅 Intervals",
   color: "#69ff47",
-  tabs: ["Core Patterns", "Meeting Rooms", "Interview Q&A"],
+  tabs: ["Core Patterns", "Meeting Rooms", "Interview Q&A", "🧠 Intuition"],
   content: [
     `<div class="detail-section"><h3 class="green">Merge Overlapping Intervals</h3>
     <div class="detail-code">def merge(intervals):
@@ -1571,7 +1811,24 @@ def minMeetingRooms(intervals):
     <div class="qcard"><div><span class="difficulty medium">MEDIUM</span></div>
     <div class="qcard-title">Interview: Explain overlap detection</div>
     <button class="qa-toggle" onclick="toggleAns(this)">Show Answer ▾</button>
-    <div class="qa-answer"><div class="hint">Two intervals [a,b] and [c,d] overlap if and only if a &lt; d AND c &lt; b (or using ≤ if touching counts). Equivalently: they do NOT overlap if b ≤ c or d ≤ a.</div></div></div>`
+    <div class="qa-answer"><div class="hint">Two intervals [a,b] and [c,d] overlap if and only if a &lt; d AND c &lt; b (or using ≤ if touching counts). Equivalently: they do NOT overlap if b ≤ c or d ≤ a.</div></div></div>`,
+
+    // INTUITION
+    `<div class="analogy"><div class="analogy-icon">📅</div><div class="analogy-title">Intervals = Blocks of Time on a Calendar</div>
+    <p>Merge intervals = "squash overlapping calendar events into one block." Two events overlap if one starts before the other ends — you need to be in two places at once.<br><br>
+    <strong>Always sort by start time first.</strong> Why? Because then you only ever need to check if the new interval overlaps the most recent one in your result — everything further left is already resolved.</p></div>
+    <div class="brain-box"><div class="brain-box-title">💡 The Overlap Test — memorize this</div>
+    <p>Intervals [a, b] and [c, d] overlap <strong>if and only if</strong>: <code>a &lt; d AND c &lt; b</code><br>
+    They do NOT overlap if: <code>b &lt;= c</code> (first ends before second starts) OR <code>d &lt;= a</code> (second ends before first starts).<br><br>
+    Tip: it's easier to remember the <em>non-overlap</em> condition and negate it.</p></div>
+    <div class="analogy"><div class="analogy-icon">🏨</div><div class="analogy-title">Meeting Rooms II = Hotel Room Check-In/Check-Out</div>
+    <p>Guests check in and check out. At any moment, rooms in use = number of overlapping intervals. The min-heap stores <strong>checkout times of occupied rooms</strong>. When a new guest arrives, can any room be reused? Check if the earliest checkout ≤ new arrival. If yes — recycle that room. If no — open a new one.<br><br>
+    <strong>Heap size at the end = peak simultaneous occupancy = min rooms needed.</strong></p></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Sorting by wrong key</div>
+    <p>Merge intervals → sort by <strong>start</strong>. Non-overlapping intervals (greedy removal) → sort by <strong>end</strong>. Using the wrong sort key produces subtly wrong answers that pass most test cases but fail edge cases.</p>
+    <div class="fix">✅ Rule: if you're greedily keeping intervals to maximize count, sort by end (earliest finish = best choice).</div></div>
+    <div class="trap"><div class="trap-title">🚨 Trap: Mutating the result list while iterating</div>
+    <p>In merge intervals, <code>res[-1][1] = max(...)</code> modifies the last element in-place. This only works if res contains mutable lists, not tuples. Using tuples and then trying to modify will throw a TypeError.</p></div>`
   ]
 }
 };
