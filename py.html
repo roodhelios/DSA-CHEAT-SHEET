@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyMaster — Python for Coding Interviews</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-ocean.min.css">
+<style>
+:root{
+  --bg:#07070e;--bg2:#0c0c18;--bg3:#111120;--panel:#0a0a16;
+  --card:#101020;--border:#1c1c30;--border2:#262640;
+  --a1:#00f0b0;--a2:#ff4f8b;--a3:#8b7fff;--a4:#ffb830;--a5:#4fb8ff;
+  --txt:#e0e0f0;--txt2:#9090b8;--txt3:#50507a;
+  --green:#00f0b0;--red:#ff4f6b;--yellow:#ffb830;
+  --sidebar:256px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:"DM Sans",sans-serif;line-height:1.75;overflow-x:hidden;}
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .7s;}
+#loader.gone{opacity:0;pointer-events:none;}
+.ld-snake{font-size:48px;animation:sway 1.4s ease-in-out infinite;}
+@keyframes sway{0%,100%{transform:rotate(-14deg);}50%{transform:rotate(14deg);}}
+.ld-logo{font-family:"Fraunces",serif;font-size:46px;font-weight:900;background:linear-gradient(135deg,var(--a1),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ld-bar-bg{width:300px;height:3px;background:var(--border2);border-radius:3px;overflow:hidden;}
+.ld-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--a3),var(--a1));border-radius:3px;transition:width .4s ease;}
+.ld-msg{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--txt3);letter-spacing:2px;}
+#app{display:flex;height:100vh;overflow:hidden;}
+#sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+#sidebar::-webkit-scrollbar{width:3px;}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border2);}
+.sb-head{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+.sb-brand{display:flex;align-items:center;gap:9px;margin-bottom:14px;}
+.sb-brand-name{font-family:"Fraunces",serif;font-size:21px;font-weight:900;background:linear-gradient(135deg,var(--a1),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-prog-label{display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--txt3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}
+.sb-prog-num{color:var(--a1);font-weight:700;}
+.sb-prog-bar{height:4px;background:var(--border2);border-radius:4px;overflow:hidden;}
+.sb-prog-fill{height:100%;background:linear-gradient(90deg,var(--a3),var(--a1));border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.sb-nav{flex:1;padding:8px 0;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-size:13px;color:var(--txt3);user-select:none;}
+.sb-item:hover{background:rgba(255,255,255,.03);color:var(--txt2);}
+.sb-item.active{background:rgba(0,240,176,.05);color:var(--a1);border-left-color:var(--a1);}
+.sb-item.done .sb-dot{background:var(--a1);box-shadow:0 0 6px rgba(0,240,176,.5);}
+.sb-num{font-family:"JetBrains Mono",monospace;font-size:10px;width:20px;flex-shrink:0;}
+.sb-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);margin-left:auto;flex-shrink:0;transition:all .3s;}
+.sb-item.active .sb-dot{background:var(--a1);box-shadow:0 0 8px rgba(0,240,176,.5);}
+.sb-footer{padding:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+.sb-footer-btn{width:100%;padding:9px;border-radius:8px;cursor:pointer;font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;border:1px solid rgba(0,240,176,.22);background:rgba(0,240,176,.06);color:var(--a1);}
+.sb-footer-btn:hover{background:rgba(0,240,176,.12);transform:translateY(-1px);}
+.sb-footer-btn.violet{border-color:rgba(139,127,255,.3);background:rgba(139,127,255,.08);color:var(--a3);}
+.sb-footer-btn.violet:hover{background:rgba(139,127,255,.14);}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;}
+#main::-webkit-scrollbar{width:5px;}
+#main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+#content{max-width:820px;padding:48px 56px 100px;margin:0 auto;}
+.section{margin-bottom:80px;scroll-margin-top:32px;}
+.sec-hdr{display:flex;align-items:flex-start;gap:16px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.sec-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:23px;flex-shrink:0;background:linear-gradient(135deg,rgba(139,127,255,.18),rgba(0,240,176,.08));border:1px solid rgba(0,240,176,.13);}
+.sec-label{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--a1);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:5px;}
+.sec-title{font-family:"Fraunces",serif;font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.mm{background:linear-gradient(135deg,rgba(139,127,255,.1),rgba(0,240,176,.05));border:1px solid rgba(139,127,255,.22);border-radius:12px;padding:18px 22px;margin-bottom:20px;}
+.mm-top{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;color:var(--a3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.mm p{font-size:14.5px;color:#c0c0e0;line-height:1.75;}
+.mm strong{color:var(--txt);}
+.mm code,.ic{font-family:"JetBrains Mono",monospace;font-size:12px;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:3px;color:#d0d0f8;}
+.analogy{background:rgba(255,184,48,.06);border:1px solid rgba(255,184,48,.17);border-radius:9px;padding:13px 18px;margin:13px 0;font-size:14px;color:#ffe0a0;display:flex;gap:12px;}
+.an-icon{font-size:19px;flex-shrink:0;}
+.concept{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:15px 20px;margin-bottom:12px;position:relative;overflow:hidden;}
+.concept::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;}
+.c-teal::before{background:var(--a1);}.c-pink::before{background:var(--a2);}.c-violet::before{background:var(--a3);}.c-amber::before{background:var(--a4);}.c-sky::before{background:var(--a5);}.c-red::before{background:var(--red);}
+.ctitle{font-weight:600;font-size:14px;margin-bottom:6px;}
+.concept p{font-size:13.5px;color:#a0a0c8;line-height:1.7;margin-bottom:6px;}
+.concept p:last-child{margin-bottom:0;}
+.alert{border-radius:8px;padding:10px 15px;margin:10px 0;font-size:13px;display:flex;gap:10px;align-items:flex-start;}
+.ai{font-size:15px;flex-shrink:0;margin-top:1px;}
+.alert.warn{background:rgba(255,79,107,.07);border:1px solid rgba(255,79,107,.2);color:#ffb8b8;}
+.alert.tip{background:rgba(0,240,176,.06);border:1px solid rgba(0,240,176,.18);color:#aaffee;}
+.alert.info{background:rgba(79,184,255,.06);border:1px solid rgba(79,184,255,.18);color:#bbdeff;}
+.alert.note{background:rgba(139,127,255,.07);border:1px solid rgba(139,127,255,.2);color:#ccc0ff;}
+.alert b{font-weight:600;}.alert code{font-family:"JetBrains Mono",monospace;font-size:11.5px;background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px;}
+.diagram{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto;}
+.diag-title{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:2px;text-transform:uppercase;margin-bottom:13px;}
+.d-row{display:flex;align-items:center;gap:5px;margin:5px 0;flex-wrap:wrap;}
+.d-box{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:7px 12px;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--txt);text-align:center;min-width:38px;}
+.d-box.hi{background:rgba(0,240,176,.12);border-color:rgba(0,240,176,.35);color:var(--a1);}
+.d-box.hi2{background:rgba(255,79,107,.1);border-color:rgba(255,79,107,.3);color:var(--red);}
+.d-box.hi3{background:rgba(139,127,255,.12);border-color:rgba(139,127,255,.35);color:var(--a3);}
+.d-arrow{color:var(--txt3);font-size:18px;line-height:1;}
+.d-lbl{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--txt3);text-align:center;}
+.d-vs{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.d-col-lbl{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:1px;margin-bottom:7px;color:var(--txt3);}
+.d-code{font-family:"JetBrains Mono",monospace;font-size:11.5px;line-height:1.9;background:var(--bg3);padding:11px;border-radius:6px;border:1px solid var(--border);white-space:pre;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:13px 0;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.tbl th{background:rgba(255,255,255,.04);padding:8px 13px;text-align:left;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);border-bottom:1px solid var(--border);}
+.tbl td{padding:8px 13px;border-bottom:1px solid rgba(255,255,255,.03);color:#b0b0d8;font-family:"JetBrains Mono",monospace;font-size:12px;}
+.tbl tr:last-child td{border-bottom:none;}
+.yes{color:var(--green);font-weight:700;}.no{color:var(--red);}
+.editor-wrap{background:#060610;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:13px 0;transition:border-color .2s;}
+.editor-wrap:focus-within{border-color:rgba(0,240,176,.3);}
+.ed-topbar{background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);padding:7px 13px;display:flex;align-items:center;gap:9px;}
+.dots{display:flex;gap:5px;}.dot{width:10px;height:10px;border-radius:50%;}
+.dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+.ed-lang{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--txt3);letter-spacing:2px;flex:1;text-align:center;}
+.ed-btns{display:flex;gap:6px;}
+.btn-run{display:flex;align-items:center;gap:5px;font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:#000;background:var(--a1);border:none;padding:5px 13px;border-radius:5px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.btn-run:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,240,176,.28);}
+.btn-run:disabled{opacity:.3;cursor:not-allowed;transform:none;filter:none;box-shadow:none;}
+.btn-reset{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--txt3);background:none;border:1px solid var(--border);padding:4px 9px;border-radius:5px;cursor:pointer;transition:all .2s;}
+.btn-reset:hover{color:var(--txt2);border-color:var(--border2);}
+.CodeMirror{background:#060610 !important;font-family:"JetBrains Mono",monospace !important;font-size:12.5px !important;line-height:1.65 !important;height:auto !important;}
+.CodeMirror-gutters{background:rgba(255,255,255,.02) !important;border-right:1px solid var(--border) !important;}
+.CodeMirror-linenumber{color:var(--txt3) !important;padding:0 8px !important;}
+.CodeMirror-cursor{border-left-color:var(--a1) !important;}
+.CodeMirror-selected{background:rgba(139,127,255,.2) !important;}
+.output-wrap{border-top:1px solid var(--border);display:none;}
+.output-wrap.show{display:block;}
+.out-hdr{padding:5px 13px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.out-lbl{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;letter-spacing:2px;}
+.out-lbl.ok{color:var(--green);}.out-lbl.err{color:var(--red);}.out-lbl.run{color:var(--yellow);}
+.clr-btn{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--txt3);background:none;border:none;cursor:pointer;transition:color .2s;}
+.clr-btn:hover{color:var(--txt2);}
+.out-body{padding:11px 15px;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;}
+.out-ok{color:var(--a1);}.out-err{color:var(--red);}
+.out-running{color:var(--yellow);font-style:italic;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.quiz-wrap{margin-top:32px;border-radius:13px;overflow:hidden;border:1px solid rgba(139,127,255,.28);background:linear-gradient(180deg,rgba(139,127,255,.06) 0%,transparent 60%);}
+.qw-header{padding:15px 20px;background:linear-gradient(90deg,rgba(139,127,255,.14),rgba(0,240,176,.06));border-bottom:1px solid rgba(139,127,255,.2);display:flex;align-items:center;gap:11px;}
+.qw-icon{font-size:20px;}
+.qw-title{font-family:"Fraunces",serif;font-size:16px;font-weight:700;flex:1;}
+.qw-meta{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--txt3);letter-spacing:1px;}
+.qw-body{padding:22px;}
+.q-blk{display:none;}
+.q-blk.active{display:block;}
+.q-type-tag{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:4px;margin-bottom:10px;}
+.qt-out{background:rgba(79,184,255,.11);border:1px solid rgba(79,184,255,.24);color:var(--a5);}
+.qt-bug{background:rgba(255,79,107,.09);border:1px solid rgba(255,79,107,.24);color:var(--red);}
+.qt-blank{background:rgba(255,184,48,.09);border:1px solid rgba(255,184,48,.24);color:var(--yellow);}
+.qt-concept{background:rgba(139,127,255,.11);border:1px solid rgba(139,127,255,.24);color:var(--a3);}
+.qt-logic{background:rgba(0,240,176,.09);border:1px solid rgba(0,240,176,.24);color:var(--a1);}
+.q-text{font-size:15px;font-weight:500;margin-bottom:13px;line-height:1.65;}
+.q-codesnip{background:#040410;border:1px solid var(--border);border-radius:7px;padding:13px 15px;font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--txt2);margin-bottom:13px;line-height:1.65;white-space:pre;overflow-x:auto;}
+.q-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:13px;}
+.q-opt{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 15px;cursor:pointer;font-size:13.5px;transition:all .15s;display:flex;align-items:flex-start;gap:11px;user-select:none;}
+.q-opt:hover:not(.answered){border-color:var(--border2);background:rgba(255,255,255,.04);}
+.q-opt.answered{cursor:default;}
+.q-opt.correct{border-color:var(--a1);background:rgba(0,240,176,.09);color:var(--a1);}
+.q-opt.wrong{border-color:var(--red);background:rgba(255,79,107,.07);color:var(--red);}
+.q-key{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid var(--border2);font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.q-fb{border-radius:8px;padding:11px 15px;font-size:13.5px;margin-bottom:13px;display:none;line-height:1.65;}
+.q-fb.show{display:block;}
+.q-fb.right{background:rgba(0,240,176,.08);border:1px solid rgba(0,240,176,.21);color:#aafff0;}
+.q-fb.wrong{background:rgba(255,79,107,.07);border:1px solid rgba(255,79,107,.2);color:#ffb8b8;}
+.q-fb b{font-weight:700;}
+.q-fb code{font-family:"JetBrains Mono",monospace;font-size:12px;background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px;}
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:13px;}
+.q-dots{display:flex;gap:5px;}
+.qdot{width:7px;height:7px;border-radius:50%;background:var(--border2);transition:all .2s;}
+.qdot.cur{background:var(--a3);box-shadow:0 0 6px var(--a3);}
+.qdot.ok{background:var(--a1);}.qdot.ko{background:var(--red);}
+.btn-next{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:8px 18px;border-radius:6px;border:none;cursor:pointer;background:var(--a3);color:#fff;transition:all .2s;}
+.btn-next:hover{background:#a49fff;transform:translateY(-1px);}
+.btn-next:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+.q-result{padding:28px;text-align:center;border-top:1px solid var(--border);display:none;background:linear-gradient(180deg,rgba(139,127,255,.06),transparent);}
+.q-result.show{display:block;}
+.q-score-big{font-family:"Fraunces",serif;font-size:52px;font-weight:900;background:linear-gradient(135deg,var(--a1),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.q-res-lbl{font-size:13px;color:var(--txt3);margin-top:3px;margin-bottom:14px;}
+.q-verdict{display:inline-block;padding:5px 17px;border-radius:20px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:18px;}
+.v-master{background:rgba(0,240,176,.12);border:1px solid rgba(0,240,176,.3);color:var(--a1);}
+.v-good{background:rgba(139,127,255,.12);border:1px solid rgba(139,127,255,.3);color:var(--a3);}
+.v-retry{background:rgba(255,184,48,.1);border:1px solid rgba(255,184,48,.27);color:var(--yellow);}
+.q-res-btns{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
+.btn-mark{display:inline-flex;align-items:center;gap:5px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:9px 18px;border-radius:7px;cursor:pointer;border:none;background:var(--a1);color:#000;transition:all .2s;}
+.btn-mark:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-mark:disabled{opacity:.5;cursor:not-allowed;transform:none;filter:none;}
+.btn-shuffle{display:inline-flex;align-items:center;gap:5px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:9px 18px;border-radius:7px;cursor:pointer;background:none;border:1px solid var(--border2);color:var(--txt2);transition:all .2s;}
+.btn-shuffle:hover{background:rgba(255,255,255,.05);border-color:var(--a3);color:var(--a3);}
+.sr-banner{background:linear-gradient(135deg,rgba(0,240,176,.08),rgba(139,127,255,.08));border:1px solid rgba(0,240,176,.2);border-radius:10px;padding:14px 18px;margin-top:14px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .2s;user-select:none;}
+.sr-banner:hover{background:linear-gradient(135deg,rgba(0,240,176,.13),rgba(139,127,255,.12));transform:translateY(-1px);}
+.sr-icon{font-size:21px;}
+.sr-text strong{display:block;font-size:14px;font-weight:600;color:var(--a1);}
+.sr-text span{font-size:12px;color:var(--txt3);}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:8000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(7px);}
+.modal-box{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:32px;max-width:680px;width:93%;max-height:88vh;overflow-y:auto;}
+.modal-box::-webkit-scrollbar{width:4px;}
+.modal-box::-webkit-scrollbar-thumb{background:var(--border2);}
+.modal-title{font-family:"Fraunces",serif;font-size:22px;font-weight:700;margin-bottom:5px;}
+.modal-sub{font-size:13px;color:var(--txt3);margin-bottom:22px;}
+.modal-close-wrap{text-align:right;margin-top:18px;}
+.modal-close{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--txt2);background:none;border:1px solid var(--border2);padding:7px 16px;border-radius:6px;cursor:pointer;transition:all .2s;}
+.modal-close:hover{color:var(--txt);border-color:var(--border2);background:rgba(255,255,255,.04);}
+#sandbox-section{padding:48px 56px 100px;max-width:820px;margin:0 auto;border-top:1px solid var(--border);}
+.sb2-hdr{margin-bottom:22px;}
+.sb2-title{font-family:"Fraunces",serif;font-size:24px;font-weight:700;margin-bottom:5px;}
+.sb2-sub{font-size:13px;color:var(--txt3);}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="ld-snake">🐍</div>
+  <div class="ld-logo">PyMaster</div>
+  <div class="ld-bar-bg"><div class="ld-bar" id="lbar"></div></div>
+  <div class="ld-msg" id="lmsg">LOADING PYTHON RUNTIME</div>
+</div>
+
+<div id="app">
+<aside id="sidebar">
+  <div class="sb-head">
+    <div class="sb-brand"><span style="font-size:22px">🐍</span><span class="sb-brand-name">PyMaster</span></div>
+    <div class="sb-prog-label">PROGRESS<span class="sb-prog-num" id="prog-txt">0 / 13</span></div>
+    <div class="sb-prog-bar"><div class="sb-prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <div class="sb-item active" data-sec="s1" onclick="goTo('s1')"><span class="sb-num">01</span>Variables<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s2" onclick="goTo('s2')"><span class="sb-num">02</span>If / Else<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s3" onclick="goTo('s3')"><span class="sb-num">03</span>Loops<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s4" onclick="goTo('s4')"><span class="sb-num">04</span>Math<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s5" onclick="goTo('s5')"><span class="sb-num">05</span>Lists<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s6" onclick="goTo('s6')"><span class="sb-num">06</span>Strings<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s7" onclick="goTo('s7')"><span class="sb-num">07</span>Queues<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s8" onclick="goTo('s8')"><span class="sb-num">08</span>Hash Sets<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s9" onclick="goTo('s9')"><span class="sb-num">09</span>Hash Maps<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s10" onclick="goTo('s10')"><span class="sb-num">10</span>Tuples<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s11" onclick="goTo('s11')"><span class="sb-num">11</span>Heaps<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s12" onclick="goTo('s12')"><span class="sb-num">12</span>Functions<span class="sb-dot"></span></div>
+    <div class="sb-item" data-sec="s13" onclick="goTo('s13')"><span class="sb-num">13</span>Classes<span class="sb-dot"></span></div>
+  </nav>
+  <div class="sb-footer">
+    <button class="sb-footer-btn" onclick="goTo('sandbox')">🏖️ Free Sandbox</button>
+    <button class="sb-footer-btn violet" onclick="openReview()">🔁 Mixed Review</button>
+  </div>
+</aside>
+
+<div id="main">
+<div id="content">
+
+<!-- ═══════════════════════════════════════════════ SECTION 1: VARIABLES -->
+<div class="section" id="s1">
+<div class="sec-hdr">
+  <div class="sec-icon">📦</div>
+  <div><div class="sec-label">Section 01</div><div class="sec-title">Variables & Types</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python variables are <strong>labels on sticky notes</strong>, not boxes. A label can move to any value — a number today, a string tomorrow. You never declare a type because Python figures it out when you assign. Multiple labels can point to the same note.</p>
+</div>
+<div class="analogy"><span class="an-icon">💡</span><span>Think of it like JavaScript's <code>let</code>/<code>var</code> but without any type coercion nonsense. Python just works.</span></div>
+<div class="concept c-teal">
+  <div class="ctitle">Dynamic Typing</div>
+  <p>Variables get their type from the value assigned, not a declaration. <code>n = 0</code> makes <code>n</code> an int. <code>n = "hello"</code> makes it a string. Same variable, different type.</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Multiple Assignment & Swap</div>
+  <p>Python's killer trick: <code>a, b = 1, 2</code> assigns both at once. And <code>a, b = b, a</code> swaps without a temp variable — Python evaluates the right side fully first.</p>
+</div>
+<div class="concept c-pink">
+  <div class="ctitle">None — Python's null</div>
+  <p><code>None</code> is Python's null. Use <code>if x is None</code> (identity check) instead of <code>if x == None</code>. Both work, but <code>is</code> is the idiomatic way.</p>
+</div>
+<div class="alert warn"><span class="ai">⚠️</span><span><b>No ++ operator!</b> Python doesn't have <code>++</code> or <code>--</code>. Use <code>n += 1</code> and <code>n -= 1</code> instead. Writing <code>n++</code> is a syntax error.</span></div>
+<div class="alert tip"><span class="ai">✅</span><span><b>Types you'll use:</b> <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>None</code>. Check with <code>type(x)</code> or test with <code>isinstance(x, int)</code>.</span></div>
+
+<div class="editor-wrap" id="ew-s1">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s1')">↺ Reset</button><button class="btn-run" onclick="runCode('s1')" id="run-s1">▶ Run</button></div></div>
+  <textarea id="code-s1">
+# Variables & Types — try everything here
+n = 0
+print(type(n))          # <class 'int'>
+
+# Multiple assignment
+a, b = 10, 20
+print(a, b)             # 10 20
+
+# Swap without temp variable!
+a, b = b, a
+print(a, b)             # 20 10
+
+# Dynamic typing — same variable, different type
+x = 42
+x = "now a string"
+x = True
+print(x, type(x))
+
+# None check
+val = None
+print(val is None)      # True
+
+# No ++ in Python — use +=
+count = 5
+count += 1
+print(count)            # 6
+</textarea>
+  <div class="output-wrap" id="out-s1"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s1">OUTPUT</span><button class="clr-btn" onclick="clearOut('s1')">✕ clear</button></div><div class="out-body" id="out-body-s1"></div></div>
+</div>
+
+<div class="quiz-wrap" id="quiz-s1">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Variables & Types — Quiz</span><span class="qw-meta" id="qmeta-s1">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s1"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 2: IF/ELSE -->
+<div class="section" id="s2">
+<div class="sec-hdr">
+  <div class="sec-icon">🔀</div>
+  <div><div class="sec-label">Section 02</div><div class="sec-title">If / Else</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python uses <strong>indentation as syntax</strong> — no curly braces. The <code>elif</code> keyword replaces <code>else if</code>. Conditions are plain English: <code>and</code>, <code>or</code>, <code>not</code> instead of <code>&&</code>, <code>||</code>, <code>!</code>.</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">elif, not else if</div>
+  <p>Python's keyword is <code>elif</code>, a contraction of "else if". A chain of <code>if / elif / elif / else</code> checks top-to-bottom and stops at the first true condition.</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Chained Comparisons</div>
+  <p>Python supports <code>1 &lt; x &lt; 10</code> — a chained comparison that reads exactly like math. No need to write <code>x &gt; 1 and x &lt; 10</code>.</p>
+</div>
+<div class="concept c-sky">
+  <div class="ctitle">Truthiness & Falsiness</div>
+  <p>Falsy values: <code>False</code>, <code>0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>None</code>. Everything else is truthy. So <code>if my_list:</code> checks if the list is non-empty.</p>
+</div>
+<div class="alert info"><span class="ai">💡</span><span><b>Multi-line conditions</b> can be wrapped in parentheses: <code>if (a == 1 and b == 2 and c == 3):</code> — the parens let you break across lines.</span></div>
+
+<div class="editor-wrap" id="ew-s2">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s2')">↺ Reset</button><button class="btn-run" onclick="runCode('s2')" id="run-s2">▶ Run</button></div></div>
+  <textarea id="code-s2">
+# If / Else — Python style
+score = 85
+
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+elif score >= 70:
+    grade = "C"
+else:
+    grade = "F"
+print(grade)  # B
+
+# Chained comparisons — Python exclusive!
+x = 5
+print(1 < x < 10)   # True — like math notation
+
+# Boolean operators are words
+a, b = True, False
+print(a and b)       # False
+print(a or b)        # True
+print(not a)         # False
+
+# Truthiness check
+lst = [1, 2, 3]
+if lst:
+    print("list is non-empty")
+
+empty = []
+if not empty:
+    print("list is empty")
+</textarea>
+  <div class="output-wrap" id="out-s2"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s2">OUTPUT</span><button class="clr-btn" onclick="clearOut('s2')">✕ clear</button></div><div class="out-body" id="out-body-s2"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s2">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">If / Else — Quiz</span><span class="qw-meta" id="qmeta-s2">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s2"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 3: LOOPS -->
+<div class="section" id="s3">
+<div class="sec-hdr">
+  <div class="sec-icon">🔁</div>
+  <div><div class="sec-label">Section 03</div><div class="sec-title">Loops</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python has <code>while</code> and <code>for</code> loops. The <code>for</code> loop iterates over any iterable — lists, ranges, strings, etc. <code>range()</code> is the go-to tool for index-based iteration.</p>
+</div>
+<div class="diagram">
+  <div class="diag-title">range() Variants</div>
+  <div class="d-row"><div class="d-box hi">range(5)</div><div class="d-arrow">→</div><div class="d-box">0</div><div class="d-box">1</div><div class="d-box">2</div><div class="d-box">3</div><div class="d-box">4</div></div>
+  <div class="d-row" style="margin-top:10px"><div class="d-box hi">range(2,6)</div><div class="d-arrow">→</div><div class="d-box">2</div><div class="d-box">3</div><div class="d-box">4</div><div class="d-box">5</div></div>
+  <div class="d-row" style="margin-top:10px"><div class="d-box hi">range(0,10,3)</div><div class="d-arrow">→</div><div class="d-box">0</div><div class="d-box">3</div><div class="d-box">6</div><div class="d-box">9</div></div>
+  <div class="d-row" style="margin-top:10px"><div class="d-box hi2">range(4,-1,-1)</div><div class="d-arrow">→</div><div class="d-box">4</div><div class="d-box">3</div><div class="d-box">2</div><div class="d-box">1</div><div class="d-box">0</div></div>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">range(n) — 0 to n-1</div>
+  <p><code>for i in range(n)</code> is the standard C-style loop. <code>range(start, stop, step)</code> gives full control. The stop is <em>exclusive</em>.</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Reverse iteration</div>
+  <p>To loop backwards: <code>range(n-1, -1, -1)</code>. Stop is <code>-1</code> because range is exclusive, and you want to include index 0.</p>
+</div>
+<div class="alert tip"><span class="ai">✅</span><span><code>break</code> exits the loop immediately. <code>continue</code> skips to the next iteration. <code>pass</code> is a no-op placeholder.</span></div>
+
+<div class="editor-wrap" id="ew-s3">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s3')">↺ Reset</button><button class="btn-run" onclick="runCode('s3')" id="run-s3">▶ Run</button></div></div>
+  <textarea id="code-s3">
+# Loops — all the patterns
+
+# While loop
+i = 0
+while i < 3:
+    print(i)
+    i += 1
+
+# for + range
+for j in range(5):
+    print(j, end=" ")
+print()  # newline
+
+# range with start and stop
+for k in range(2, 7):
+    print(k, end=" ")
+print()
+
+# range with step
+for n in range(0, 20, 5):
+    print(n, end=" ")
+print()
+
+# Reverse loop
+for r in range(4, -1, -1):
+    print(r, end=" ")
+print()
+
+# Iterate directly over a list
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print(fruit)
+
+# break and continue
+for x in range(10):
+    if x == 3:
+        continue   # skip 3
+    if x == 6:
+        break      # stop at 6
+    print(x, end=" ")
+print()
+</textarea>
+  <div class="output-wrap" id="out-s3"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s3">OUTPUT</span><button class="clr-btn" onclick="clearOut('s3')">✕ clear</button></div><div class="out-body" id="out-body-s3"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s3">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Loops — Quiz</span><span class="qw-meta" id="qmeta-s3">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s3"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 4: MATH -->
+<div class="section" id="s4">
+<div class="sec-hdr">
+  <div class="sec-icon">🔢</div>
+  <div><div class="sec-label">Section 04</div><div class="sec-title">Math & Division</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python 3 changed division forever: <code>/</code> always gives a <strong>float</strong>. Use <code>//</code> for integer floor division. The floor division catches people off guard with <strong>negative numbers</strong> — it floors toward negative infinity, not toward zero.</p>
+</div>
+<div class="alert warn"><span class="ai">⚠️</span><span><b>Critical gotcha:</b> <code>-3 // 2</code> is <code>-2</code> in Python (floors to -∞). In Java/C++ it's <code>-1</code> (truncates toward 0). Use <code>int(-3 / 2)</code> to get Java-style truncation.</span></div>
+<div class="concept c-teal">
+  <div class="ctitle">Division operators</div>
+  <p><code>5 / 2</code> → <code>2.5</code> (always float). <code>5 // 2</code> → <code>2</code> (floor integer). <code>5 % 2</code> → <code>1</code> (modulo/remainder).</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Infinity</div>
+  <p><code>float('inf')</code> and <code>float('-inf')</code> represent positive and negative infinity. Useful as sentinel values: initialize a min-tracker to <code>float('inf')</code>.</p>
+</div>
+<div class="concept c-amber">
+  <div class="ctitle">math module</div>
+  <p><code>import math</code> gives you <code>math.floor()</code>, <code>math.ceil()</code>, <code>math.sqrt()</code>, <code>math.log()</code>, <code>math.pow()</code>, and constants <code>math.pi</code>, <code>math.e</code>.</p>
+</div>
+
+<div class="editor-wrap" id="ew-s4">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s4')">↺ Reset</button><button class="btn-run" onclick="runCode('s4')" id="run-s4">▶ Run</button></div></div>
+  <textarea id="code-s4">
+import math
+
+# Division
+print(5 / 2)     # 2.5 — always float!
+print(5 // 2)    # 2   — floor division
+
+# THE GOTCHA: negative floor division
+print(-3 // 2)   # -2  (floors toward -inf)
+print(int(-3/2)) # -1  (truncates toward 0, Java-style)
+
+# Modulo
+print(10 % 3)    # 1
+print(-1 % 10)   # 9 (Python modulo always non-negative if divisor positive)
+
+# Powers
+print(2 ** 10)   # 1024
+print(math.sqrt(16))  # 4.0
+
+# Infinity — great for interview problems
+inf = float('inf')
+best = float('inf')
+for val in [5, 3, 8, 1, 9]:
+    best = min(best, val)
+print(best)      # 1
+
+# Type conversion
+print(int(3.9))  # 3 (truncates, not rounds)
+print(float(5))  # 5.0
+</textarea>
+  <div class="output-wrap" id="out-s4"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s4">OUTPUT</span><button class="clr-btn" onclick="clearOut('s4')">✕ clear</button></div><div class="out-body" id="out-body-s4"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s4">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Math & Division — Quiz</span><span class="qw-meta" id="qmeta-s4">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s4"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 5: LISTS -->
+<div class="section" id="s5">
+<div class="sec-hdr">
+  <div class="sec-icon">📋</div>
+  <div><div class="sec-label">Section 05</div><div class="sec-title">Lists</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python lists are <strong>dynamic arrays</strong>. <code>append</code> and <code>pop</code> from the end are O(1). <code>insert</code> and <code>pop(0)</code> are O(n) because they shift elements. Negative indexing (<code>[-1]</code>) accesses from the end.</p>
+</div>
+<div class="alert warn"><span class="ai">⚠️</span><span><b>2D list trap!</b> <code>[[0]*4]*4</code> creates 4 references to the <em>same</em> inner list. Use <code>[[0]*4 for _ in range(4)]</code> to create independent rows.</span></div>
+<div class="diagram">
+  <div class="diag-title">List Indexing</div>
+  <div class="d-row">
+    <div class="d-box hi">0</div><div class="d-box">1</div><div class="d-box">2</div><div class="d-box">3</div><div class="d-box hi2">4</div>
+  </div>
+  <div class="d-row">
+    <div class="d-box dim">a</div><div class="d-box dim">b</div><div class="d-box dim">c</div><div class="d-box dim">d</div><div class="d-box dim">e</div>
+  </div>
+  <div class="d-row">
+    <div class="d-box dim">-5</div><div class="d-box dim">-4</div><div class="d-box dim">-3</div><div class="d-box dim">-2</div><div class="d-box hi2">-1</div>
+  </div>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">Core operations & complexities</div>
+  <p><code>append(x)</code> O(1) · <code>pop()</code> O(1) · <code>insert(i,x)</code> O(n) · <code>pop(0)</code> O(n) · <code>len(lst)</code> O(1) · <code>lst[i]</code> O(1)</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Slicing</div>
+  <p><code>lst[start:stop:step]</code> — all optional. <code>lst[::-1]</code> reverses a list. <code>lst[1:4]</code> gives indices 1,2,3. Slicing creates a shallow copy.</p>
+</div>
+<div class="concept c-sky">
+  <div class="ctitle">enumerate & zip</div>
+  <p><code>enumerate(lst)</code> gives <code>(index, value)</code> pairs. <code>zip(a, b)</code> pairs elements from two lists. Both are lazy iterators — wrap in <code>list()</code> to print.</p>
+</div>
+<div class="concept c-amber">
+  <div class="ctitle">List Comprehension</div>
+  <p><code>[x*2 for x in range(5)]</code> creates a new list. Add a filter: <code>[x for x in lst if x > 0]</code>. More readable and faster than equivalent loops.</p>
+</div>
+
+<div class="editor-wrap" id="ew-s5">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s5')">↺ Reset</button><button class="btn-run" onclick="runCode('s5')" id="run-s5">▶ Run</button></div></div>
+  <textarea id="code-s5">
+# Lists — comprehensive demo
+nums = [3, 1, 4, 1, 5, 9]
+
+# Append / pop
+nums.append(2)
+print(nums)           # [3,1,4,1,5,9,2]
+print(nums.pop())     # 2
+print(nums[-1])       # 9 (last element)
+
+# Slicing
+print(nums[1:4])      # [1,4,1]
+print(nums[::-1])     # reversed copy
+
+# 2D list — CORRECT way
+grid = [[0]*3 for _ in range(3)]
+grid[0][0] = 99
+print(grid[0])        # [99, 0, 0]
+print(grid[1])        # [0, 0, 0]  — independent!
+
+# enumerate
+words = ["cat", "dog", "bird"]
+for i, w in enumerate(words):
+    print(i, w)
+
+# zip
+a = [1, 2, 3]
+b = ["x", "y", "z"]
+for n, c in zip(a, b):
+    print(n, c)
+
+# Sorting with key
+pairs = [(1, 'b'), (3, 'a'), (2, 'c')]
+pairs.sort(key=lambda x: x[0])
+print(pairs)
+
+# List comprehension with filter
+evens = [x for x in range(10) if x % 2 == 0]
+print(evens)
+</textarea>
+  <div class="output-wrap" id="out-s5"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s5">OUTPUT</span><button class="clr-btn" onclick="clearOut('s5')">✕ clear</button></div><div class="out-body" id="out-body-s5"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s5">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Lists — Quiz</span><span class="qw-meta" id="qmeta-s5">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s5"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 6: STRINGS -->
+<div class="section" id="s6">
+<div class="sec-hdr">
+  <div class="sec-icon">🔤</div>
+  <div><div class="sec-label">Section 06</div><div class="sec-title">Strings</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Strings in Python are <strong>immutable sequences of characters</strong>. You can slice and index them like lists, but you can't change a character in place. Building strings with <code>+=</code> in a loop is O(n²) — use <code>join()</code> instead.</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">Immutability</div>
+  <p>You cannot do <code>s[0] = 'X'</code> — strings are immutable. Convert to a list to mutate, then join back: <code>chars = list(s); chars[0] = 'X'; s = ''.join(chars)</code></p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">ord() and chr()</div>
+  <p><code>ord('a')</code> → 97 (ASCII value). <code>chr(97)</code> → 'a'. Essential for problems involving character arithmetic, like checking if a char is alphabetic or computing offsets.</p>
+</div>
+<div class="concept c-pink">
+  <div class="ctitle">join() — the right way to build strings</div>
+  <p><code>''.join(list_of_chars)</code> builds a string from parts in O(n). Concatenating with <code>+=</code> in a loop creates a new string each iteration → O(n²).</p>
+</div>
+<div class="alert info"><span class="ai">💡</span><span>Useful methods: <code>.split()</code>, <code>.strip()</code>, <code>.lower()</code>, <code>.upper()</code>, <code>.replace(old, new)</code>, <code>.startswith()</code>, <code>.endswith()</code>.</span></div>
+
+<div class="editor-wrap" id="ew-s6">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s6')">↺ Reset</button><button class="btn-run" onclick="runCode('s6')" id="run-s6">▶ Run</button></div></div>
+  <textarea id="code-s6">
+# Strings
+s = "hello"
+
+# Indexing and slicing (just like lists)
+print(s[0])      # h
+print(s[-1])     # o
+print(s[1:4])    # ell
+print(s[::-1])   # olleh (reverse)
+
+# Immutability — this fails:
+# s[0] = 'H'  → TypeError!
+
+# To modify, convert to list
+chars = list(s)
+chars[0] = 'H'
+print(''.join(chars))  # Hello
+
+# ord and chr
+print(ord('a'))  # 97
+print(ord('z') - ord('a'))  # 25
+print(chr(65))   # A
+
+# Efficient string building
+parts = []
+for i in range(5):
+    parts.append(str(i))
+result = '-'.join(parts)
+print(result)    # 0-1-2-3-4
+
+# Type conversion
+print(str(42))       # "42"
+print(int("123"))    # 123
+print(float("3.14")) # 3.14
+
+# Useful methods
+sentence = "  Hello, World!  "
+print(sentence.strip())
+print(sentence.lower())
+print(sentence.split(','))
+</textarea>
+  <div class="output-wrap" id="out-s6"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s6">OUTPUT</span><button class="clr-btn" onclick="clearOut('s6')">✕ clear</button></div><div class="out-body" id="out-body-s6"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s6">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Strings — Quiz</span><span class="qw-meta" id="qmeta-s6">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s6"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 7: QUEUES -->
+<div class="section" id="s7">
+<div class="sec-hdr">
+  <div class="sec-icon">🚶</div>
+  <div><div class="sec-label">Section 07</div><div class="sec-title">Queues (deque)</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>A queue is a <strong>double-ended line</strong>. Python's <code>collections.deque</code> is a doubly-linked list that supports O(1) append/pop from both ends. Never use a regular list as a queue — <code>list.pop(0)</code> is O(n) and will TLE.</p>
+</div>
+<div class="diagram">
+  <div class="diag-title">deque vs list for queue ops</div>
+  <div class="d-vs">
+    <div>
+      <div class="d-col-lbl" style="color:var(--a1)">DEQUE — O(1) both ends</div>
+      <div class="d-code">appendleft(x)  ← front
+append(x)      → back
+popleft()      ← front O(1)
+pop()          → back  O(1)</div>
+    </div>
+    <div>
+      <div class="d-col-lbl" style="color:var(--red)">LIST — O(n) at front</div>
+      <div class="d-code">insert(0, x)   ← O(n)!
+append(x)      → O(1)
+pop(0)         ← O(n)!
+pop()          → O(1)</div>
+    </div>
+  </div>
+</div>
+<div class="alert warn"><span class="ai">⚠️</span><span>In BFS, every node gets enqueued once. If <code>dequeue</code> is O(n), your BFS is accidentally O(n²). Always use <code>deque</code> and <code>popleft()</code>.</span></div>
+
+<div class="editor-wrap" id="ew-s7">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s7')">↺ Reset</button><button class="btn-run" onclick="runCode('s7')" id="run-s7">▶ Run</button></div></div>
+  <textarea id="code-s7">
+from collections import deque
+
+# Create a deque
+q = deque()
+
+# Enqueue (add to back)
+q.append(1)
+q.append(2)
+q.append(3)
+print(q)          # deque([1, 2, 3])
+
+# Dequeue (remove from front) — O(1)!
+print(q.popleft())  # 1
+print(q)            # deque([2, 3])
+
+# Double-ended — add/remove from front too
+q.appendleft(0)
+print(q)          # deque([0, 2, 3])
+
+# Initialize with values
+q2 = deque([10, 20, 30])
+print(len(q2))    # 3
+print(q2[0])      # 10 (peek front)
+print(q2[-1])     # 30 (peek back)
+
+# BFS pattern (classic)
+graph = {1: [2, 3], 2: [4], 3: [4], 4: []}
+visited = set()
+bfs_q = deque([1])
+visited.add(1)
+order = []
+while bfs_q:
+    node = bfs_q.popleft()
+    order.append(node)
+    for nei in graph[node]:
+        if nei not in visited:
+            visited.add(nei)
+            bfs_q.append(nei)
+print("BFS order:", order)
+</textarea>
+  <div class="output-wrap" id="out-s7"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s7">OUTPUT</span><button class="clr-btn" onclick="clearOut('s7')">✕ clear</button></div><div class="out-body" id="out-body-s7"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s7">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Queues — Quiz</span><span class="qw-meta" id="qmeta-s7">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s7"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 8: HASH SETS -->
+<div class="section" id="s8">
+<div class="sec-hdr">
+  <div class="sec-icon">🎯</div>
+  <div><div class="sec-label">Section 08</div><div class="sec-title">Hash Sets</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>A set is a <strong>hash table with only keys, no values</strong>. It gives you O(1) membership testing, insertion, and deletion. No duplicates allowed. Use it when you need "have I seen this before?" in O(1).</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">Core operations — all O(1)</div>
+  <p><code>s.add(x)</code> · <code>s.remove(x)</code> (raises if missing) · <code>s.discard(x)</code> (safe remove) · <code>x in s</code> (O(1) lookup!) · <code>len(s)</code></p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Set operations</div>
+  <p><code>a & b</code> intersection · <code>a | b</code> union · <code>a - b</code> difference · <code>a ^ b</code> symmetric difference. Or use methods: <code>.intersection()</code>, <code>.union()</code>, etc.</p>
+</div>
+<div class="alert info"><span class="ai">💡</span><span>Sets only store <strong>hashable</strong> items — ints, strings, tuples. Lists and dicts can't be stored in sets. Sets are unordered — iteration order is unpredictable.</span></div>
+
+<div class="editor-wrap" id="ew-s8">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s8')">↺ Reset</button><button class="btn-run" onclick="runCode('s8')" id="run-s8">▶ Run</button></div></div>
+  <textarea id="code-s8">
+# Hash Sets
+s = {1, 2, 3, 3, 2}
+print(s)            # {1, 2, 3} — no duplicates
+
+# O(1) operations
+s.add(4)
+s.remove(1)
+print(s)            # {2, 3, 4}
+
+# O(1) membership test (vs list O(n))
+print(3 in s)       # True
+print(5 in s)       # False
+
+# Discard (no error if missing)
+s.discard(99)       # fine!
+
+# Set operations
+a = {1, 2, 3, 4}
+b = {3, 4, 5, 6}
+print(a & b)        # {3, 4}  intersection
+print(a | b)        # {1,2,3,4,5,6} union
+print(a - b)        # {1, 2}  a minus b
+
+# Set comprehension
+squares = {x*x for x in range(6)}
+print(squares)
+
+# Deduplication pattern
+lst = [1, 2, 2, 3, 3, 3, 4]
+unique = list(set(lst))
+print(sorted(unique))  # [1, 2, 3, 4]
+
+# Visited set for DFS/BFS
+visited = set()
+visited.add((0, 0))
+visited.add((1, 1))
+print((0,0) in visited)  # True — tuples are hashable
+</textarea>
+  <div class="output-wrap" id="out-s8"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s8">OUTPUT</span><button class="clr-btn" onclick="clearOut('s8')">✕ clear</button></div><div class="out-body" id="out-body-s8"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s8">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Hash Sets — Quiz</span><span class="qw-meta" id="qmeta-s8">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s8"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 9: HASH MAPS -->
+<div class="section" id="s9">
+<div class="sec-hdr">
+  <div class="sec-icon">🗺️</div>
+  <div><div class="sec-label">Section 09</div><div class="sec-title">Hash Maps (dict)</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python's <code>dict</code> is a hash map. Use it to <strong>count frequencies, cache results, build adjacency lists</strong>, or map one value to another. The <code>.get(key, default)</code> method is your best friend — no KeyError, returns default if missing.</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">Safe access with .get()</div>
+  <p><code>d.get(key, 0)</code> returns 0 if key doesn't exist instead of raising <code>KeyError</code>. The frequency-counting pattern: <code>count[c] = count.get(c, 0) + 1</code>.</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Iterating a dict</div>
+  <p><code>d.keys()</code>, <code>d.values()</code>, <code>d.items()</code>. The most common pattern: <code>for key, val in d.items():</code>. In Python 3.7+ dicts maintain insertion order.</p>
+</div>
+<div class="concept c-sky">
+  <div class="ctitle">defaultdict shortcut</div>
+  <p><code>from collections import defaultdict</code>. <code>defaultdict(int)</code> auto-initializes missing keys to 0. <code>defaultdict(list)</code> auto-initializes to <code>[]</code>.</p>
+</div>
+
+<div class="editor-wrap" id="ew-s9">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s9')">↺ Reset</button><button class="btn-run" onclick="runCode('s9')" id="run-s9">▶ Run</button></div></div>
+  <textarea id="code-s9">
+from collections import defaultdict
+
+# Basic dict
+d = {"a": 1, "b": 2}
+print(d["a"])         # 1
+
+# Safe get
+print(d.get("c", 0))  # 0 (no KeyError!)
+
+# Frequency counter — classic interview pattern
+s = "aabbccaab"
+count = {}
+for c in s:
+    count[c] = count.get(c, 0) + 1
+print(count)
+
+# Iterating
+for key, val in count.items():
+    print(f"{key}: {val}")
+
+# Dict comprehension
+squares = {x: x**2 for x in range(6)}
+print(squares)
+
+# defaultdict — even cleaner
+freq = defaultdict(int)
+for c in "hello world":
+    freq[c] += 1
+print(dict(freq))
+
+# Adjacency list using defaultdict
+graph = defaultdict(list)
+edges = [(1,2),(1,3),(2,4),(3,4)]
+for u, v in edges:
+    graph[u].append(v)
+    graph[v].append(u)
+print(dict(graph))
+</textarea>
+  <div class="output-wrap" id="out-s9"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s9">OUTPUT</span><button class="clr-btn" onclick="clearOut('s9')">✕ clear</button></div><div class="out-body" id="out-body-s9"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s9">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Hash Maps — Quiz</span><span class="qw-meta" id="qmeta-s9">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s9"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 10: TUPLES -->
+<div class="section" id="s10">
+<div class="sec-hdr">
+  <div class="sec-icon">📌</div>
+  <div><div class="sec-label">Section 10</div><div class="sec-title">Tuples</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Tuples are <strong>immutable lists</strong>. Because they can't change, they're <strong>hashable</strong> — they can be used as dict keys or stored in sets. Lists are mutable, so they're NOT hashable. This distinction is critical for graph coordinates, cache keys, and more.</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">Tuples are hashable — lists are not</div>
+  <p><code>(1, 2)</code> can be a dict key or set element. <code>[1, 2]</code> cannot — <code>TypeError: unhashable type: 'list'</code>. Use tuples for multi-dimensional coordinates.</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Tuple unpacking</div>
+  <p><code>x, y = (1, 2)</code> unpacks a tuple. This is why <code>for i, v in enumerate(lst)</code> works — enumerate yields <code>(int, value)</code> tuples.</p>
+</div>
+<div class="alert tip"><span class="ai">✅</span><span>One-element tuple needs a trailing comma: <code>(42,)</code>. Without the comma, <code>(42)</code> is just a parenthesized int.</span></div>
+
+<div class="editor-wrap" id="ew-s10">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s10')">↺ Reset</button><button class="btn-run" onclick="runCode('s10')" id="run-s10">▶ Run</button></div></div>
+  <textarea id="code-s10">
+# Tuples
+t = (1, 2, 3)
+print(t[0])      # 1
+print(len(t))    # 3
+
+# Immutable — this fails:
+# t[0] = 99  → TypeError!
+
+# Tuples as dict keys (hashable!)
+d = {}
+d[(0, 0)] = "origin"
+d[(1, 2)] = "point A"
+print(d[(0, 0)])  # origin
+
+# Tuples in sets (hashable!)
+visited = set()
+visited.add((0, 0))
+visited.add((1, 1))
+print((0, 0) in visited)  # True
+
+# Lists can NOT be dict keys
+try:
+    d[[1, 2]] = "nope"
+except TypeError as e:
+    print("Error:", e)
+
+# Tuple unpacking
+x, y = (3, 4)
+print(x, y)
+
+# Swap uses tuples internally
+a, b = 1, 2
+a, b = b, a
+print(a, b)  # 2 1
+
+# One-element tuple
+single = (42,)
+print(type(single))  # <class 'tuple'>
+not_tuple = (42)
+print(type(not_tuple))  # <class 'int'>
+</textarea>
+  <div class="output-wrap" id="out-s10"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s10">OUTPUT</span><button class="clr-btn" onclick="clearOut('s10')">✕ clear</button></div><div class="out-body" id="out-body-s10"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s10">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Tuples — Quiz</span><span class="qw-meta" id="qmeta-s10">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s10"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 11: HEAPS -->
+<div class="section" id="s11">
+<div class="sec-hdr">
+  <div class="sec-icon">⛰️</div>
+  <div><div class="sec-label">Section 11</div><div class="sec-title">Heaps</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python's <code>heapq</code> implements a <strong>min-heap</strong> — the smallest element is always at index 0. For a max-heap, negate all values when pushing and negate again when popping. Heaps are used for "k smallest/largest" problems and Dijkstra's algorithm.</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">heapq operations</div>
+  <p><code>heapq.heappush(h, x)</code> O(log n) · <code>heapq.heappop(h)</code> O(log n) · <code>h[0]</code> peek at min O(1) · <code>heapq.heapify(lst)</code> O(n)</p>
+</div>
+<div class="concept c-pink">
+  <div class="ctitle">Max-heap trick</div>
+  <p>Negate values: <code>heappush(h, -x)</code>. When popping: <code>-heappop(h)</code>. This flips the ordering so the largest value is at the top.</p>
+</div>
+<div class="concept c-amber">
+  <div class="ctitle">Push tuples for custom ordering</div>
+  <p><code>heappush(h, (priority, value))</code>. Tuples are compared lexicographically — first by priority, then value. This is the standard pattern for Dijkstra's.</p>
+</div>
+
+<div class="editor-wrap" id="ew-s11">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s11')">↺ Reset</button><button class="btn-run" onclick="runCode('s11')" id="run-s11">▶ Run</button></div></div>
+  <textarea id="code-s11">
+import heapq
+
+# Min-heap
+h = []
+heapq.heappush(h, 5)
+heapq.heappush(h, 2)
+heapq.heappush(h, 8)
+heapq.heappush(h, 1)
+
+print(h[0])              # 1 — peek at min, O(1)
+print(heapq.heappop(h))  # 1 — remove min
+print(heapq.heappop(h))  # 2
+
+# heapify — convert list to heap in O(n)
+lst = [5, 3, 8, 1, 9, 2]
+heapq.heapify(lst)
+print(lst[0])  # 1
+
+# Max-heap trick — negate values
+max_h = []
+for val in [5, 3, 8, 1, 9]:
+    heapq.heappush(max_h, -val)
+
+print(-heapq.heappop(max_h))  # 9 (largest!)
+print(-heapq.heappop(max_h))  # 8
+
+# K smallest elements
+nums = [7, 10, 4, 3, 20, 15]
+print(heapq.nsmallest(3, nums))  # [3, 4, 7]
+print(heapq.nlargest(3, nums))   # [20, 15, 10]
+
+# Dijkstra pattern: (distance, node)
+dist_heap = []
+heapq.heappush(dist_heap, (0, 'A'))
+heapq.heappush(dist_heap, (5, 'B'))
+heapq.heappush(dist_heap, (3, 'C'))
+d, node = heapq.heappop(dist_heap)
+print(f"Closest: {node} at dist {d}")
+</textarea>
+  <div class="output-wrap" id="out-s11"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s11">OUTPUT</span><button class="clr-btn" onclick="clearOut('s11')">✕ clear</button></div><div class="out-body" id="out-body-s11"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s11">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Heaps — Quiz</span><span class="qw-meta" id="qmeta-s11">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s11"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 12: FUNCTIONS -->
+<div class="section" id="s12">
+<div class="sec-hdr">
+  <div class="sec-icon">⚙️</div>
+  <div><div class="sec-label">Section 12</div><div class="sec-title">Functions</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Functions use <code>def</code>. Nested functions can <strong>read</strong> outer variables freely (closures). But to <strong>reassign</strong> a primitive in an outer scope, you need <code>nonlocal</code>. You do NOT need nonlocal to mutate a list — mutation and reassignment are different.</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">Closures — read for free</div>
+  <p>Inner functions can read outer variables without any keyword. Only <em>reassigning</em> a primitive (int, str, bool) requires <code>nonlocal</code>.</p>
+</div>
+<div class="concept c-pink">
+  <div class="ctitle">nonlocal — for reassigning primitives</div>
+  <p>Without <code>nonlocal</code>, <code>count = count + 1</code> inside an inner function creates a new local variable, leaving the outer one unchanged. <code>nonlocal count</code> tells Python to use the outer scope's variable.</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">Mutation vs Reassignment</div>
+  <p><code>lst.append(x)</code> is mutation — it modifies the existing object. No <code>nonlocal</code> needed. <code>lst = [1,2,3]</code> is reassignment — replaces the reference. Needs <code>nonlocal</code>.</p>
+</div>
+
+<div class="editor-wrap" id="ew-s12">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s12')">↺ Reset</button><button class="btn-run" onclick="runCode('s12')" id="run-s12">▶ Run</button></div></div>
+  <textarea id="code-s12">
+# Functions
+
+# Default arguments
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+print(greet("Alice"))           # Hello, Alice!
+print(greet("Bob", "Hi"))       # Hi, Bob!
+
+# Nested function — can READ outer freely
+def outer():
+    message = "hi"
+    def inner():
+        print(message)   # reads outer — works!
+    inner()
+
+outer()
+
+# nonlocal needed to REASSIGN primitive
+def make_counter():
+    count = 0
+    def increment():
+        nonlocal count    # required!
+        count += 1
+        return count
+    return increment
+
+counter = make_counter()
+print(counter())  # 1
+print(counter())  # 2
+print(counter())  # 3
+
+# Mutation doesn't need nonlocal
+def append_to_list():
+    results = []
+    def add(x):
+        results.append(x)   # mutation — no nonlocal!
+    add(1); add(2); add(3)
+    return results
+
+print(append_to_list())  # [1, 2, 3]
+
+# Lambda — one-liner function
+square = lambda x: x ** 2
+print(square(5))  # 25
+nums = [3,1,4,1,5]
+nums.sort(key=lambda x: -x)
+print(nums)
+</textarea>
+  <div class="output-wrap" id="out-s12"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s12">OUTPUT</span><button class="clr-btn" onclick="clearOut('s12')">✕ clear</button></div><div class="out-body" id="out-body-s12"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s12">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Functions — Quiz</span><span class="qw-meta" id="qmeta-s12">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s12"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ SECTION 13: CLASSES -->
+<div class="section" id="s13">
+<div class="sec-hdr">
+  <div class="sec-icon">🏛️</div>
+  <div><div class="sec-label">Section 13</div><div class="sec-title">Classes</div></div>
+</div>
+<div class="mm">
+  <div class="mm-top">🧠 Mental Model</div>
+  <p>Python classes use <code>__init__</code> as the constructor and require <code>self</code> as the explicit first argument of every method. Unlike Java's implicit <code>this</code>, Python makes the instance parameter visible. All instance variables are set via <code>self.name = value</code>.</p>
+</div>
+<div class="concept c-teal">
+  <div class="ctitle">self is explicit</div>
+  <p>Every instance method takes <code>self</code> as its first parameter. When you call <code>obj.method()</code>, Python automatically passes <code>obj</code> as <code>self</code>. You don't pass it manually.</p>
+</div>
+<div class="concept c-violet">
+  <div class="ctitle">__init__ — constructor</div>
+  <p><code>def __init__(self, ...)</code> is called when you create an object. Set instance variables here: <code>self.value = value</code>. Without <code>self.</code>, you're creating a local variable that disappears.</p>
+</div>
+<div class="concept c-sky">
+  <div class="ctitle">Interview: ListNode & TreeNode</div>
+  <p>Almost every linked list and tree problem uses a simple class. Memorize: <code>class ListNode: def __init__(self, val=0, next=None): self.val=val; self.next=next</code></p>
+</div>
+
+<div class="editor-wrap" id="ew-s13">
+  <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON</span><div class="ed-btns"><button class="btn-reset" onclick="resetEditor('s13')">↺ Reset</button><button class="btn-run" onclick="runCode('s13')" id="run-s13">▶ Run</button></div></div>
+  <textarea id="code-s13">
+# Classes
+
+class Animal:
+    def __init__(self, name, sound):
+        self.name = name    # instance variable
+        self.sound = sound
+
+    def speak(self):
+        return f"{self.name} says {self.sound}"
+
+dog = Animal("Dog", "Woof")
+cat = Animal("Cat", "Meow")
+print(dog.speak())
+print(cat.speak())
+print(dog.name)   # access attribute directly
+
+# Inheritance
+class Dog(Animal):
+    def __init__(self, name):
+        super().__init__(name, "Woof")
+
+    def fetch(self):
+        return f"{self.name} fetches the ball!"
+
+rex = Dog("Rex")
+print(rex.speak())   # inherited
+print(rex.fetch())   # own method
+
+# ListNode — you'll use this every interview!
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Build linked list: 1 -> 2 -> 3
+head = ListNode(1, ListNode(2, ListNode(3)))
+curr = head
+while curr:
+    print(curr.val, end=" -> " if curr.next else "\n")
+    curr = curr.next
+
+# TreeNode — also very common
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+root = TreeNode(1, TreeNode(2), TreeNode(3))
+print(root.val, root.left.val, root.right.val)
+</textarea>
+  <div class="output-wrap" id="out-s13"><div class="out-hdr"><span class="out-lbl" id="out-lbl-s13">OUTPUT</span><button class="clr-btn" onclick="clearOut('s13')">✕ clear</button></div><div class="out-body" id="out-body-s13"></div></div>
+</div>
+<div class="quiz-wrap" id="quiz-s13">
+  <div class="qw-header"><span class="qw-icon">🧪</span><span class="qw-title">Classes — Quiz</span><span class="qw-meta" id="qmeta-s13">Q 1 / 10</span></div>
+  <div class="qw-body" id="qbody-s13"></div>
+</div>
+</div>
+
+</div><!-- /content -->
+
+<!-- SANDBOX -->
+<div id="sandbox-section">
+  <div class="sb2-hdr">
+    <div class="sb2-title">🏖️ Free Sandbox</div>
+    <div class="sb2-sub">Write and run any Python. Full standard library available.</div>
+  </div>
+  <div class="editor-wrap" id="ew-sandbox">
+    <div class="ed-topbar"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="ed-lang">PYTHON — SANDBOX</span><div class="ed-btns"><button class="btn-reset" onclick="resetSandbox()">↺ Reset</button><button class="btn-run" onclick="runSandbox()" id="run-sandbox">▶ Run</button></div></div>
+    <textarea id="code-sandbox">
+# Free to experiment — the full standard library is available!
+from collections import deque, defaultdict
+import heapq
+
+# BFS example
+def bfs(graph, start):
+    visited = set([start])
+    queue = deque([start])
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return order
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': []
+}
+print("BFS:", bfs(graph, 'A'))
+
+# Try your own code below!
+</textarea>
+    <div class="output-wrap" id="out-sandbox"><div class="out-hdr"><span class="out-lbl" id="out-lbl-sandbox">OUTPUT</span><button class="clr-btn" onclick="clearOut('sandbox')">✕ clear</button></div><div class="out-body" id="out-body-sandbox"></div></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MIXED REVIEW MODAL -->
+<div class="modal-bg" id="review-modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">🔁 Mixed Review</div>
+    <div class="modal-sub" id="review-sub">Questions from all completed sections</div>
+    <div id="review-body"></div>
+    <div class="modal-close-wrap"><button class="modal-close" onclick="closeReview()">✕ Close</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════ QUESTION BANK
+const QUESTIONS = {
+s1: [
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`n = 5\nn = "hello"\nprint(type(n).__name__)`,opts:["int","str","NoneType","TypeError"],ans:1,fb:"Variables are dynamically typed — <code>n</code> is reassigned to a string, so <code>type(n)</code> is <code>str</code>."},
+  {type:"bug",tag:"qt-bug",q:"Which line has a bug?",code:`x = 10\nx++\nprint(x)`,opts:["Line 1: x = 10","Line 2: x++","Line 3: print(x)","No bug — output is 11"],ans:1,fb:"Python has no <code>++</code> operator. Use <code>x += 1</code> instead. <code>x++</code> is a SyntaxError."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`a, b = 1, 2\na, b = b, a\nprint(a, b)`,opts:["1 2","2 1","1 1","2 2"],ans:1,fb:"Python evaluates the right side completely first, then assigns. <code>b, a</code> = <code>2, 1</code>, so <code>a=2, b=1</code>."},
+  {type:"blank",tag:"qt-blank",q:"Fill in the blank: Python's null value is ___",opts:["null","undefined","None","nil"],ans:2,fb:"Python uses <code>None</code> (capital N) as its null value. It's a singleton object of type <code>NoneType</code>."},
+  {type:"concept",tag:"qt-concept",q:"What is the idiomatic way to check if a variable is None?",opts:["x == None","x === None","x is None","not x"],ans:2,fb:"Use <code>x is None</code> — it checks identity (same object), not equality. <code>==</code> can be overloaded; <code>is</code> cannot."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`x = None\nprint(x is None)\nprint(x == None)`,opts:["True\\nFalse","False\\nTrue","True\\nTrue","Error"],ans:2,fb:"Both print <code>True</code> for <code>None</code>. But <code>is</code> is preferred idiomatically. <code>==</code> also works here since <code>None</code> doesn't override <code>__eq__</code> weirdly."},
+  {type:"logic",tag:"qt-logic",q:"After this code, what are the values of x and y?",code:`x = 10\ny = x\nx = 20\nprint(x, y)`,opts:["20 20","10 10","20 10","10 20"],ans:2,fb:"<code>y = x</code> copies the value 10. Integers are immutable. Changing <code>x</code> to 20 doesn't affect <code>y</code>."},
+  {type:"blank",tag:"qt-blank",q:"What is the output of <code>type(True).__name__</code>?",opts:["bool","int","boolean","True"],ans:0,fb:"<code>True</code> and <code>False</code> are instances of <code>bool</code>, which is a subclass of <code>int</code>. <code>int(True)</code> is <code>1</code>."},
+  {type:"bug",tag:"qt-bug",q:"What's wrong with this swap?",code:`a = 5\nb = 10\ntemp = a\na = b\nb = a  # bug here?\nprint(a, b)`,opts:["Nothing wrong, prints 10 5","Bug: b = a should be b = temp","Bug: temp = a should be temp = b","Bug: needs nonlocal"],ans:1,fb:"Line 5 assigns <code>b = a</code>, but <code>a</code> was already set to 10. Should be <code>b = temp</code> (the original value of a). The Pythonic fix: <code>a, b = b, a</code>."},
+  {type:"concept",tag:"qt-concept",q:"Which of these correctly increments n by 1 in Python?",opts:["n++","++n","n += 1","n =+ 1"],ans:2,fb:"<code>n += 1</code> is the correct form. Python has no <code>++</code> or <code>--</code>. Note: <code>n =+ 1</code> sets n to positive 1 (unary plus), it doesn't increment."},
+],
+s2: [
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`x = 7\nif x > 5:\n    print("A")\nelif x > 3:\n    print("B")\nelse:\n    print("C")`,opts:["A","B","C","A and B"],ans:0,fb:"<code>x > 5</code> is True, so the first branch executes and we print <code>A</code>. Python stops at the first true condition."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`print(1 < 5 < 10)\nprint(1 < 5 > 10)`,opts:["True\\nTrue","True\\nFalse","False\\nTrue","False\\nFalse"],ans:1,fb:"Chained comparisons: <code>1 < 5 < 10</code> is True. <code>1 < 5 > 10</code> means (1 < 5) and (5 > 10) = True and False = False."},
+  {type:"blank",tag:"qt-blank",q:"Python's keyword for 'else if' is ___",opts:["else if","elsif","elif","elseif"],ans:2,fb:"Python uses <code>elif</code> as the contraction of 'else if'. This is unique to Python."},
+  {type:"bug",tag:"qt-bug",q:"This code has an indentation bug. Which line is wrong?",code:`x = 5\nif x > 0:\nprint("positive")  # line 3\nelse:\n    print("non-positive")`,opts:["Line 1","Line 2","Line 3 — missing indent","Line 5"],ans:2,fb:"Line 3 is missing indentation. After the <code>if</code> colon, the body must be indented. Python uses indentation as syntax."},
+  {type:"concept",tag:"qt-concept",q:"Which of these are falsy in Python? (pick the correct set)",opts:["0, '', [], None","0, '', [], None, False","False, 0, '', [], {}, None","Only False and None"],ans:2,fb:"All of these are falsy: <code>False</code>, <code>0</code>, <code>0.0</code>, <code>''</code>, <code>[]</code>, <code>{}</code>, <code>set()</code>, <code>None</code>. Everything else is truthy."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`lst = []\nif lst:\n    print("full")\nelse:\n    print("empty")`,opts:["full","empty","None","Error"],ans:1,fb:"An empty list is falsy. So <code>if lst:</code> evaluates to False, and we print 'empty'."},
+  {type:"logic",tag:"qt-logic",q:"Which is the Pythonic way to write (x > 0 and x < 100)?",opts:["x > 0 && x < 100","(x > 0) & (x < 100)","0 < x < 100","x in range(1, 100)"],ans:2,fb:"Python supports chained comparisons: <code>0 < x < 100</code>. This is equivalent to <code>x > 0 and x < 100</code> and is the idiomatic Pythonic way."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`a = True\nb = False\nprint(a and b)\nprint(a or b)\nprint(not a)`,opts:["True\\nTrue\\nFalse","False\\nTrue\\nFalse","True\\nFalse\\nFalse","False\\nFalse\\nTrue"],ans:1,fb:"<code>and</code>: both must be True → False. <code>or</code>: at least one True → True. <code>not True</code> → False."},
+  {type:"blank",tag:"qt-blank",q:"Python uses ___ instead of && for logical AND",opts:["&&","and","&","AND"],ans:1,fb:"Python uses the word <code>and</code> for logical AND. The <code>&</code> operator is bitwise AND, not logical."},
+  {type:"bug",tag:"qt-bug",q:"What is wrong with this code?",code:`x = 5\nif x == 5\n    print("five")`,opts:["Missing colon after condition","Should use = not ==","Missing parentheses around condition","Incorrect indentation"],ans:0,fb:"Python <code>if</code> statements require a colon at the end: <code>if x == 5:</code>. The colon is mandatory syntax."},
+],
+s3: [
+  {type:"out",tag:"qt-out",q:"What does range(2, 8, 2) produce?",code:`print(list(range(2, 8, 2)))`,opts:["[2, 4, 6, 8]","[2, 4, 6]","[2, 3, 4, 5, 6, 7]","[0, 2, 4, 6]"],ans:1,fb:"<code>range(start, stop, step)</code> — starts at 2, increments by 2, stops before 8. So: 2, 4, 6."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`for i in range(4, -1, -1):\n    print(i, end=" ")`,opts:["4 3 2 1 0","0 1 2 3 4","4 3 2 1","3 2 1 0"],ans:0,fb:"<code>range(4, -1, -1)</code> starts at 4, goes to 0 inclusive. Stop is -1 (exclusive), so 0 is included. Outputs: 4 3 2 1 0."},
+  {type:"blank",tag:"qt-blank",q:"To loop over indices 0 through n-1, use ___",opts:["range(1, n)","range(n)","range(0, n, 1)","range(n-1)"],ans:1,fb:"<code>range(n)</code> is shorthand for <code>range(0, n, 1)</code>. It generates 0, 1, 2, ..., n-1. The stop n is exclusive."},
+  {type:"bug",tag:"qt-bug",q:"This loop is supposed to print 0 to 4. What's wrong?",code:`for i in range(1, 5):\n    print(i)`,opts:["Nothing wrong","range(1, 5) gives 1,2,3,4 — missing 0","range(1, 5) gives 1,2,3,4,5","Should be while loop"],ans:1,fb:"<code>range(1, 5)</code> generates 1, 2, 3, 4. To include 0, use <code>range(0, 5)</code> or simply <code>range(5)</code>."},
+  {type:"logic",tag:"qt-logic",q:"What does continue do in a loop?",opts:["Exits the loop entirely","Skips the rest of the current iteration and goes to the next","Pauses the loop","Acts as a no-op placeholder"],ans:1,fb:"<code>continue</code> skips to the next iteration. <code>break</code> exits the loop entirely. <code>pass</code> is a no-op placeholder."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`total = 0\nfor i in range(1, 5):\n    total += i\nprint(total)`,opts:["10","6","15","4"],ans:0,fb:"<code>range(1,5)</code> = 1,2,3,4. Sum = 1+2+3+4 = 10."},
+  {type:"concept",tag:"qt-concept",q:"Which loop is better for iterating n times with an index?",opts:["while i < n: ... i+=1","for i in range(n):","Both are equivalent","Neither — use recursion"],ans:1,fb:"<code>for i in range(n)</code> is the idiomatic Python way. It's more concise and less error-prone than a while loop (no risk of forgetting i+=1)."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`for i in range(5):\n    if i == 2:\n        break\n    print(i, end=" ")`,opts:["0 1 2","0 1","0 1 2 3 4","1 2"],ans:1,fb:"The loop prints 0 and 1, then when i=2, <code>break</code> exits immediately without printing 2."},
+  {type:"blank",tag:"qt-blank",q:"To reverse-iterate over list indices, the range stop should be ___",opts:["0","1","-1","-n"],ans:2,fb:"To include index 0 when going backwards, the stop must be -1 (exclusive), so <code>range(n-1, -1, -1)</code> gives n-1, n-2, ..., 1, 0."},
+  {type:"logic",tag:"qt-logic",q:"What is pass used for?",opts:["Exit a loop","Skip an iteration","A no-op placeholder for empty blocks","Same as continue"],ans:2,fb:"<code>pass</code> does nothing. It's used as a placeholder where Python syntax requires a statement but you have no code to write yet — empty function bodies, empty if blocks, etc."},
+],
+s4: [
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`print(5 / 2)\nprint(5 // 2)`,opts:["2\\n2","2.5\\n2","2\\n2.5","2.5\\n2.5"],ans:1,fb:"<code>/</code> always returns float in Python 3: 2.5. <code>//</code> is floor division: 2. This is a Python 3 change from Python 2."},
+  {type:"out",tag:"qt-out",q:"What does -7 // 2 evaluate to in Python?",opts:["-3","-4","3","-3.5"],ans:1,fb:"Python's <code>//</code> floors toward negative infinity. -7/2 = -3.5, flooring to -∞ gives -4. In Java/C++ truncation gives -3."},
+  {type:"concept",tag:"qt-concept",q:"How do you get Java/C++-style truncation division (toward zero) in Python?",opts:["x // y","int(x / y)","x % y","math.trunc(x/y)"],ans:1,fb:"<code>int(x / y)</code> or <code>math.trunc(x/y)</code> truncates toward zero (Java style). <code>x // y</code> floors toward -∞ (Python default)."},
+  {type:"blank",tag:"qt-blank",q:"Python's operator for exponentiation is ___",opts:["^","exp()","**","^^"],ans:2,fb:"<code>**</code> is Python's exponentiation operator. <code>2 ** 10</code> = 1024. Note: <code>^</code> is bitwise XOR in Python, not power."},
+  {type:"out",tag:"qt-out",q:"What does this evaluate to?",code:`print(10 % 3)\nprint(-1 % 10)`,opts:["1\\n-1","1\\n9","3\\n-1","1\\n1"],ans:1,fb:"<code>10 % 3</code> = 1. Python modulo: <code>-1 % 10</code> = 9 (always non-negative when divisor is positive). This differs from C++/Java which gives -1."},
+  {type:"logic",tag:"qt-logic",q:"What is float('inf') useful for in interviews?",opts:["Representing a very large integer","As a sentinel starting value for finding minimums","Division operations","Replacing None checks"],ans:1,fb:"Initialize a min-tracker to <code>float('inf')</code> so any real number will be smaller. Similarly use <code>float('-inf')</code> for max-trackers."},
+  {type:"out",tag:"qt-out",q:"What does int(3.9) return?",opts:["4","3","3.9","Error"],ans:1,fb:"<code>int()</code> truncates toward zero — it doesn't round. <code>int(3.9)</code> = 3. Use <code>round(3.9)</code> to get 4."},
+  {type:"bug",tag:"qt-bug",q:"A student wants to use the XOR operator on two numbers. They write <code>a ^ b</code>. What does this actually compute in Python?",opts:["Exponentiation (a to the power b)","Bitwise XOR","Logical XOR","Syntax error"],ans:1,fb:"<code>^</code> in Python is bitwise XOR, not exponentiation. For power use <code>**</code>. So <code>2 ^ 3</code> = 1 (bitwise), not 8."},
+  {type:"blank",tag:"qt-blank",q:"To get the ceiling of a division, use ___",opts:["x // y","math.ceil(x/y)","-(-x // y)","int(x/y)+1"],ans:1,fb:"<code>math.ceil(x/y)</code> is the standard way. The trick <code>-(-x // y)</code> also works using floor division on negated values, but <code>math.ceil</code> is clearer."},
+  {type:"out",tag:"qt-out",q:"What is the result?",code:`import math\nprint(math.floor(3.7))\nprint(math.ceil(3.2))`,opts:["3\\n3","3\\n4","4\\n4","4\\n3"],ans:1,fb:"<code>math.floor(3.7)</code> = 3 (round down). <code>math.ceil(3.2)</code> = 4 (round up)."},
+],
+s5: [
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`lst = [1, 2, 3, 4, 5]\nprint(lst[1:4])`,opts:["[1, 2, 3]","[2, 3, 4]","[2, 3, 4, 5]","[1, 2, 3, 4]"],ans:1,fb:"Slicing <code>lst[1:4]</code> includes indices 1, 2, 3 (stop is exclusive). Values at those indices: 2, 3, 4."},
+  {type:"bug",tag:"qt-bug",q:"This 2D list has a subtle bug. What happens when you set grid[0][0] = 99?",code:`grid = [[0]*3]*3\ngrid[0][0] = 99\nprint(grid[1][0])`,opts:["0 — only row 0 is affected","99 — all rows share the same inner list","Error","None"],ans:1,fb:"<code>[[0]*3]*3</code> creates 3 references to the SAME inner list. Changing any row changes all rows. Use <code>[[0]*3 for _ in range(3)]</code> for independent rows."},
+  {type:"concept",tag:"qt-concept",q:"What is the time complexity of list.insert(0, x)?",opts:["O(1)","O(log n)","O(n)","O(n²)"],ans:2,fb:"<code>insert(0, x)</code> shifts all existing elements one position right — O(n). Appending to the end is O(1) amortized."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`lst = [10, 20, 30, 40, 50]\nprint(lst[-1])\nprint(lst[-2])`,opts:["50\\n40","40\\n50","50\\n30","Error"],ans:0,fb:"Negative indices count from the end. <code>lst[-1]</code> = 50 (last), <code>lst[-2]</code> = 40 (second-to-last)."},
+  {type:"out",tag:"qt-out",q:"What does list comprehension produce?",code:`result = [x**2 for x in range(5) if x % 2 == 0]\nprint(result)`,opts:["[0, 4, 16]","[0, 1, 4, 9, 16]","[4, 16]","[1, 4]"],ans:0,fb:"Even numbers in range(5): 0, 2, 4. Squared: 0, 4, 16."},
+  {type:"blank",tag:"qt-blank",q:"To reverse a list in-place (modifying the original), use ___",opts:["lst[::-1]","reversed(lst)","lst.reverse()","list(reversed(lst))"],ans:2,fb:"<code>lst.reverse()</code> reverses in-place and returns None. <code>lst[::-1]</code> creates a new reversed copy. <code>reversed(lst)</code> returns an iterator."},
+  {type:"out",tag:"qt-out",q:"What does enumerate do?",code:`words = ["a", "b", "c"]\nfor i, w in enumerate(words):\n    print(i, w)`,opts:["0 a\\n1 b\\n2 c","a b c","0 1 2","Error"],ans:0,fb:"<code>enumerate()</code> yields <code>(index, value)</code> pairs starting from 0."},
+  {type:"logic",tag:"qt-logic",q:"You need to remove the first element of a list frequently. What should you use?",opts:["list with pop(0)","collections.deque with popleft()","list with remove()","list with del lst[0]"],ans:1,fb:"<code>list.pop(0)</code> is O(n) because it shifts all elements. <code>deque.popleft()</code> is O(1). For queue operations, always use <code>deque</code>."},
+  {type:"out",tag:"qt-out",q:"What does zip produce?",code:`a = [1, 2, 3]\nb = ['x', 'y', 'z']\nprint(list(zip(a, b)))`,opts:["[(1,'x'),(2,'y'),(3,'z')]","[1,2,3,'x','y','z']","[[1,'x'],[2,'y'],[3,'z']]","Error"],ans:0,fb:"<code>zip</code> pairs up elements from both iterables into tuples."},
+  {type:"concept",tag:"qt-concept",q:"Which sort is stable and uses a key function?",opts:["sorted(lst, key=fn)","lst.sort(key=fn)","Both — both are stable with key support","Neither — Python sort is unstable"],ans:2,fb:"Both <code>sorted()</code> and <code>list.sort()</code> use Timsort (stable) and support <code>key=</code>. <code>sorted()</code> returns a new list; <code>.sort()</code> modifies in-place and returns None."},
+],
+s6: [
+  {type:"concept",tag:"qt-concept",q:"Why is strings += str in a loop O(n²)?",opts:["Python strings are stored as linked lists","Each += creates a new string object, copying all existing chars","String concatenation requires hashing","It isn't — it's O(n)"],ans:1,fb:"Strings are immutable. Each <code>+=</code> allocates a new string and copies all previous characters. Over n iterations: 1+2+3+...+n = O(n²). Use a list + join instead."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`s = "hello"\nprint(s[1:4])\nprint(s[::-1])`,opts:["ell\\nolleh","ell\\nhello","hell\\nolleh","hel\\nelloh"],ans:0,fb:"<code>s[1:4]</code> = indices 1,2,3 = 'ell'. <code>s[::-1]</code> reverses: 'olleh'."},
+  {type:"blank",tag:"qt-blank",q:"ord('a') returns ___",opts:["1","26","97","65"],ans:2,fb:"<code>ord('a')</code> = 97 (ASCII value). <code>ord('A')</code> = 65. <code>ord('z') - ord('a')</code> = 25 gives you the offset."},
+  {type:"bug",tag:"qt-bug",q:"This code tries to change the first character of a string. What happens?",code:`s = "hello"\ns[0] = 'H'`,opts:["s becomes 'Hello'","TypeError: strings are immutable","Works — prints Hello","AttributeError"],ans:1,fb:"Strings are immutable in Python. You cannot change characters in place. Convert to list, modify, then join: <code>''.join(['H'] + list(s[1:]))</code>."},
+  {type:"out",tag:"qt-out",q:"What does join produce?",code:`parts = ['a', 'b', 'c']\nprint('-'.join(parts))\nprint(''.join(parts))`,opts:["a-b-c\\nabc","a b c\\nabc","abc\\na-b-c","a,b,c\\nabc"],ans:0,fb:"<code>'-'.join(lst)</code> concatenates with '-' as separator. <code>''.join(lst)</code> joins with no separator."},
+  {type:"logic",tag:"qt-logic",q:"What's the correct way to build a string from characters efficiently?",opts:["result = ''; for c in chars: result += c","result = []; for c in chars: result.append(c); ''.join(result)","''.join(chars) directly if chars is already a list","Both B and C"],ans:3,fb:"Both collecting into a list and then joining, or directly joining an existing iterable, are O(n). The key is using <code>join()</code> at the end rather than repeated <code>+=</code>."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`s = "  Hello, World!  "\nprint(s.strip())\nprint(s.lower().strip())`,opts:["Hello, World!\\nhello, world!","  Hello, World!\\nhello","Hello, World!\\nhello, world!","Error"],ans:2,fb:"<code>.strip()</code> removes leading/trailing whitespace. <code>.lower()</code> lowercases all chars. Methods chain left to right."},
+  {type:"blank",tag:"qt-blank",q:"chr(65) returns ___",opts:["a","A","65","Error"],ans:1,fb:"<code>chr(65)</code> = 'A'. ASCII 65 is capital A. <code>chr(ord('a') + 1)</code> = 'b'. These are essential for character arithmetic in interview problems."},
+  {type:"out",tag:"qt-out",q:"What does this produce?",code:`s = "one,two,three"\nprint(s.split(','))`,opts:["['one','two','three']","one two three","('one','two','three')","Error"],ans:0,fb:"<code>.split(',')</code> splits on commas and returns a list of strings."},
+  {type:"concept",tag:"qt-concept",q:"Which conversion gives you the integer 42 from the string '42'?",opts:["ord('42')","int('42')","float('42')","str(42)"],ans:1,fb:"<code>int('42')</code> converts the string to integer 42. <code>str(42)</code> goes the other way. <code>ord()</code> only works on single characters."},
+],
+s7: [
+  {type:"concept",tag:"qt-concept",q:"Why is deque preferred over list for queue operations?",opts:["deque uses less memory","deque.popleft() is O(1); list.pop(0) is O(n)","deque is faster for appending","deque supports negative indexing"],ans:1,fb:"<code>list.pop(0)</code> must shift every element one position left — O(n). <code>deque.popleft()</code> is a doubly-linked list pointer change — O(1)."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`from collections import deque\nq = deque([1, 2, 3])\nq.append(4)\nq.appendleft(0)\nprint(list(q))`,opts:["[0,1,2,3,4]","[1,2,3,4,0]","[4,1,2,3,0]","[0,4,1,2,3]"],ans:0,fb:"<code>append(4)</code> adds to the right: [1,2,3,4]. <code>appendleft(0)</code> adds to the left: [0,1,2,3,4]."},
+  {type:"blank",tag:"qt-blank",q:"To import deque, use: from ___ import deque",opts:["queue","itertools","collections","builtins"],ans:2,fb:"<code>from collections import deque</code>. The <code>collections</code> module also has <code>defaultdict</code>, <code>Counter</code>, <code>OrderedDict</code>, etc."},
+  {type:"bug",tag:"qt-bug",q:"A BFS uses list.pop(0) instead of deque.popleft(). If the graph has n nodes, the BFS is actually ___",opts:["O(n) — same as intended","O(n²) due to O(n) pop(0)","O(n log n)","Still O(n) because Python optimizes it"],ans:1,fb:"BFS visits each node once (n times). Each <code>list.pop(0)</code> is O(n). Total: O(n²). Python does NOT optimize <code>pop(0)</code>. Always use <code>deque</code>."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`from collections import deque\nq = deque([10, 20, 30])\nprint(q.popleft())\nprint(q[0])`,opts:["10\\n10","10\\n20","20\\n10","20\\n20"],ans:1,fb:"<code>popleft()</code> removes and returns the first element (10). After removal, <code>q = deque([20, 30])</code>, so <code>q[0]</code> = 20."},
+  {type:"logic",tag:"qt-logic",q:"In BFS, when should you mark a node as visited?",opts:["When you pop it from the queue","When you add it to the queue","After processing all its neighbors","Both A and B work identically"],ans:1,fb:"Mark visited when ENQUEUING. If you wait until dequeuing, duplicate nodes can pile up in the queue for dense graphs, causing extra work or bugs."},
+  {type:"out",tag:"qt-out",q:"What is the complexity of deque.append(x)?",opts:["O(1)","O(log n)","O(n)","O(1) amortized"],ans:0,fb:"<code>deque.append()</code> and <code>deque.appendleft()</code> are both O(1) — no shifting needed since deque is a doubly-linked list of fixed-size blocks."},
+  {type:"blank",tag:"qt-blank",q:"To peek at the front of a deque without removing it, use ___",opts:["q.peek()","q.front()","q[0]","q.popleft() and put it back"],ans:2,fb:"<code>q[0]</code> accesses the first element without removing it. Deques support O(1) indexing at both ends (q[0] and q[-1])."},
+  {type:"concept",tag:"qt-concept",q:"A deque can be used as both a queue and a stack. As a stack, which operations would you use?",opts:["appendleft + popleft","append + pop","append + popleft","appendleft + pop"],ans:1,fb:"Stack = LIFO: add to back with <code>append</code>, remove from back with <code>pop</code>. Queue = FIFO: add to back with <code>append</code>, remove from front with <code>popleft</code>."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`from collections import deque\nd = deque(maxlen=3)\nfor i in range(5):\n    d.append(i)\nprint(list(d))`,opts:["[0,1,2,3,4]","[2,3,4]","[0,1,2]","Error"],ans:1,fb:"A deque with <code>maxlen=3</code> automatically drops items from the opposite end when full. After appending 0,1,2,3,4 — only the last 3 remain: [2,3,4]."},
+],
+s8: [
+  {type:"concept",tag:"qt-concept",q:"What is the time complexity of 'x in my_set'?",opts:["O(n)","O(log n)","O(1)","O(1) average, O(n) worst"],ans:2,fb:"Set membership testing is O(1) average due to hashing. This is the key advantage over lists where <code>x in list</code> is O(n)."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`s = {1, 2, 3, 2, 1}\nprint(len(s))`,opts:["5","3","2","Error"],ans:1,fb:"Sets automatically deduplicate. {1,2,3,2,1} has 3 unique elements: {1,2,3}."},
+  {type:"out",tag:"qt-out",q:"What is the result of a & b?",code:`a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\nprint(a & b)`,opts:["{1,2,3,4,5,6}","{3,4}","{1,2,5,6}","{1,2}"],ans:1,fb:"<code>&</code> is set intersection — elements in BOTH sets. {3,4} are in both a and b."},
+  {type:"blank",tag:"qt-blank",q:"To safely remove an element from a set without raising an error if it's absent, use ___",opts:["s.remove(x)","s.delete(x)","s.discard(x)","del s[x]"],ans:2,fb:"<code>s.discard(x)</code> removes x if present, does nothing if not. <code>s.remove(x)</code> raises <code>KeyError</code> if x is missing."},
+  {type:"out",tag:"qt-out",q:"What does a | b compute?",code:`a = {1, 2, 3}\nb = {3, 4, 5}\nprint(a | b)`,opts:["{3}","{1,2}","{1,2,3,4,5}","{4,5}"],ans:2,fb:"<code>|</code> is set union — all elements from either set (no duplicates). {1,2,3,4,5}."},
+  {type:"bug",tag:"qt-bug",q:"A student tries to add a list to a set. What happens?",code:`s = {1, 2, 3}\ns.add([4, 5])`,opts:["s becomes {1,2,3,[4,5]}","TypeError: unhashable type: 'list'","s becomes {1,2,3,4,5}","Nothing happens"],ans:1,fb:"Only hashable objects can be added to sets. Lists are mutable and unhashable. Use a tuple instead: <code>s.add((4, 5))</code>."},
+  {type:"logic",tag:"qt-logic",q:"You want to find elements in set A but not in set B. Use ___",opts:["a & b","a | b","a - b","a ^ b"],ans:2,fb:"<code>a - b</code> (set difference) gives elements in a that are NOT in b. <code>a ^ b</code> is symmetric difference (in one but not both)."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`s = set()\ns.add((1, 2))\ns.add((1, 2))\nprint(len(s))`,opts:["2","1","0","Error"],ans:1,fb:"Tuples are hashable and can be added to sets. Adding the same tuple twice — the set deduplicates, length is 1."},
+  {type:"concept",tag:"qt-concept",q:"Which of these can be stored in a set?",opts:["Lists","Dicts","Tuples","Sets"],ans:2,fb:"Only hashable (immutable) objects can be in a set: ints, floats, strings, tuples. Lists, dicts, and sets themselves are mutable and unhashable."},
+  {type:"out",tag:"qt-out",q:"What is the output?",code:`squares = {x*x for x in range(5)}\nprint(sorted(squares))`,opts:["[0,1,4,9,16]","[1,4,9,16]","{0,1,4,9,16}","[0,1,2,3,4]"],ans:0,fb:"Set comprehension generates {0,1,4,9,16}. <code>sorted()</code> converts to a sorted list."},
+],
+s9: [
+  {type:"out",tag:"qt-out",q:"What does .get() return when the key doesn't exist?",code:`d = {"a": 1}\nprint(d.get("b", 99))`,opts:["None","KeyError","99","0"],ans:2,fb:"<code>d.get(key, default)</code> returns the default (99) if the key doesn't exist, instead of raising <code>KeyError</code>."},
+  {type:"blank",tag:"qt-blank",q:"To iterate over key-value pairs of a dict, use ___",opts:["d.keys()","d.values()","d.items()","d.pairs()"],ans:2,fb:"<code>d.items()</code> yields <code>(key, value)</code> tuples. Use <code>for k, v in d.items():</code> to unpack both."},
+  {type:"out",tag:"qt-out",q:"What does this frequency counter produce?",code:`count = {}\nfor c in "aab":\n    count[c] = count.get(c, 0) + 1\nprint(count)`,opts:["{'a':1,'b':1}","{'a':2,'b':1}","{'a':2,'b':2}","{'a':1,'b':0}"],ans:1,fb:"Iterating 'a','a','b': first 'a' → 0+1=1, second 'a' → 1+1=2, 'b' → 0+1=1. Result: {'a':2,'b':1}."},
+  {type:"bug",tag:"qt-bug",q:"This code raises an exception. Why?",code:`d = {"x": 10}\nprint(d["y"])`,opts:["y is not a string","KeyError: 'y'","TypeError","AttributeError"],ans:1,fb:"Accessing a missing key with <code>d[key]</code> raises <code>KeyError</code>. Use <code>d.get('y', default)</code> to avoid this."},
+  {type:"logic",tag:"qt-logic",q:"What does defaultdict(list) do when you access a missing key?",opts:["Raises KeyError","Returns None","Creates an empty list [] for that key","Returns an empty list without storing it"],ans:2,fb:"<code>defaultdict(list)</code> calls <code>list()</code> to create a new empty list and STORES it for the missing key. Then you can immediately append to it."},
+  {type:"out",tag:"qt-out",q:"What does dict comprehension produce?",code:`d = {x: x**2 for x in range(4)}\nprint(d[3])`,opts:["3","6","9","Error"],ans:2,fb:"Dict comprehension creates {0:0, 1:1, 2:4, 3:9}. <code>d[3]</code> = 9."},
+  {type:"concept",tag:"qt-concept",q:"In Python 3.7+, what order do dicts iterate in?",opts:["Sorted by key","Random hash order","Insertion order","Sorted by value"],ans:2,fb:"Since Python 3.7, dicts are guaranteed to maintain insertion order. Before 3.7, use <code>OrderedDict</code> if order matters."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`d = {"a": 1, "b": 2, "c": 3}\nprint(list(d.keys()))\nprint(list(d.values()))`,opts:["['a','b','c']\\n[1,2,3]","[1,2,3]\\n['a','b','c']","Error","dict_keys(...)\\ndict_values(...)"],ans:0,fb:"<code>d.keys()</code> returns a view of keys; wrapping in <code>list()</code> gives a list. Same for <code>d.values()</code>."},
+  {type:"blank",tag:"qt-blank",q:"Counter from collections automatically counts element frequencies. Counter('hello') gives ___",opts:["{'h':1,'e':1,'l':2,'o':1}","{'h','e','l','o'}","['h','e','l','l','o']","4"],ans:0,fb:"<code>Counter('hello')</code> counts each character: h=1, e=1, l=2, o=1. It's a dict subclass."},
+  {type:"logic",tag:"qt-logic",q:"What is the best data structure for building an adjacency list for a graph?",opts:["list of lists","dict of lists","set of tuples","defaultdict(list)"],ans:3,fb:"<code>defaultdict(list)</code> is ideal: <code>graph[u].append(v)</code> works even if u hasn't been added yet — no need to initialize with <code>graph[u] = []</code> first."},
+],
+s10: [
+  {type:"concept",tag:"qt-concept",q:"Why can tuples be used as dict keys but lists cannot?",opts:["Tuples are smaller in memory","Tuples are immutable and hashable; lists are mutable and unhashable","Tuples support comparison; lists don't","Tuples are faster to access"],ans:1,fb:"Hashing requires the object not to change. Tuples are immutable → hashable → can be dict keys or set elements. Lists can be modified, making them unhashable."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`t = (1, 2, 3)\nprint(t[1])\nprint(len(t))`,opts:["1\\n3","2\\n3","1\\n2","2\\n2"],ans:1,fb:"<code>t[1]</code> = 2 (index 1). <code>len(t)</code> = 3."},
+  {type:"bug",tag:"qt-bug",q:"What error does this raise?",code:`t = (1, 2, 3)\nt[0] = 99`,opts:["IndexError","TypeError: 'tuple' object does not support item assignment","ValueError","AttributeError"],ans:1,fb:"Tuples are immutable — you cannot assign to an index. This raises <code>TypeError</code>."},
+  {type:"out",tag:"qt-out",q:"What type is this?",code:`x = (42)\ny = (42,)\nprint(type(x).__name__)\nprint(type(y).__name__)`,opts:["tuple\\ntuple","int\\ntuple","int\\nint","tuple\\nint"],ans:1,fb:"<code>(42)</code> is just a parenthesized integer — not a tuple! <code>(42,)</code> with trailing comma IS a one-element tuple."},
+  {type:"logic",tag:"qt-logic",q:"When storing 2D coordinates in a set for visited tracking, you should use ___",opts:["visited.add([r, c])","visited.add((r, c))","visited[r][c] = True","visited.add(str(r)+','+str(c))"],ans:1,fb:"<code>(r, c)</code> is a tuple — hashable, can be added to a set. <code>[r, c]</code> is a list — unhashable, will raise TypeError."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`a, b, c = (10, 20, 30)\nprint(b)`,opts:["10","20","30","(10,20,30)"],ans:1,fb:"Tuple unpacking assigns values in order: a=10, b=20, c=30. Print b → 20."},
+  {type:"blank",tag:"qt-blank",q:"Tuples are ___ while lists are ___",opts:["ordered, unordered","mutable, immutable","immutable, mutable","hashable, unhashable"],ans:2,fb:"Tuples are immutable (cannot be changed after creation). Lists are mutable. This is the core difference, and it's why tuples are hashable."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`d = {}\nd[(0,0)] = "origin"\nd[(1,1)] = "point"\nprint(d[(0,0)])`,opts:["Error","origin","point","(0,0)"],ans:1,fb:"Tuples as dict keys — works perfectly. <code>(0,0)</code> is the key, 'origin' is the value."},
+  {type:"concept",tag:"qt-concept",q:"Which statement about tuples is FALSE?",opts:["Tuples support indexing","Tuples support slicing","Tuples can be appended to with .append()","Tuples can contain mutable objects"],ans:2,fb:"Tuples have no <code>.append()</code> method — they're immutable. You can index and slice them. A tuple CAN contain mutable objects like lists: <code>([1,2], [3,4])</code> is a valid tuple."},
+  {type:"logic",tag:"qt-logic",q:"Why does enumerate() work naturally with tuple unpacking?",opts:["enumerate returns a list","enumerate yields (index, value) tuples which unpack into i, v","enumerate is a built-in class","for loops automatically unpack"],ans:1,fb:"<code>enumerate(lst)</code> yields tuples like <code>(0, 'a')</code>. Python's <code>for i, v in enumerate(lst)</code> unpacks each tuple automatically."},
+],
+s11: [
+  {type:"concept",tag:"qt-concept",q:"Python's heapq implements a ___",opts:["max-heap","min-heap","balanced BST","priority queue with O(1) search"],ans:1,fb:"Python's heapq is a min-heap. The smallest element is always at index 0. For max-heap behavior, negate all values."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`import heapq\nh = [5, 3, 8, 1, 9]\nheapq.heapify(h)\nprint(h[0])`,opts:["1","5","3","9"],ans:0,fb:"After <code>heapify</code>, h is a valid min-heap with the minimum at index 0. Minimum of [5,3,8,1,9] is 1."},
+  {type:"out",tag:"qt-out",q:"What is the max-heap trick output?",code:`import heapq\nh = []\nfor v in [5, 3, 8]:\n    heapq.heappush(h, -v)\nprint(-heapq.heappop(h))`,opts:["3","5","8","Error"],ans:2,fb:"Negating values: push -5, -3, -8. Min-heap root is -8 (smallest negative = largest original). Pop -8, negate → 8."},
+  {type:"blank",tag:"qt-blank",q:"heapq.heapify(lst) has time complexity ___",opts:["O(n log n)","O(n)","O(log n)","O(1)"],ans:1,fb:"<code>heapify</code> is O(n) — it's faster than pushing elements one by one (which would be O(n log n))."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`import heapq\nh = []\nheapq.heappush(h, (3, 'low'))\nheapq.heappush(h, (1, 'high'))\nheapq.heappush(h, (2, 'med'))\nd, label = heapq.heappop(h)\nprint(label)`,opts:["low","high","med","Error"],ans:1,fb:"Tuples are compared lexicographically — first by the first element. Smallest priority is 1, so (1, 'high') is popped first."},
+  {type:"bug",tag:"qt-bug",q:"A student wants the max element from a heap. What's wrong?",code:`import heapq\nh = [3, 1, 8, 2]\nheapq.heapify(h)\nprint(h[0])  # expects 8`,opts:["heapify doesn't work on pre-filled lists","h[0] is the MINIMUM, not maximum","Should use heappop not h[0]","Nothing wrong"],ans:1,fb:"Python's heap is a MIN-heap. <code>h[0]</code> = 1 (the minimum). To get the max, use <code>max(h)</code> or negate values during push."},
+  {type:"logic",tag:"qt-logic",q:"For a problem asking for 'k largest elements', which is most efficient?",opts:["Sort descending, take first k → O(n log n)","Use heapq.nlargest(k, lst) → O(n log k)","Push all to max-heap, pop k times → O(n + k log n)","B and C are both O(n log k) — use nlargest for simplicity"],ans:3,fb:"<code>heapq.nlargest(k, lst)</code> is O(n log k). Building a max-heap and popping k times is also efficient. For small k << n, both beat full sorting."},
+  {type:"out",tag:"qt-out",q:"What is h[0] after these pushes?",code:`import heapq\nh = []\nheapq.heappush(h, 10)\nheapq.heappush(h, 5)\nheapq.heappush(h, 15)\nprint(h[0])`,opts:["5","10","15","Undefined"],ans:0,fb:"Min-heap invariant: root is always the minimum. After pushing 10, 5, 15 — the minimum 5 is at h[0]."},
+  {type:"blank",tag:"qt-blank",q:"heappop() removes and returns the ___ element",opts:["last","first in order of insertion","minimum","maximum"],ans:2,fb:"<code>heapq.heappop(h)</code> removes and returns the minimum element, then re-heapifies in O(log n)."},
+  {type:"concept",tag:"qt-concept",q:"Dijkstra's algorithm uses a heap with tuples. What should the tuple be?",opts:["(node, distance)","(distance, node)","(node, neighbors)","(distance, neighbors, node)"],ans:1,fb:"<code>(distance, node)</code> — distance first so the heap is ordered by distance (min first). This ensures we always process the closest unvisited node."},
+],
+s12: [
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`def greet(name, msg="Hello"):\n    return f"{msg}, {name}!"\n\nprint(greet("Alice"))\nprint(greet("Bob", "Hi"))`,opts:["Hello, Alice!\\nHi, Bob!","Hello, Alice!\\nHello, Bob!","Alice\\nBob","Error"],ans:0,fb:"Default args fill in when not provided. First call uses default 'Hello'. Second call overrides with 'Hi'."},
+  {type:"bug",tag:"qt-bug",q:"This inner function tries to increment count. What's wrong?",code:`def make_counter():\n    count = 0\n    def inc():\n        count += 1  # bug?\n        return count\n    return inc`,opts:["count isn't defined in inner scope","Needs 'nonlocal count' before count += 1","inc() can't return values","Nothing wrong"],ans:1,fb:"<code>count += 1</code> is reassignment (count = count + 1). Without <code>nonlocal count</code>, Python creates a new local variable instead of modifying the outer one."},
+  {type:"concept",tag:"qt-concept",q:"An inner function reads an outer variable without nonlocal. This is called a ___",opts:["Decorator","Closure","Generator","Coroutine"],ans:1,fb:"A closure is an inner function that captures (closes over) variables from its enclosing scope. The inner function 'remembers' the outer variable even after the outer function returns."},
+  {type:"logic",tag:"qt-logic",q:"Which operation on a list inside a nested function does NOT need nonlocal?",opts:["lst = [1, 2, 3]  (reassignment)","lst.append(x)  (mutation)","lst = lst + [x]  (creates new list)","lst = []  (reassignment to empty)"],ans:1,fb:"<code>lst.append(x)</code> mutates the existing list object — no new object is created, so no reassignment. <code>nonlocal</code> is only needed when the variable name is rebound to a new object."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`def outer():\n    x = 10\n    def inner():\n        print(x)   # reads outer x\n    inner()\n\nouter()`,opts:["10","Error — x not in scope","None","0"],ans:0,fb:"Inner functions can freely READ outer variables. <code>x = 10</code> is visible inside <code>inner()</code> without any keyword."},
+  {type:"out",tag:"qt-out",q:"What does this lambda do?",code:`f = lambda x, y: x * y\nprint(f(3, 4))`,opts:["7","12","34","Error"],ans:1,fb:"Lambda is a one-liner function. <code>lambda x, y: x * y</code> multiplies its two args. <code>f(3,4)</code> = 12."},
+  {type:"blank",tag:"qt-blank",q:"To use a variable from an outer scope in reassignment within a nested function, use the ___ keyword",opts:["global","outer","nonlocal","extern"],ans:2,fb:"<code>nonlocal</code> tells Python to use the variable from the nearest enclosing (non-global) scope instead of creating a new local one."},
+  {type:"out",tag:"qt-out",q:"What happens here?",code:`def make_adder(n):\n    def add(x):\n        return x + n\n    return add\n\nadd5 = make_adder(5)\nprint(add5(10))`,opts:["5","10","15","Error"],ans:2,fb:"<code>make_adder(5)</code> returns <code>add</code> with <code>n=5</code> captured. Calling <code>add5(10)</code> returns <code>10 + 5 = 15</code>. This is a closure."},
+  {type:"concept",tag:"qt-concept",q:"What does the *args parameter do?",opts:["Passes keyword arguments as a dict","Passes extra positional arguments as a tuple","Makes all arguments optional","Unpacks a list into arguments"],ans:1,fb:"<code>def f(*args)</code> collects all extra positional arguments into a tuple named <code>args</code>. <code>**kwargs</code> collects keyword arguments into a dict."},
+  {type:"bug",tag:"qt-bug",q:"What is the bug with this mutable default argument?",code:`def add_item(item, lst=[]):\n    lst.append(item)\n    return lst\n\nprint(add_item(1))\nprint(add_item(2))`,opts:["No bug — prints [1] then [2]","Bug: mutable default [] is shared — prints [1] then [1,2]","TypeError","Returns None"],ans:1,fb:"Mutable default arguments are evaluated ONCE and shared across calls. The same list object is reused. Fix: <code>def add_item(item, lst=None): if lst is None: lst = []</code>"},
+],
+s13: [
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`class Dog:\n    def __init__(self, name):\n        self.name = name\n    def bark(self):\n        return self.name + " says woof"\n\nd = Dog("Rex")\nprint(d.bark())`,opts:["says woof","Rex says woof","Dog says woof","Error"],ans:1,fb:"<code>self.name</code> is 'Rex'. <code>bark()</code> returns 'Rex says woof'."},
+  {type:"bug",tag:"qt-bug",q:"This __init__ has a bug. What is it?",code:`class Point:\n    def __init__(self, x, y):\n        x = x   # bug\n        y = y`,opts:["Missing return statement","x = x creates a local variable, not self.x — should be self.x = x","y = y overwrites x","__init__ should be named __new__"],ans:1,fb:"Without <code>self.</code>, <code>x = x</code> just creates a local variable that disappears. Instance attributes must be set with <code>self.x = x</code>."},
+  {type:"blank",tag:"qt-blank",q:"Python's constructor method is named ___",opts:["__new__","__create__","__init__","constructor"],ans:2,fb:"<code>__init__</code> is called immediately after object creation. It sets up the initial state. <code>__new__</code> actually creates the object (rarely overridden)."},
+  {type:"concept",tag:"qt-concept",q:"Why must every instance method have 'self' as its first parameter?",opts:["Python requires it for syntax only","self is the explicit instance reference — it's how the method accesses instance data","Python automatically makes self = None","It's optional but conventional"],ans:1,fb:"Python doesn't implicitly pass the instance. <code>self</code> must be declared explicitly so the method knows which object's data to work with. When you call <code>obj.method()</code>, Python passes <code>obj</code> as <code>self</code> automatically."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`class Counter:\n    def __init__(self):\n        self.count = 0\n    def increment(self):\n        self.count += 1\n\nc = Counter()\nc.increment()\nc.increment()\nprint(c.count)`,opts:["0","1","2","Error"],ans:2,fb:"Two calls to <code>increment()</code>, each adds 1 to <code>self.count</code>. Count goes 0→1→2."},
+  {type:"logic",tag:"qt-logic",q:"In an interview, you implement a ListNode. What's the correct signature?",opts:["def __init__(val, next):","def __init__(self, val=0, next=None):","def init(self, val, next):","def ListNode(val, next=None):"],ans:1,fb:"<code>def __init__(self, val=0, next=None):</code> — needs <code>self</code>, uses default args so you can do <code>ListNode(5)</code> without specifying next."},
+  {type:"out",tag:"qt-out",q:"What does super() do?",code:`class Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Cat(Animal):\n    def __init__(self, name):\n        super().__init__(name)\n        self.lives = 9\n\nc = Cat("Whiskers")\nprint(c.name, c.lives)`,opts:["Error — super() not valid","Whiskers 9","Cat 9","Whiskers None"],ans:1,fb:"<code>super().__init__(name)</code> calls the parent class's <code>__init__</code>, setting <code>self.name</code>. Then <code>self.lives = 9</code> adds Cat-specific attribute."},
+  {type:"blank",tag:"qt-blank",q:"To make a class iterable (usable in for loops), implement ___",opts:["__next__ only","__iter__ and __next__","__loop__","__for__"],ans:1,fb:"Implement <code>__iter__</code> (returns self) and <code>__next__</code> (returns next value or raises StopIteration) to make a class iterable."},
+  {type:"out",tag:"qt-out",q:"What does this print?",code:`class Foo:\n    x = 10  # class variable\n\na = Foo()\nb = Foo()\na.x = 99\nprint(a.x, b.x)`,opts:["99 99","10 10","99 10","Error"],ans:2,fb:"<code>a.x = 99</code> creates an INSTANCE variable on <code>a</code> that shadows the class variable. <code>b.x</code> still reads the class variable 10."},
+  {type:"concept",tag:"qt-concept",q:"What special method lets you use len() on a custom class?",opts:["__length__","__size__","__len__","__count__"],ans:2,fb:"Implementing <code>__len__(self)</code> lets you use <code>len(obj)</code>. Python's data model uses dunder (double underscore) methods for operator and built-in overloading."},
+],
+};
+
+// ═══════════════════════════════════════════════ STATE
+const editors = {};
+const origCode = {};
+const quizState = {};
+const doneSections = new Set();
+let pyodideReady = false;
+let pyodide = null;
+
+// ═══════════════════════════════════════════════ LOADER
+async function initPyodide() {
+  const bar = document.getElementById('lbar');
+  const msg = document.getElementById('lmsg');
+  const steps = [
+    [10, 'LOADING PYTHON RUNTIME'],
+    [35, 'INITIALIZING STDLIB'],
+    [65, 'WARMING UP INTERPRETER'],
+    [85, 'BUILDING MODULES'],
+    [100, 'READY']
+  ];
+  let si = 0;
+  const tick = setInterval(() => {
+    if (si < steps.length - 1) {
+      bar.style.width = steps[si][0] + '%';
+      msg.textContent = steps[si][1];
+      si++;
+    }
+  }, 600);
+  try {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+    document.head.appendChild(script);
+    await new Promise(r => script.onload = r);
+    pyodide = await loadPyodide();
+    pyodideReady = true;
+  } catch(e) { console.warn('Pyodide failed:', e); }
+  clearInterval(tick);
+  bar.style.width = '100%';
+  msg.textContent = 'READY';
+  setTimeout(() => document.getElementById('loader').classList.add('gone'), 700);
+}
+
+// ═══════════════════════════════════════════════ EDITORS
+function initEditors() {
+  document.querySelectorAll('textarea[id^="code-"]').forEach(ta => {
+    const id = ta.id.replace('code-','');
+    origCode[id] = ta.value;
+    const cm = CodeMirror.fromTextArea(ta, {
+      mode:'python', theme:'material-ocean', lineNumbers:true,
+      autoCloseBrackets:true, matchBrackets:true, indentUnit:4,
+      indentWithTabs:false, tabSize:4,
+      extraKeys:{"Ctrl-Enter": () => id==='sandbox' ? runSandbox() : runCode(id)}
+    });
+    editors[id] = cm;
+  });
+}
+
+async function runCode(id) {
+  if (!pyodideReady) { showOut(id, 'run', '⏳ Python runtime loading…'); return; }
+  const code = editors[id].getValue();
+  const btn = document.getElementById('run-'+id);
+  btn.disabled = true;
+  showOut(id, 'run', '▶ Running…');
+  try {
+    pyodide.runPython(`
+import sys, io
+sys.stdout = io.StringIO()
+sys.stderr = io.StringIO()
+`);
+    await pyodide.runPythonAsync(code);
+    const out = pyodide.runPython('sys.stdout.getvalue()');
+    const err = pyodide.runPython('sys.stderr.getvalue()');
+    if (err) showOut(id,'err',err.trim());
+    else showOut(id,'ok', out || '(no output)');
+  } catch(e) {
+    showOut(id,'err', e.message || String(e));
+  }
+  btn.disabled = false;
+}
+
+async function runSandbox() { runCode('sandbox'); }
+
+function showOut(id, status, txt) {
+  const wrap = document.getElementById('out-'+id);
+  const lbl = document.getElementById('out-lbl-'+id);
+  const body = document.getElementById('out-body-'+id);
+  wrap.classList.add('show');
+  lbl.className = 'out-lbl ' + status;
+  lbl.textContent = status==='ok'?'✓ OUTPUT':status==='err'?'✕ ERROR':'▶ RUNNING';
+  body.className = 'out-body out-'+status;
+  body.textContent = txt;
+}
+
+function clearOut(id) {
+  const wrap = document.getElementById('out-'+id);
+  wrap.classList.remove('show');
+}
+
+function resetEditor(id) {
+  if (editors[id] && origCode[id]) editors[id].setValue(origCode[id]);
+  clearOut(id);
+}
+function resetSandbox() { resetEditor('sandbox'); }
+
+// ═══════════════════════════════════════════════ QUIZ ENGINE
+function shuffleArr(arr) {
+  const a = [...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a;
+}
+
+function initQuiz(sid) {
+  const qs = shuffleArr(QUESTIONS[sid]);
+  quizState[sid] = { qs, cur:0, score:0, answers:[] };
+  renderQuestion(sid);
+}
+
+function renderQuestion(sid) {
+  const st = quizState[sid];
+  const body = document.getElementById('qbody-'+sid);
+  const meta = document.getElementById('qmeta-'+sid);
+  if (!body) return;
+  const { qs, cur } = st;
+  meta.textContent = `Q ${cur+1} / ${qs.length}`;
+
+  body.innerHTML = '';
+  if (cur >= qs.length) { showResult(sid); return; }
+
+  const q = qs[cur];
+  const div = document.createElement('div');
+  div.className = 'q-blk active';
+  let html = `<span class="q-type-tag ${q.tag}">${q.type==='out'?'OUTPUT':q.type==='bug'?'BUG SPOT':q.type==='blank'?'FILL BLANK':q.type==='concept'?'CONCEPT':'LOGIC'}</span>`;
+  html += `<div class="q-text">${q.q}</div>`;
+  if (q.code) html += `<div class="q-codesnip">${escHtml(q.code)}</div>`;
+  html += `<div class="q-opts" id="opts-${sid}">`;
+  q.opts.forEach((o,i) => {
+    html += `<div class="q-opt" onclick="answer('${sid}',${i})" data-idx="${i}"><div class="q-key">${String.fromCharCode(65+i)}</div><span>${o.replace(/\\n/g,'↵ ')}</span></div>`;
+  });
+  html += `</div>`;
+  html += `<div class="q-fb" id="fb-${sid}">${q.fb}</div>`;
+  html += `<div class="q-nav"><div class="q-dots" id="qdots-${sid}"></div><button class="btn-next" id="btnNext-${sid}" disabled onclick="nextQ('${sid}')">Next →</button></div>`;
+  div.innerHTML = html;
+  body.appendChild(div);
+  renderDots(sid);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderDots(sid) {
+  const st = quizState[sid];
+  const container = document.getElementById('qdots-'+sid);
+  if(!container) return;
+  let h = '';
+  st.qs.forEach((_,i) => {
+    let cls = 'qdot';
+    if(i === st.cur) cls += ' cur';
+    else if(st.answers[i]===true) cls += ' ok';
+    else if(st.answers[i]===false) cls += ' ko';
+    h += `<div class="${cls}"></div>`;
+  });
+  container.innerHTML = h;
+}
+
+function answer(sid, idx) {
+  const st = quizState[sid];
+  const q = st.qs[st.cur];
+  if (st.answered) return;
+  st.answered = true;
+
+  const opts = document.querySelectorAll(`#opts-${sid} .q-opt`);
+  opts.forEach(o => o.classList.add('answered'));
+  opts[q.ans].classList.add('correct');
+  const correct = idx === q.ans;
+  if (!correct) opts[idx].classList.add('wrong');
+  if (correct) st.score++;
+  st.answers[st.cur] = correct;
+  renderDots(sid);
+
+  const fb = document.getElementById('fb-'+sid);
+  if (fb) { fb.classList.add('show','right'); fb.classList.toggle('right',correct); fb.classList.toggle('wrong',!correct); }
+
+  const btn = document.getElementById('btnNext-'+sid);
+  if(btn) btn.disabled = false;
+}
+
+function nextQ(sid) {
+  const st = quizState[sid];
+  st.cur++;
+  st.answered = false;
+  renderQuestion(sid);
+}
+
+function showResult(sid) {
+  const st = quizState[sid];
+  const pct = Math.round(st.score/st.qs.length*100);
+  const verdict = pct>=80?'MASTERED':pct>=50?'GOOD JOB':'KEEP GOING';
+  const vcls = pct>=80?'v-master':pct>=50?'v-good':'v-retry';
+  const body = document.getElementById('qbody-'+sid);
+  body.innerHTML = `<div class="q-result show">
+    <div class="q-score-big">${st.score}/${st.qs.length}</div>
+    <div class="q-res-lbl">${pct}% correct</div>
+    <div class="q-verdict ${vcls}">${verdict}</div>
+    <div class="q-res-btns">
+      <button class="btn-mark" onclick="markDone('${sid}')" id="markbtn-${sid}">✓ Mark Complete</button>
+      <button class="btn-shuffle" onclick="initQuiz('${sid}')">↺ Retry Quiz</button>
+    </div>
+  </div>`;
+  if (doneSections.has(sid)) document.getElementById('markbtn-'+sid).disabled = true;
+}
+
+function markDone(sid) {
+  doneSections.add(sid);
+  const item = document.querySelector(`.sb-item[data-sec="${sid}"]`);
+  if (item) item.classList.add('done');
+  updateProgress();
+  document.getElementById('markbtn-'+sid).disabled = true;
+}
+
+function updateProgress() {
+  const n = doneSections.size;
+  document.getElementById('prog-txt').textContent = n + ' / 13';
+  document.getElementById('prog-fill').style.width = (n/13*100) + '%';
+}
+
+// ═══════════════════════════════════════════════ NAV
+function goTo(sid) {
+  document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+  const item = document.querySelector(`.sb-item[data-sec="${sid}"]`);
+  if (item) item.classList.add('active');
+
+  const main = document.getElementById('main');
+  if (sid === 'sandbox') {
+    document.getElementById('sandbox-section').scrollIntoView({behavior:'smooth'});
+  } else {
+    const sec = document.getElementById(sid);
+    if (sec) sec.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+// Update active sidebar item on scroll
+document.getElementById('main').addEventListener('scroll', () => {
+  const sids = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13'];
+  const main = document.getElementById('main');
+  const scrollTop = main.scrollTop + 100;
+  let current = sids[0];
+  for (const sid of sids) {
+    const el = document.getElementById(sid);
+    if (el && el.offsetTop <= scrollTop) current = sid;
+  }
+  document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+  const item = document.querySelector(`.sb-item[data-sec="${current}"]`);
+  if (item) item.classList.add('active');
+});
+
+// ═══════════════════════════════════════════════ MIXED REVIEW
+function openReview() {
+  const allDone = [...doneSections];
+  const modal = document.getElementById('review-modal');
+  const sub = document.getElementById('review-sub');
+  const body = document.getElementById('review-body');
+
+  if (allDone.length < 2) {
+    sub.textContent = 'Complete at least 2 sections to unlock Mixed Review';
+    body.innerHTML = '<div style="color:var(--txt3);font-size:14px;text-align:center;padding:20px">Keep going! Mark sections complete after quizzing.</div>';
+    modal.style.display = 'flex';
+    return;
+  }
+
+  // Pick up to 8 random questions from completed sections
+  let pool = [];
+  allDone.forEach(sid => {
+    QUESTIONS[sid].forEach(q => pool.push({...q, sid}));
+  });
+  pool = shuffleArr(pool).slice(0, 8);
+
+  sub.textContent = `8 random questions from ${allDone.length} completed section${allDone.length>1?'s':''}`;
+
+  const rid = 'review';
+  quizState[rid] = { qs: pool, cur:0, score:0, answers:[] };
+  body.innerHTML = '';
+  renderReviewQuestion();
+  modal.style.display = 'flex';
+}
+
+function renderReviewQuestion() {
+  const body = document.getElementById('review-body');
+  const st = quizState['review'];
+  if (!st || st.cur >= st.qs.length) { showReviewResult(); return; }
+
+  const q = st.qs[st.cur];
+  let html = `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);margin-bottom:12px">Q ${st.cur+1} / ${st.qs.length}</div>`;
+  html += `<span class="q-type-tag ${q.tag}">${q.type==='out'?'OUTPUT':q.type==='bug'?'BUG SPOT':q.type==='blank'?'FILL BLANK':q.type==='concept'?'CONCEPT':'LOGIC'}</span>`;
+  html += `<div class="q-text">${q.q}</div>`;
+  if (q.code) html += `<div class="q-codesnip">${escHtml(q.code)}</div>`;
+  html += `<div class="q-opts" id="opts-review">`;
+  q.opts.forEach((o,i) => {
+    html += `<div class="q-opt" onclick="answerReview(${i})" data-idx="${i}"><div class="q-key">${String.fromCharCode(65+i)}</div><span>${o.replace(/\\n/g,'↵ ')}</span></div>`;
+  });
+  html += `</div><div class="q-fb" id="fb-review">${q.fb}</div>`;
+  html += `<div style="margin-top:12px;text-align:right"><button class="btn-next" id="btnNextReview" disabled onclick="nextReview()">Next →</button></div>`;
+  body.innerHTML = html;
+}
+
+function answerReview(idx) {
+  const st = quizState['review'];
+  if (st.answered) return;
+  st.answered = true;
+  const q = st.qs[st.cur];
+  const opts = document.querySelectorAll('#opts-review .q-opt');
+  opts.forEach(o => o.classList.add('answered'));
+  opts[q.ans].classList.add('correct');
+  const correct = idx === q.ans;
+  if (!correct) opts[idx].classList.add('wrong');
+  if (correct) st.score++;
+  st.answers[st.cur] = correct;
+  const fb = document.getElementById('fb-review');
+  if (fb) { fb.classList.add('show'); fb.classList.toggle('right',correct); fb.classList.toggle('wrong',!correct); }
+  const btn = document.getElementById('btnNextReview');
+  if (btn) btn.disabled = false;
+}
+
+function nextReview() {
+  const st = quizState['review'];
+  st.cur++;
+  st.answered = false;
+  renderReviewQuestion();
+}
+
+function showReviewResult() {
+  const st = quizState['review'];
+  const pct = Math.round(st.score/st.qs.length*100);
+  const verdict = pct>=80?'MASTERED':pct>=50?'GOOD JOB':'KEEP GOING';
+  const vcls = pct>=80?'v-master':pct>=50?'v-good':'v-retry';
+  document.getElementById('review-body').innerHTML = `<div class="q-result show">
+    <div class="q-score-big">${st.score}/${st.qs.length}</div>
+    <div class="q-res-lbl">${pct}% correct — Mixed Review</div>
+    <div class="q-verdict ${vcls}">${verdict}</div>
+    <div class="q-res-btns"><button class="btn-shuffle" onclick="openReview()">↺ New Mix</button></div>
+  </div>`;
+}
+
+function closeReview() {
+  document.getElementById('review-modal').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════ INIT
+window.addEventListener('DOMContentLoaded', () => {
+  initPyodide();
+  // Wait for CodeMirror to load then init editors
+  const cmCheck = setInterval(() => {
+    if (typeof CodeMirror !== 'undefined') {
+      clearInterval(cmCheck);
+      initEditors();
+      // Init all quizzes
+      const sids = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13'];
+      sids.forEach(initQuiz);
+    }
+  }, 100);
+});
+</script>
+</body>
+</html>
