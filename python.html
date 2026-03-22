@@ -1,873 +1,1743 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python for Coding Interviews — Interactive Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+:root {
+  --bg: #090910;
+  --bg2: #0f0f18;
+  --bg3: #141420;
+  --card: #10101a;
+  --card2: #15151f;
+  --border: #22223a;
+  --border2: #2a2a44;
+  --accent: #7c6aff;
+  --accent-glow: rgba(124,106,255,0.2);
+  --accent2: #ff6a9b;
+  --accent3: #4dffd2;
+  --accent4: #ffc86a;
+  --text: #e2e2f0;
+  --muted: #6060a0;
+  --muted2: #4a4a80;
+  --green: #4dffd2;
+  --red: #ff6a6a;
+  --yellow: #ffc86a;
+  --blue: #6ab8ff;
+  --purple: #b06aff;
+  --editor-bg: #07070e;
+  --editor-line: #12121c;
+  --output-bg: #060610;
+}
 
-  .header { background: linear-gradient(135deg, #1a1f2e, #2d1b69); padding: 24px; text-align: center; border-bottom: 2px solid #30363d; }
-  .header h1 { font-size: 1.6em; color: #58a6ff; margin-bottom: 6px; }
-  .header p { color: #8b949e; font-size: 0.9em; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
-  .progress-bar { background: #21262d; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 100; }
-  .progress-track { flex: 1; background: #30363d; border-radius: 99px; height: 8px; }
-  .progress-fill { background: linear-gradient(90deg, #58a6ff, #a371f7); height: 8px; border-radius: 99px; transition: width 0.4s; }
-  .progress-text { color: #8b949e; font-size: 0.85em; white-space: nowrap; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
 
-  .nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px; background: #161b22; border-bottom: 1px solid #30363d; }
-  .nav-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #30363d; background: #21262d; color: #8b949e; cursor: pointer; font-size: 0.8em; transition: all 0.2s; }
-  .nav-btn:hover { border-color: #58a6ff; color: #58a6ff; }
-  .nav-btn.active { background: #1d3557; border-color: #58a6ff; color: #58a6ff; font-weight: 600; }
-  .nav-btn.done { background: #1a3a1a; border-color: #3fb950; color: #3fb950; }
+/* ── PYODIDE LOADER OVERLAY ── */
+#loader {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  transition: opacity 0.6s ease;
+}
+#loader.hidden { opacity: 0; pointer-events: none; }
 
-  .content { padding: 20px; max-width: 860px; margin: 0 auto; }
+.loader-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .topic { display: none; animation: fadeIn 0.3s; }
-  .topic.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.loader-bar-wrap {
+  width: 280px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.loader-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent3));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.loader-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
 
-  .topic-header { margin-bottom: 20px; }
-  .topic-title { font-size: 1.4em; color: #f0f6fc; margin-bottom: 4px; }
-  .topic-subtitle { color: #8b949e; font-size: 0.9em; }
+/* ── HEADER ── */
+header {
+  position: relative;
+  padding: 80px 40px 56px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -150px; left: 50%;
+  transform: translateX(-50%);
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse, rgba(124,106,255,0.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
 
-  .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
-  .card-header { padding: 14px 18px; background: #1c2128; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-  .card-header:hover { background: #22272e; }
-  .card-title { font-weight: 600; color: #e6edf3; font-size: 0.95em; }
-  .card-badge { background: #2d333b; color: #8b949e; font-size: 0.75em; padding: 2px 8px; border-radius: 99px; }
-  .card-body { padding: 18px; display: none; border-top: 1px solid #30363d; }
-  .card-body.open { display: block; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--accent3);
+  text-transform: uppercase;
+  border: 1px solid rgba(77,255,210,0.25);
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+  background: rgba(77,255,210,0.07);
+}
+.badge-dot {
+  width: 6px; height: 6px;
+  background: var(--accent3);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
 
-  .concept-box { background: #0d1117; border-left: 3px solid #58a6ff; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 14px; }
-  .concept-box.green { border-color: #3fb950; }
-  .concept-box.yellow { border-color: #d29922; }
-  .concept-box.red { border-color: #f85149; }
-  .concept-box.purple { border-color: #a371f7; }
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 5.5vw, 68px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin-bottom: 16px;
+}
+h1 .grad {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 45%, var(--accent3) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .label { font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; color: #8b949e; margin-bottom: 6px; }
+.sub {
+  color: var(--muted);
+  font-size: 16px;
+  max-width: 500px;
+  margin: 0 auto 36px;
+}
 
-  code, .code { font-family: 'Consolas', 'Courier New', monospace; }
-  .code-block { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 14px; margin: 10px 0; overflow-x: auto; }
-  .code-block code { color: #e6edf3; font-size: 0.88em; line-height: 1.7; white-space: pre; }
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.stat-n { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: var(--accent3); }
+.stat-l { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
 
-  .kw { color: #ff7b72; }
-  .fn { color: #d2a8ff; }
-  .str { color: #a5d6ff; }
-  .num { color: #79c0ff; }
-  .cm { color: #6e7681; font-style: italic; }
-  .var { color: #ffa657; }
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(9,9,16,0.95);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  overflow-x: auto;
+}
+nav::-webkit-scrollbar { height: 0; }
+.nav-inner { display: flex; white-space: nowrap; min-width: max-content; }
+.nb {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  color: var(--muted);
+  background: none; border: none;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+.nb::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 16px; right: 16px;
+  height: 2px;
+  background: var(--accent3);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+  border-radius: 2px 2px 0 0;
+}
+.nb:hover { color: var(--text); }
+.nb:hover::after { transform: scaleX(1); }
+.nb.active { color: var(--accent3); }
+.nb.active::after { transform: scaleX(1); }
 
-  .analogy { background: #1a2332; border: 1px solid #1d3557; border-radius: 8px; padding: 14px; margin: 10px 0; }
-  .analogy .em { color: #58a6ff; font-weight: 600; }
+/* ── MAIN ── */
+main { max-width: 900px; margin: 0 auto; padding: 56px 32px 80px; }
 
-  .gotcha { background: #2d1515; border: 1px solid #3d1a1a; border-radius: 8px; padding: 12px 14px; margin: 10px 0; }
-  .gotcha .g-title { color: #f85149; font-weight: 600; font-size: 0.85em; margin-bottom: 6px; }
+/* ── SECTION ── */
+.section { margin-bottom: 80px; }
 
-  .tip { background: #1a2d1a; border: 1px solid #1a3d1a; border-radius: 8px; padding: 12px 14px; margin: 10px 0; }
-  .tip .t-title { color: #3fb950; font-weight: 600; font-size: 0.85em; margin-bottom: 6px; }
+.sec-hdr {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.sec-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  color: var(--accent3);
+  background: rgba(77,255,210,0.09);
+  border: 1px solid rgba(77,255,210,0.2);
+  padding: 3px 9px; border-radius: 4px;
+  letter-spacing: 1px;
+}
+.sec-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px; font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.sec-icon { font-size: 22px; }
 
-  .quiz-section { margin-top: 20px; }
-  .quiz-q { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
-  .quiz-question { font-weight: 600; margin-bottom: 12px; color: #e6edf3; }
-  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
-  .quiz-opt { background: #21262d; border: 1px solid #30363d; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; font-size: 0.9em; color: #e6edf3; text-align: left; }
-  .quiz-opt:hover { border-color: #58a6ff; background: #1d3557; }
-  .quiz-opt.correct { background: #1a3a1a; border-color: #3fb950; color: #3fb950; }
-  .quiz-opt.wrong { background: #2d1515; border-color: #f85149; color: #f85149; }
-  .quiz-feedback { margin-top: 10px; padding: 10px 14px; border-radius: 8px; font-size: 0.88em; display: none; }
-  .quiz-feedback.show { display: block; }
-  .quiz-feedback.ok { background: #1a3a1a; color: #3fb950; }
-  .quiz-feedback.bad { background: #2d1515; color: #f85149; }
+/* ── CONCEPT CARD ── */
+.concept {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s;
+}
+.concept:hover { border-color: var(--border2); }
+.concept::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+.concept.g::before { background: var(--green); }
+.concept.r::before { background: var(--red); }
+.concept.y::before { background: var(--yellow); }
+.concept.b::before { background: var(--blue); }
+.concept.p::before { background: var(--purple); }
+.concept.pk::before { background: var(--accent2); }
 
-  .bottom-nav { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 16px; border-top: 1px solid #30363d; }
-  .btn { padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.9em; font-weight: 600; transition: all 0.2s; }
-  .btn-primary { background: #1f6feb; color: white; }
-  .btn-primary:hover { background: #388bfd; }
-  .btn-secondary { background: #21262d; color: #e6edf3; border: 1px solid #30363d; }
-  .btn-secondary:hover { background: #2d333b; }
-  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.ctitle {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.concept p { color: #a8a8cc; font-size: 14px; margin-bottom: 10px; }
+.concept p:last-child { margin-bottom: 0; }
 
-  .cheatsheet { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 600px) { .cheatsheet { grid-template-columns: 1fr; } }
-  .cs-item { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px; }
-  .cs-item .cs-title { color: #58a6ff; font-weight: 600; font-size: 0.85em; margin-bottom: 8px; }
-  .cs-item code { color: #a5d6ff; font-size: 0.82em; display: block; margin: 3px 0; }
+/* ── ALERT BOXES ── */
+.box {
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 13.5px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.box-i { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.box.warn { background: rgba(255,106,106,0.07); border: 1px solid rgba(255,106,106,0.22); color: #ffbbbb; }
+.box.tip  { background: rgba(77,255,210,0.06);  border: 1px solid rgba(77,255,210,0.18);  color: #aaffee; }
+.box.info { background: rgba(106,184,255,0.07); border: 1px solid rgba(106,184,255,0.2);  color: #bbd8ff; }
+.box.mind { background: rgba(176,106,255,0.07); border: 1px solid rgba(176,106,255,0.2);  color: #d8bbff; }
+.box b { font-weight: 600; }
+.box code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius: 3px; }
 
-  .memory-hook { background: linear-gradient(135deg, #1a1040, #2d1b69); border: 1px solid #6e40c9; border-radius: 10px; padding: 14px; margin: 12px 0; }
-  .memory-hook .mh-title { color: #a371f7; font-weight: 700; font-size: 0.85em; margin-bottom: 6px; }
-  .memory-hook p { font-size: 0.9em; line-height: 1.6; }
+/* ── CODE EDITOR ── */
+.editor-wrap {
+  background: var(--editor-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 14px 0;
+  transition: border-color 0.2s;
+}
+.editor-wrap:focus-within { border-color: rgba(124,106,255,0.5); }
 
-  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.88em; }
-  th { background: #21262d; color: #8b949e; padding: 8px 12px; text-align: left; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; }
-  td { padding: 8px 12px; border-bottom: 1px solid #21262d; color: #e6edf3; }
-  tr:hover td { background: #1c2128; }
+.editor-topbar {
+  background: rgba(255,255,255,0.025);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.editor-dots { display: flex; gap: 6px; }
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.dot-r { background: #ff5f56; }
+.dot-y { background: #ffbd2e; }
+.dot-g { background: #27c93f; }
+
+.editor-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  color: var(--muted2);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  flex: 1;
+  text-align: center;
+}
+
+.editor-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn-run {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1px;
+  color: #000;
+  background: var(--accent3);
+  border: none;
+  padding: 5px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+.btn-run:hover { background: #7afff0; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(77,255,210,0.3); }
+.btn-run:active { transform: translateY(0); }
+.btn-run:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-run svg { width: 10px; height: 10px; }
+
+.btn-reset {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted2);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+}
+.btn-reset:hover { color: var(--text); border-color: var(--border2); }
+
+/* ── EDITOR BODY ── */
+.editor-body {
+  position: relative;
+  display: flex;
+}
+.line-nums {
+  padding: 14px 0 14px;
+  background: rgba(255,255,255,0.015);
+  border-right: 1px solid var(--border);
+  min-width: 42px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  color: var(--muted2);
+  line-height: 1.6;
+  user-select: none;
+  padding-right: 10px;
+  padding-left: 8px;
+}
+.code-textarea {
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border: none;
+  outline: none;
+  resize: none;
+  tab-size: 4;
+  caret-color: var(--accent3);
+  white-space: pre;
+  overflow-x: auto;
+  min-height: 80px;
+  field-sizing: content;
+}
+.code-textarea::selection { background: rgba(124,106,255,0.3); }
+
+/* ── OUTPUT ── */
+.output-wrap {
+  border-top: 1px solid var(--border);
+  background: var(--output-bg);
+  display: none;
+}
+.output-wrap.visible { display: block; }
+.output-header {
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.02);
+}
+.output-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.output-label.ok  { color: var(--green); }
+.output-label.err { color: var(--red); }
+.output-label.run { color: var(--yellow); }
+
+.clear-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+.clear-btn:hover { color: var(--muted); }
+
+.output-content {
+  padding: 12px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.output-content::-webkit-scrollbar { width: 4px; }
+.output-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.out-stdout { color: var(--accent3); }
+.out-error  { color: var(--red); }
+.out-running { color: var(--yellow); font-style: italic; animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── TABLE ── */
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  margin: 14px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.tbl th {
+  background: rgba(255,255,255,0.04);
+  padding: 9px 14px;
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.tbl td {
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: #c0c0e8;
+  vertical-align: top;
+}
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: rgba(255,255,255,0.02); }
+.yes { color: var(--green); font-weight: 700; }
+.no  { color: var(--red); }
+
+/* ── CHEATSHEET GRID ── */
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.ref-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color 0.2s;
+}
+.ref-card:hover { border-color: var(--border2); }
+.ref-card-t {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent3);
+  margin-bottom: 10px;
+}
+.ref-card p { font-size: 12.5px; color: var(--muted); margin: 3px 0; }
+.ic { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: rgba(77,255,210,0.1); color: #aaffee; padding: 1px 5px; border-radius: 3px; border: 1px solid rgba(77,255,210,0.15); }
+
+/* ── GOTCHAS ── */
+.gotcha-list { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+
+/* ── BACK TOP ── */
+#btt {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--accent);
+  color: white; border: none;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  font-size: 17px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(124,106,255,0.4);
+  transition: transform 0.2s, opacity 0.3s;
+  opacity: 0; transform: translateY(10px);
+  z-index: 300;
+}
+#btt.show { opacity: 1; transform: translateY(0); }
+#btt:hover { transform: translateY(-2px) scale(1.05); }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 36px;
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+footer span { color: var(--accent3); }
+
+@media (max-width: 600px) {
+  header { padding: 50px 20px 40px; }
+  main { padding: 36px 16px 60px; }
+  nav { padding: 0 12px; }
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🐍 Python for Coding Interviews</h1>
-  <p>Learn it once. Never forget it. Interactive guide from the video.</p>
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">🐍 PyGuide</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="lbar"></div></div>
+  <div class="loader-text" id="ltxt">Loading Python runtime...</div>
 </div>
 
-<div class="progress-bar">
-  <span class="progress-text" id="prog-label">Topic 1 of 10</span>
-  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:10%"></div></div>
-  <span class="progress-text" id="score-label">0 pts</span>
-</div>
+<!-- HEADER -->
+<header>
+  <div class="badge"><span class="badge-dot"></span>Live Python Runtime · Editable + Runnable</div>
+  <h1>Python for<br><span class="grad">Coding Interviews</span></h1>
+  <p class="sub">Every concept from NeetCode's transcript. Edit any code block and run it live — right here in your browser.</p>
+  <div class="stats">
+    <div><div class="stat-n">13</div><div class="stat-l">Topics</div></div>
+    <div><div class="stat-n">50+</div><div class="stat-l">Live Editors</div></div>
+    <div><div class="stat-n">100%</div><div class="stat-l">Offline</div></div>
+  </div>
+</header>
 
-<div class="nav" id="nav"></div>
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <button class="nb" onclick="goTo('s1')">01 Variables</button>
+    <button class="nb" onclick="goTo('s2')">02 If/Else</button>
+    <button class="nb" onclick="goTo('s3')">03 Loops</button>
+    <button class="nb" onclick="goTo('s4')">04 Math</button>
+    <button class="nb" onclick="goTo('s5')">05 Lists</button>
+    <button class="nb" onclick="goTo('s6')">06 Strings</button>
+    <button class="nb" onclick="goTo('s7')">07 Queues</button>
+    <button class="nb" onclick="goTo('s8')">08 Hash Sets</button>
+    <button class="nb" onclick="goTo('s9')">09 Hash Maps</button>
+    <button class="nb" onclick="goTo('s10')">10 Tuples</button>
+    <button class="nb" onclick="goTo('s11')">11 Heaps</button>
+    <button class="nb" onclick="goTo('s12')">12 Functions</button>
+    <button class="nb" onclick="goTo('s13')">13 Classes</button>
+    <button class="nb" onclick="goTo('s14')">⚡ Cheatsheet</button>
+  </div>
+</nav>
 
-<div class="content" id="content"></div>
+<main>
 
+<!-- ══════════ 01 VARIABLES ══════════ -->
+<section class="section" id="s1">
+  <div class="sec-hdr">
+    <span class="sec-num">01</span>
+    <h2 class="sec-title">Variables &amp; Types</h2>
+    <span class="sec-icon">📦</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: Sticky Notes, not labeled boxes</div>
+    <p>In Java/C++, a variable is a <strong>labeled box</strong> — the box type is fixed forever. In Python, a variable is a <strong>sticky note</strong> you attach to any object. The note can move to anything, anytime.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Dynamic typing &amp; multiple assignment</div>
+    <p>No type declarations. Reassign to any type freely. Assign multiple variables on one line.</p>
+  </div>
+  <div data-code="# No type declaration needed
+n = 0
+print(n)   # 0
+
+# Reassign to a different type — totally fine
+n = 'abc'
+print(n)   # abc
+
+# Multiple assignment
+a, b = 1, 2
+print(a, b)  # 1 2
+
+# Swap — no temp variable needed!
+a, b = b, a
+print(a, b)  # 2 1"></div>
+
+  <div class="concept y">
+    <div class="ctitle">⚠️ Incrementing — No ++ in Python!</div>
+    <div data-code="n = 5
+n = n + 1   # works
+print(n)    # 6
+
+n += 1      # also works
+print(n)    # 7
+
+# n++  ← SyntaxError! Does not exist in Python"></div>
+    <div class="box warn"><span class="box-i">⚠️</span><div><b>n++</b> throws a SyntaxError. Always use <code>n += 1</code>.</div></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">None — Python's null</div>
+    <div data-code="n = 4
+n = None      # reassign to nothing
+print(n)      # None
+
+# Check for None:
+if n is None:
+    print('n has no value')"></div>
+  </div>
+</section>
+
+<!-- ══════════ 02 CONDITIONALS ══════════ -->
+<section class="section" id="s2">
+  <div class="sec-hdr">
+    <span class="sec-num">02</span>
+    <h2 class="sec-title">If / Else Statements</h2>
+    <span class="sec-icon">🔀</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: Same logic, less clutter</div>
+    <p>Python drops the <strong>( )</strong> around conditions and <strong>{ }</strong> for blocks. A <strong>colon :</strong> ends the condition and <strong>indentation</strong> marks the block body.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">if / elif / else — basic structure</div>
+    <div data-code="n = 5
+
+if n > 10:            # colon, no parentheses
+    print('big')      # indented body
+elif n == 5:          # 'elif' not 'else if'
+    print('five')     # this will run
+else:
+    print('small')"></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">Logical operators — English words</div>
+    <div data-code="n = 7
+
+# && → and   |   || → or   |   ! → not
+if n > 0 and n < 10:
+    print('between 0 and 10')  # prints
+
+if n == 0 or n == 7:
+    print('zero or seven')     # prints
+
+if not (n == 5):
+    print('not five')          # prints"></div>
+  </div>
+
+  <div class="concept y">
+    <div class="ctitle">Multi-line conditions — need parentheses</div>
+    <div data-code="n = 42
+
+# When spanning multiple lines, wrap in ( )
+if (n > 0 and
+    n < 100 and
+    n % 2 == 0):
+    print('positive even under 100')  # prints"></div>
+    <div class="box warn"><span class="box-i">⚠️</span><div>Without the outer <code>()</code> on a multi-line condition, Python throws a <b>SyntaxError</b>.</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 03 LOOPS ══════════ -->
+<section class="section" id="s3">
+  <div class="sec-hdr">
+    <span class="sec-num">03</span>
+    <h2 class="sec-title">Loops</h2>
+    <span class="sec-icon">🔄</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: range(start, stop, step)</div>
+    <p>"Give me numbers from <em>start</em> up to but NOT including <em>stop</em>, jumping by <em>step</em>." Stop is always exclusive — just like slicing.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">While loop</div>
+    <div data-code="n = 0
+while n < 5:       # no parentheses, colon at end
+    print(n)       # 0 1 2 3 4
+    n += 1"></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">For loop — 3 forms of range()</div>
+    <div data-code="# Form 1: range(n) → 0 to n-1
+print('0 to 4:')
+for i in range(5):
+    print(i, end=' ')
+
+# Form 2: range(start, stop)
+print('\n2 to 5:')
+for i in range(2, 6):
+    print(i, end=' ')
+
+# Form 3: range(start, stop, step) — reverse
+print('\n5 down to 2:')
+for i in range(5, 1, -1):
+    print(i, end=' ')
+
+# Step by 2
+print('\nEvens 0-8:')
+for i in range(0, 10, 2):
+    print(i, end=' ')"></div>
+  </div>
+
+  <table class="tbl">
+    <tr><th>range() call</th><th>Output</th><th>Use case</th></tr>
+    <tr><td>range(5)</td><td>0 1 2 3 4</td><td>Loop n times</td></tr>
+    <tr><td>range(2, 6)</td><td>2 3 4 5</td><td>Start at specific index</td></tr>
+    <tr><td>range(5, 1, -1)</td><td>5 4 3 2</td><td>Reverse iteration</td></tr>
+    <tr><td>range(0, 10, 2)</td><td>0 2 4 6 8</td><td>Every other element</td></tr>
+  </table>
+</section>
+
+<!-- ══════════ 04 MATH ══════════ -->
+<section class="section" id="s4">
+  <div class="sec-hdr">
+    <span class="sec-num">04</span>
+    <h2 class="sec-title">Math &amp; Division</h2>
+    <span class="sec-icon">➗</span>
+  </div>
+
+  <div class="concept r">
+    <div class="ctitle">⚠️ Division is DECIMAL by default — unlike most languages!</div>
+    <div data-code="# Regular division → always decimal
+print(5 / 2)       # 2.5 ← NOT 2 like Java/C++!
+
+# Integer (floor) division
+print(5 // 2)      # 2
+
+# ⚠️ Python floors toward -infinity, not toward zero!
+print(-3 // 2)     # -2  ← NOT -1 like Java/C++!
+
+# Safe truncation (toward zero, like other languages)
+print(int(-3 / 2)) # -1  ← convert float to int"></div>
+    <div class="box warn"><span class="box-i">⚠️</span><div><b>Critical:</b> <code>-3 // 2</code> = <b>-2</b> in Python (floors down). Java/C++ give <b>-1</b> (truncates toward zero). Use <code>int(a/b)</code> to match other languages.</div></div>
+  </div>
+
+  <div class="concept y">
+    <div class="ctitle">⚠️ Modulo with negatives is also different!</div>
+    <div data-code="import math
+
+print(10 % 3)              # 1   (normal)
+print(-10 % 3)             # 2   ← NOT -1! Python gives positive remainder
+
+# To match Java/C++ behavior:
+print(math.fmod(-10, 3))   # -1.0  (C-style remainder)"></div>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Full math toolkit</div>
+    <div data-code="import math
+
+print(math.floor(3.9))    # 3   — round down
+print(math.ceil(3.1))     # 4   — round up
+print(math.sqrt(16))      # 4.0 — square root
+print(2 ** 10)             # 1024 — power (2^10)
+print(abs(-7))             # 7   — absolute value
+
+# Infinity — beats any real number
+print(float('inf'))        # inf
+print(float('-inf'))       # -inf
+print(999999 < float('inf'))  # True
+
+# Python integers NEVER overflow!
+huge = 2 ** 200
+print(huge < float('inf')) # True — even this giant is finite"></div>
+    <div class="box tip"><span class="box-i">💡</span><div>Use <code>float('inf')</code> and <code>float('-inf')</code> as initial values when finding min/max — any real number will beat them on the first comparison.</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 05 LISTS ══════════ -->
+<section class="section" id="s5">
+  <div class="sec-hdr">
+    <span class="sec-num">05</span>
+    <h2 class="sec-title">Lists (Arrays)</h2>
+    <span class="sec-icon">📋</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: Dynamic arrays that do everything</div>
+    <p>Python lists grow automatically. They serve as arrays, stacks, or queues. The most versatile structure in Python.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Basics — create, access, modify</div>
+    <div data-code="nums = [1, 2, 3, 4, 5]
+
+# Read by index — O(1)
+print(nums[0])    # 1  — first
+print(nums[-1])   # 5  — LAST (negative index!)
+print(nums[-2])   # 4  — second to last
+
+# Modify
+nums[0] = 99
+print(nums)       # [99, 2, 3, 4, 5]
+
+# Length
+print(len(nums))  # 5"></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">Stack operations — push/pop from end</div>
+    <div data-code="stack = [1, 2, 3]
+
+stack.append(4)    # push → O(1)
+stack.append(5)
+print(stack)       # [1, 2, 3, 4, 5]
+
+val = stack.pop()  # pop last → O(1)
+print(val)         # 5
+print(stack)       # [1, 2, 3, 4]
+
+# Insert into middle — O(n), slower!
+stack.insert(1, 99)   # insert 99 at index 1
+print(stack)           # [1, 99, 2, 3, 4]"></div>
+    <div class="box info"><span class="box-i">ℹ️</span><div><b>O(1)</b> for append/pop at end. <b>O(n)</b> for insert in middle — all elements shift.</div></div>
+  </div>
+
+  <div class="concept p">
+    <div class="ctitle">Slicing — "give me a chunk"</div>
+    <div data-code="nums = [1, 2, 3, 4, 5]
+
+print(nums[1:3])   # [2, 3]    — index 1 up to (not including) 3
+print(nums[0:4])   # [1, 2, 3, 4]
+print(nums[2:])    # [3, 4, 5] — from index 2 to end
+print(nums[:3])    # [1, 2, 3] — from start to index 3
+print(nums[:])     # [1, 2, 3, 4, 5] — full copy
+print(nums[::-1])  # [5, 4, 3, 2, 1] — reversed!"></div>
+    <div class="box mind"><span class="box-i">🧠</span><div>Slicing = <b>[start : stop]</b> — start is included, stop is excluded. Same rule as range()!</div></div>
+  </div>
+
+  <div class="concept y">
+    <div class="ctitle">⚠️ Initializing — the 2D list trap</div>
+    <div data-code="# Simple init
+arr = [0] * 5
+print(arr)   # [0, 0, 0, 0, 0]
+
+# ✅ CORRECT 2D grid — each row is a unique list
+grid = [[0] * 4 for i in range(4)]
+grid[0][0] = 99
+print(grid)   # only row 0 changed
+
+# ❌ WRONG — all rows are the SAME list object!
+bad = [[0] * 4] * 4
+bad[0][0] = 99
+print(bad)    # ALL rows changed to 99!"></div>
+    <div class="box warn"><span class="box-i">⚠️</span><div><b>The 2D trap:</b> <code>[[0]*4]*4</code> creates 4 references to the SAME inner list. Always use list comprehension for 2D grids!</div></div>
+  </div>
+
+  <div class="concept pk">
+    <div class="ctitle">Unpacking &amp; zip</div>
+    <div data-code="# Unpack list into variables
+a, b, c = [1, 2, 3]
+print(a, b, c)   # 1 2 3
+
+# Enumerate — index AND value
+nums = [10, 20, 30]
+for i, n in enumerate(nums):
+    print(i, n)   # 0 10 | 1 20 | 2 30
+
+# Zip — two lists at once
+names = ['alice', 'bob', 'carol']
+scores = [88, 72, 95]
+for name, score in zip(names, scores):
+    print(name, score)"></div>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Sorting &amp; reversing</div>
+    <div data-code="nums = [3, 1, 4, 1, 5, 9, 2]
+
+nums.sort()                      # ascending in-place
+print(nums)
+
+nums.sort(reverse=True)          # descending
+print(nums)
+
+# Custom sort — by string length
+words = ['banana', 'fig', 'apple', 'kiwi']
+words.sort(key=lambda x: len(x)) # lambda = mini function
+print(words)                     # shortest first
+
+# Reverse a list
+nums.reverse()
+print(nums)"></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">List comprehension — build lists in one line</div>
+    <div data-code="# Squares of 0-4
+squares = [i*i for i in range(5)]
+print(squares)   # [0, 1, 4, 9, 16]
+
+# Doubled
+doubles = [i*2 for i in range(5)]
+print(doubles)   # [0, 2, 4, 6, 8]
+
+# With filter condition
+evens = [i for i in range(10) if i % 2 == 0]
+print(evens)     # [0, 2, 4, 6, 8]
+
+# 2D grid the right way
+grid = [[0] * 3 for _ in range(3)]
+print(grid)"></div>
+    <div class="box mind"><span class="box-i">🧠</span><div>Read <code>[expr for x in iterable if cond]</code> as: "give me <b>expr</b> for every <b>x</b> in <b>iterable</b>, but only if <b>cond</b> is true."</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 06 STRINGS ══════════ -->
+<section class="section" id="s6">
+  <div class="sec-hdr">
+    <span class="sec-num">06</span>
+    <h2 class="sec-title">Strings</h2>
+    <span class="sec-icon">📝</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: Immutable list of characters</div>
+    <p>Strings work like lists — you can index and slice them. But they are <strong>frozen</strong> — you can never change a character in place. Every modification creates a brand new string.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Basics — immutability &amp; slicing</div>
+    <div data-code='s = "hello"
+
+# Slice like a list
+print(s[1:3])    # "el"
+print(s[-1])     # "o"  — last char
+
+# Concatenation creates NEW string (O(n)!)
+s2 = s + " world"
+print(s2)        # "hello world"
+print(s)         # "hello" — original unchanged
+
+# Try modifying in place:
+try:
+    s[0] = "H"
+except TypeError as e:
+    print("Error:", e)   # strings are immutable!'></div>
+    <div class="box warn"><span class="box-i">⚠️</span><div>Every <code>+</code> on strings creates a new string — it's <b>O(n)</b>. Inside loops, append to a list then <code>join</code> at the end.</div></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">Type conversion &amp; ASCII</div>
+    <div data-code='# int ↔ string conversion
+print(str(123))         # "123"
+print(int("456"))       # 456
+
+# String "addition" is concatenation
+print("1" + "2")        # "12"   (NOT 3!)
+print(1 + 2)            # 3
+
+# ASCII value of a character
+print(ord("a"))         # 97
+print(ord("A"))         # 65
+print(chr(97))          # "a"  — reverse of ord
+print(chr(ord("a") + 1)) # "b"'></div>
+  </div>
+
+  <div class="concept y">
+    <div class="ctitle">join() — the RIGHT way to build strings</div>
+    <div data-code='words = ["hello", "world", "!"]
+
+print("".join(words))    # "helloworld!"
+print(" ".join(words))   # "hello world !"
+print("-".join(words))   # "hello-world-!"
+
+# Best practice: build list, then join once
+chars = []
+for c in "hello":
+    chars.append(c.upper())
+result = "".join(chars)
+print(result)            # "HELLO"'></div>
+    <div class="box tip"><span class="box-i">💡</span><div>Read <code>"sep".join(list)</code> as: "join these items together with sep as the glue." The string before <code>.join</code> is the separator.</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 07 QUEUES ══════════ -->
+<section class="section" id="s7">
+  <div class="sec-hdr">
+    <span class="sec-num">07</span>
+    <h2 class="sec-title">Queues (deque)</h2>
+    <span class="sec-icon">🚶</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: A double-ended hallway</div>
+    <p>A regular list can add/remove from the right in O(1). But removing from the <strong>left is O(n)</strong> — every element shifts. <strong>deque</strong> does both ends in O(1).</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">deque — all operations</div>
+    <div data-code="from collections import deque
+
+q = deque()
+
+# Add to right — O(1)
+q.append(1)
+q.append(2)
+q.append(3)
+print(q)          # deque([1, 2, 3])
+
+# Add to LEFT — O(1) ← list can't do this fast!
+q.appendleft(0)
+print(q)          # deque([0, 1, 2, 3])
+
+# Remove from left — O(1) — used in BFS!
+print(q.popleft()) # 0
+print(q)           # deque([1, 2, 3])
+
+# Remove from right — O(1)
+print(q.pop())     # 3
+print(q)           # deque([1, 2])
+
+print(len(q))      # 2"></div>
+  </div>
+
+  <table class="tbl">
+    <tr><th>Operation</th><th>List</th><th>Deque</th></tr>
+    <tr><td>Add to end</td><td class="yes">O(1) ✓</td><td class="yes">O(1) ✓</td></tr>
+    <tr><td>Remove from end</td><td class="yes">O(1) ✓</td><td class="yes">O(1) ✓</td></tr>
+    <tr><td>Add to front</td><td class="no">O(n) ✗</td><td class="yes">O(1) ✓</td></tr>
+    <tr><td>Remove from front</td><td class="no">O(n) ✗</td><td class="yes">O(1) ✓</td></tr>
+  </table>
+</section>
+
+<!-- ══════════ 08 HASH SETS ══════════ -->
+<section class="section" id="s8">
+  <div class="sec-hdr">
+    <span class="sec-num">08</span>
+    <h2 class="sec-title">Hash Sets</h2>
+    <span class="sec-icon">🔍</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: A bag that instantly knows what's inside</div>
+    <p>A list checks membership by scanning every element — O(n). A set uses hashing to answer "is X in here?" in <strong>O(1)</strong> — instantly, regardless of size. Trade-off: no duplicates, no ordering.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Hash set — all operations</div>
+    <div data-code="# Create
+s = {1, 2, 3}
+
+# Add — O(1)
+s.add(4)
+s.add(2)    # already exists, no duplicate
+print(s)    # {1, 2, 3, 4}
+
+# Membership check — O(1) ← superpower!
+print(1 in s)    # True
+print(99 in s)   # False
+
+# Remove — O(1)
+s.remove(3)
+print(s)    # {1, 2, 4}
+
+# Size
+print(len(s))   # 3
+
+# Init from list (removes duplicates!)
+s2 = set([1, 1, 2, 2, 3])
+print(s2)   # {1, 2, 3}
+
+# Set comprehension
+s3 = {i*i for i in range(5)}
+print(s3)   # {0, 1, 4, 9, 16}"></div>
+    <div class="box tip"><span class="box-i">💡</span><div>Use sets to answer <b>"have I seen this before?"</b> — cycle detection, visited nodes in graphs, finding duplicates. All O(1).</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 09 HASH MAPS ══════════ -->
+<section class="section" id="s9">
+  <div class="sec-hdr">
+    <span class="sec-num">09</span>
+    <h2 class="sec-title">Hash Maps (Dictionaries)</h2>
+    <span class="sec-icon">🗂️</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: A lookup table — key → value</div>
+    <p>Like a real dictionary: look up a word (key) to find its definition (value). All lookups, inserts, and deletes are <strong>O(1)</strong>. The #1 most used data structure in interviews.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Dictionary — all operations</div>
+    <div data-code="d = {}
+
+# Insert / Update — O(1)
+d['alice'] = 88
+d['bob'] = 72
+d['alice'] = 90    # update existing
+
+# Read
+print(d['alice'])   # 90
+
+# Safe read (avoids KeyError if key missing)
+print(d.get('charlie', 0))   # 0 — default value
+
+# Check key exists — O(1)
+print('alice' in d)   # True
+print('zara' in d)    # False
+
+# Delete
+del d['bob']
+print(d)   # {'alice': 90}
+
+# Size
+print(len(d))   # 1"></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">Initializing &amp; dict comprehension</div>
+    <div data-code="# Initialize with values
+d = {'alice': 88, 'bob': 72, 'carol': 95}
+print(d)
+
+# Dict comprehension — map i to i*2
+d2 = {i: i*2 for i in range(5)}
+print(d2)   # {0:0, 1:2, 2:4, 3:6, 4:8}
+
+# Build adjacency list for graphs:
+adj = {i: [] for i in range(5)}
+adj[0].append(1)
+adj[0].append(2)
+print(adj)"></div>
+  </div>
+
+  <div class="concept p">
+    <div class="ctitle">Looping — 3 ways</div>
+    <div data-code="d = {'a': 1, 'b': 2, 'c': 3}
+
+# 1. Keys only (default)
+print('Keys:')
+for key in d:
+    print(key, end=' ')
+
+# 2. Values only
+print('\nValues:')
+for val in d.values():
+    print(val, end=' ')
+
+# 3. Both — most useful!
+print('\nItems:')
+for key, val in d.items():
+    print(f'{key}={val}', end=' ')"></div>
+    <div class="box tip"><span class="box-i">💡</span><div><b>Most common:</b> <code>for key, val in d.items()</code> — use this whenever you need both.</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 10 TUPLES ══════════ -->
+<section class="section" id="s10">
+  <div class="sec-hdr">
+    <span class="sec-num">10</span>
+    <h2 class="sec-title">Tuples</h2>
+    <span class="sec-icon">🔒</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: A frozen, read-only list</div>
+    <p>Tuples are like lists but <strong>immutable</strong>. Because they can't change, Python can use them as dictionary keys or set members — something lists can't do.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Tuples as hashable keys</div>
+    <div data-code="# Create tuple (parentheses not brackets)
+t = (1, 2)
+print(t[0])   # 1 — can read
+# t[0] = 5   # ← TypeError: cannot modify!
+
+# ✅ Tuple as dictionary key (coordinate map)
+d = {}
+d[(0, 0)] = 'origin'
+d[(1, 2)] = 'point A'
+print(d)
+
+# ✅ Tuples in a set (visited tracking)
+visited = {(0,0), (1,2), (3,4)}
+print((1, 2) in visited)   # True
+
+# Test that lists fail as keys:
+try:
+    bad = {[1,2]: 'point'}
+except TypeError as e:
+    print('Error:', e)   # lists are not hashable"></div>
+    <div class="box info"><span class="box-i">ℹ️</span><div><b>Hashable = immutable.</b> Tuples ✓  Strings ✓  Integers ✓  Lists ✗  Dicts ✗</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 11 HEAPS ══════════ -->
+<section class="section" id="s11">
+  <div class="sec-hdr">
+    <span class="sec-num">11</span>
+    <h2 class="sec-title">Heaps (Priority Queue)</h2>
+    <span class="sec-icon">🏔️</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: A self-sorting queue — smallest always at top</div>
+    <p>After every push or pop, the heap reorganizes so the <strong>minimum value is always at index 0</strong>. You never search for the min — it's always right there.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Min heap — default in Python</div>
+    <div data-code="import heapq
+
+heap = []
+
+# Push — O(log n)
+heapq.heappush(heap, 3)
+heapq.heappush(heap, 1)
+heapq.heappush(heap, 4)
+heapq.heappush(heap, 2)
+
+# Peek minimum — O(1), always at index 0!
+print('min:', heap[0])   # 1
+
+# Pop minimum — O(log n)
+print(heapq.heappop(heap))  # 1
+print(heapq.heappop(heap))  # 2
+print(heapq.heappop(heap))  # 3
+print(heapq.heappop(heap))  # 4
+# Pops in sorted order!"></div>
+  </div>
+
+  <div class="concept r">
+    <div class="ctitle">Max heap — negate values (Python trick)</div>
+    <div data-code="import heapq
+
+max_heap = []
+
+# Push: negate the value
+heapq.heappush(max_heap, -3)
+heapq.heappush(max_heap, -1)
+heapq.heappush(max_heap, -4)
+heapq.heappush(max_heap, -2)
+
+# Peek max — negate back
+print('max:', -max_heap[0])   # 4
+
+# Pop max values — negate back
+while max_heap:
+    print(-heapq.heappop(max_heap), end=' ')
+# Prints: 4 3 2 1 — largest first!"></div>
+    <div class="box mind"><span class="box-i">🧠</span><div>Negating flips the ordering: the largest number becomes the "most negative" = rises to the top of the min heap. Negate on push, negate again on pop to recover the original.</div></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">heapify — build from existing list in O(n)</div>
+    <div data-code="import heapq
+
+arr = [5, 3, 8, 1, 9, 2, 7]
+print('Before:', arr)
+
+heapq.heapify(arr)   # transforms in-place — O(n)!
+print('After heapify:', arr)
+
+# Pop everything in sorted order
+result = []
+while arr:
+    result.append(heapq.heappop(arr))
+print('Sorted:', result)"></div>
+  </div>
+
+  <table class="tbl">
+    <tr><th>Operation</th><th>Code</th><th>Time</th></tr>
+    <tr><td>Push</td><td>heapq.heappush(h, val)</td><td>O(log n)</td></tr>
+    <tr><td>Pop min</td><td>heapq.heappop(h)</td><td>O(log n)</td></tr>
+    <tr><td>Peek min</td><td>h[0]</td><td>O(1)</td></tr>
+    <tr><td>Build from list</td><td>heapq.heapify(arr)</td><td>O(n)</td></tr>
+  </table>
+</section>
+
+<!-- ══════════ 12 FUNCTIONS ══════════ -->
+<section class="section" id="s12">
+  <div class="sec-hdr">
+    <span class="sec-num">12</span>
+    <h2 class="sec-title">Functions &amp; Nested Functions</h2>
+    <span class="sec-icon">⚙️</span>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Basic functions</div>
+    <div data-code="def multiply(n, m):
+    return n * m
+
+print(multiply(3, 4))   # 12
+print(multiply(7, 8))   # 56"></div>
+  </div>
+
+  <div class="concept b">
+    <div class="ctitle">Nested functions — inner reads outer variables freely</div>
+    <div data-code="def outer(a, b):
+    c = 10
+
+    def inner():
+        # inner sees a, b, c — no arguments needed!
+        print(a, b, c)
+
+    inner()   # call without passing anything
+
+outer(1, 2)   # prints: 1 2 10
+outer(5, 6)   # prints: 5 6 10"></div>
+    <div class="box tip"><span class="box-i">💡</span><div>This is <b>extremely powerful</b> for recursive DFS/BFS — put <code>visited</code> and <code>result</code> in the outer function, write recursive logic in inner. It automatically sees everything.</div></div>
+  </div>
+
+  <div class="concept r">
+    <div class="ctitle">nonlocal — required to MODIFY (not just read) outer variables</div>
+    <div data-code="def counter_demo():
+    nums = [1, 2, 3]
+    count = 0
+
+    def helper():
+        # ✅ Mutating list contents works without nonlocal
+        for i in range(len(nums)):
+            nums[i] *= 2
+
+        # ✅ Reassigning count requires nonlocal
+        nonlocal count
+        count += 1
+
+    helper()
+    print(nums)    # [2, 4, 6]  — list was modified
+    print(count)   # 1          — count was updated
+
+counter_demo()"></div>
+    <div class="box warn"><span class="box-i">⚠️</span><div><b>Rule:</b> Mutating objects (lists, dicts) = no <code>nonlocal</code> needed. Reassigning primitives (int, str, bool) = must use <code>nonlocal</code>.</div></div>
+  </div>
+</section>
+
+<!-- ══════════ 13 CLASSES ══════════ -->
+<section class="section" id="s13">
+  <div class="sec-hdr">
+    <span class="sec-num">13</span>
+    <h2 class="sec-title">Classes</h2>
+    <span class="sec-icon">🏗️</span>
+  </div>
+
+  <div class="concept">
+    <div class="ctitle">🧠 Mental Model: self = Python's "this"</div>
+    <p>In Java/C++, <code class="ic">this</code> is implicit. In Python, you must explicitly write <code class="ic">self</code> as the first parameter of every method. It refers to the current instance.</p>
+  </div>
+
+  <div class="concept g">
+    <div class="ctitle">Full class example</div>
+    <div data-code="class MyClass:
+
+    def __init__(self, nums):       # constructor
+        self.nums = nums            # member variable
+        self.size = len(nums)       # another member variable
+
+    def get_length(self):           # method — always takes self
+        return self.size
+
+    def get_double_length(self):
+        return 2 * self.get_length()   # call method via self
+
+    def add_element(self, val):
+        self.nums.append(val)
+        self.size += 1
+
+# Create instances
+obj = MyClass([1, 2, 3, 4])
+print(obj.get_length())           # 4
+print(obj.get_double_length())    # 8
+print(obj.nums)                   # [1, 2, 3, 4]
+
+obj.add_element(5)
+print(obj.get_length())           # 5
+print(obj.nums)                   # [1, 2, 3, 4, 5]"></div>
+  </div>
+
+  <table class="tbl">
+    <tr><th>Concept</th><th>Java/C++</th><th>Python</th></tr>
+    <tr><td>Constructor</td><td>ClassName() {}</td><td>def __init__(self):</td></tr>
+    <tr><td>This reference</td><td>this</td><td>self</td></tr>
+    <tr><td>Member variable</td><td>this.x = 5</td><td>self.x = 5</td></tr>
+    <tr><td>Call method</td><td>this.method()</td><td>self.method()</td></tr>
+  </table>
+</section>
+
+<!-- ══════════ CHEATSHEET ══════════ -->
+<section class="section" id="s14">
+  <div class="sec-hdr">
+    <span class="sec-num">⚡</span>
+    <h2 class="sec-title">Quick Reference Cheatsheet</h2>
+    <span class="sec-icon">📌</span>
+  </div>
+
+  <div class="ref-grid">
+    <div class="ref-card"><div class="ref-card-t">Variables</div>
+      <p><span class="ic">a, b = 1, 2</span> multi-assign</p>
+      <p><span class="ic">a, b = b, a</span> swap!</p>
+      <p><span class="ic">n += 1</span> — no ++ in Python</p>
+      <p><span class="ic">n = None</span> — null</p></div>
+    <div class="ref-card"><div class="ref-card-t">Conditionals</div>
+      <p><span class="ic">elif</span> not <span class="ic">else if</span></p>
+      <p><span class="ic">and</span> / <span class="ic">or</span> / <span class="ic">not</span></p>
+      <p>No parentheses needed</p>
+      <p>Colon + indent = block</p></div>
+    <div class="ref-card"><div class="ref-card-t">Loops</div>
+      <p><span class="ic">range(n)</span> → 0 to n-1</p>
+      <p><span class="ic">range(a,b)</span> → a to b-1</p>
+      <p><span class="ic">range(a,b,-1)</span> → reverse</p>
+      <p><span class="ic">for x in list</span> → by value</p></div>
+    <div class="ref-card"><div class="ref-card-t">Math ⚠️</div>
+      <p><span class="ic">5/2</span> → 2.5 (decimal!)</p>
+      <p><span class="ic">5//2</span> → 2 (floor)</p>
+      <p><span class="ic">int(-3/2)</span> → -1 (truncate)</p>
+      <p><span class="ic">float('inf')</span> → ∞</p></div>
+    <div class="ref-card"><div class="ref-card-t">Lists</div>
+      <p><span class="ic">nums[-1]</span> last element</p>
+      <p><span class="ic">nums[1:3]</span> slice</p>
+      <p><span class="ic">[0]*5</span> init 5 zeros</p>
+      <p><span class="ic">append/pop</span> → O(1) stack</p></div>
+    <div class="ref-card"><div class="ref-card-t">List Loops</div>
+      <p><span class="ic">for n in nums</span></p>
+      <p><span class="ic">for i,n in enumerate()</span></p>
+      <p><span class="ic">for a,b in zip(l1,l2)</span></p>
+      <p><span class="ic">[i*2 for i in range(5)]</span></p></div>
+    <div class="ref-card"><div class="ref-card-t">Strings</div>
+      <p>Immutable — no in-place edit</p>
+      <p><span class="ic">ord("a")</span> → 97 (ASCII)</p>
+      <p><span class="ic">str(123)</span> / <span class="ic">int("123")</span></p>
+      <p><span class="ic">" ".join(list)</span> → string</p></div>
+    <div class="ref-card"><div class="ref-card-t">Deque</div>
+      <p><span class="ic">from collections import deque</span></p>
+      <p><span class="ic">q.append(x)</span> right O(1)</p>
+      <p><span class="ic">q.appendleft(x)</span> left O(1)</p>
+      <p><span class="ic">q.popleft()</span> O(1)!</p></div>
+    <div class="ref-card"><div class="ref-card-t">Hash Set</div>
+      <p><span class="ic">s = {1,2,3}</span></p>
+      <p><span class="ic">s.add(x)</span> / <span class="ic">s.remove(x)</span></p>
+      <p><span class="ic">x in s</span> → O(1) lookup</p>
+      <p><span class="ic">{i for i in range(5)}</span></p></div>
+    <div class="ref-card"><div class="ref-card-t">Hash Map</div>
+      <p><span class="ic">d[key] = val</span> insert</p>
+      <p><span class="ic">key in d</span> O(1) check</p>
+      <p><span class="ic">del d[key]</span> remove</p>
+      <p><span class="ic">for k,v in d.items()</span></p></div>
+    <div class="ref-card"><div class="ref-card-t">Tuples</div>
+      <p><span class="ic">t = (1, 2)</span> immutable</p>
+      <p>Use as dict key / set member</p>
+      <p>Lists ❌ not hashable</p>
+      <p><span class="ic">x, y = (3, 4)</span> unpack</p></div>
+    <div class="ref-card"><div class="ref-card-t">Heaps</div>
+      <p><span class="ic">import heapq</span></p>
+      <p><span class="ic">heapq.heappush(h, x)</span></p>
+      <p><span class="ic">heapq.heappop(h)</span></p>
+      <p>Min by default. Negate for max.</p></div>
+    <div class="ref-card"><div class="ref-card-t">Nested Fns</div>
+      <p>Inner reads outer vars freely</p>
+      <p><span class="ic">nonlocal x</span> to modify ints</p>
+      <p>Lists mutate without nonlocal</p>
+      <p>Great for DFS recursion!</p></div>
+    <div class="ref-card"><div class="ref-card-t">Classes</div>
+      <p><span class="ic">def __init__(self, ...):</span></p>
+      <p><span class="ic">self.x = val</span> member var</p>
+      <p>Every method needs <span class="ic">self</span></p>
+      <p><span class="ic">self.method()</span> calls method</p></div>
+  </div>
+
+  <div style="margin-top:36px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px;">
+    <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px;color:var(--red);">⚠️ The 5 Biggest Python Gotchas</div>
+    <div class="gotcha-list">
+      <div class="box warn" style="margin:0"><span class="box-i">1</span><div><b>No ++ operator.</b> Use <code>n += 1</code> always. <code>n++</code> is a SyntaxError.</div></div>
+      <div class="box warn" style="margin:0"><span class="box-i">2</span><div><b>Division is decimal.</b> <code>5 / 2 = 2.5</code>. Use <code>//</code> for floor division.</div></div>
+      <div class="box warn" style="margin:0"><span class="box-i">3</span><div><b>Floor division floors toward -∞.</b> <code>-3 // 2 = -2</code>, not -1. Use <code>int(-3/2)</code> to truncate like Java/C++.</div></div>
+      <div class="box warn" style="margin:0"><span class="box-i">4</span><div><b>2D list trap.</b> <code>[[0]*4]*4</code> creates shared rows. Use <code>[[0]*4 for _ in range(4)]</code>.</div></div>
+      <div class="box warn" style="margin:0"><span class="box-i">5</span><div><b>nonlocal for reassignment.</b> Mutating a list works. Reassigning an int/str inside a nested function requires <code>nonlocal</code>.</div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Built from the NeetCode Python for Coding Interviews transcript.<br>
+  Powered by <span>Pyodide</span> — real Python running in your browser.
+</footer>
+
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- PYODIDE -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
 <script>
-const topics = [
-{
-  id: 'variables',
-  title: '1. Variables & Types',
-  emoji: '📦',
-  short: 'Variables',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">📦 Variables & Types</div>
-  <div class="topic-subtitle">Python is dynamically typed — no type declarations needed</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">The Core Idea</span><span class="card-badge">concept</span>
-  </div>
-  <div class="card-body open">
-    <div class="analogy">
-      <p><span class="em">Analogy:</span> In Java/C++, a variable is like a box with a label saying "only oranges go here." In Python, the box has NO label — you can put anything in it at any time. The <em>contents</em> know their own type, not the box.</p>
-    </div>
-    <div class="code-block"><code><span class="var">n</span> = <span class="num">0</span>         <span class="cm"># n holds an int</span>
-<span class="var">n</span> = <span class="str">"ABC"</span>     <span class="cm"># now n holds a string — totally fine</span>
-<span class="var">n</span> = <span class="kw">None</span>      <span class="cm"># None = null in Python</span></code></div>
-    <div class="concept-box">
-      <div class="label">Multiple Assignment (Python style)</div>
-      <div class="code-block"><code><span class="var">a</span>, <span class="var">b</span> = <span class="num">1</span>, <span class="num">2</span>    <span class="cm"># both at once</span></code></div>
-    </div>
-    <div class="concept-box green">
-      <div class="label">Incrementing</div>
-      <div class="code-block"><code><span class="var">n</span> += <span class="num">1</span>   <span class="cm"># ✅ works</span>
-<span class="var">n</span>++      <span class="cm"># ❌ DOES NOT EXIST in Python</span></code></div>
-    </div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>Python variables are sticky notes</strong> — peel the note off and stick it on anything. The note doesn't care what it's on. The object knows its own type."</p>
-    </div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-variables"></div>
-`,
-  quiz: [
-    { q: "What does Python do with this code? → n = 5   then   n = 'hello'", opts: ["Error — can't change types", "n becomes 'hello' — totally valid", "n stays 5, the string is ignored", "n becomes None"], ans: 1, explain: "Python is dynamically typed. A variable can hold any type at any time. n just points to 'hello' now." },
-    { q: "How do you increment n by 1 in Python?", opts: ["n++", "++n", "n += 1", "n = n++ "], ans: 2, explain: "n++ doesn't exist in Python. Use n += 1 or n = n + 1." }
-  ]
-},
-{
-  id: 'ifloops',
-  title: '2. If / Loops',
-  emoji: '🔁',
-  short: 'If/Loops',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">🔁 If Statements & Loops</div>
-  <div class="topic-subtitle">No curly braces. No parentheses. Just indentation.</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">If / Elif / Else</span><span class="card-badge">syntax</span>
-  </div>
-  <div class="card-body open">
-    <div class="analogy">
-      <p><span class="em">Analogy:</span> Python uses <strong>indentation as grammar</strong>. The colon says "what follows belongs to me." No braces, no parentheses — the tab IS the block.</p>
-    </div>
-    <div class="code-block"><code><span class="kw">if</span> <span class="var">n</span> > <span class="num">2</span>:         <span class="cm"># no parens needed</span>
-    <span class="fn">print</span>(<span class="str">"big"</span>)
-<span class="kw">elif</span> <span class="var">n</span> == <span class="num">2</span>:      <span class="cm"># NOT "else if" — it's "elif"</span>
-    <span class="fn">print</span>(<span class="str">"two"</span>)
-<span class="kw">else</span>:
-    <span class="fn">print</span>(<span class="str">"small"</span>)
-
-<span class="cm"># Logic operators: AND / OR (not && / ||)</span>
-<span class="kw">if</span> (<span class="var">n</span> > <span class="num">0</span> <span class="kw">and</span> <span class="var">n</span> < <span class="num">10</span>):   <span class="cm"># parens needed for multi-line only</span>
-    <span class="fn">print</span>(<span class="str">"single digit"</span>)</code></div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">While & For Loops</span><span class="card-badge">syntax</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="cm"># While loop</span>
-<span class="var">n</span> = <span class="num">0</span>
-<span class="kw">while</span> <span class="var">n</span> < <span class="num">5</span>:
-    <span class="fn">print</span>(<span class="var">n</span>)
-    <span class="var">n</span> += <span class="num">1</span>
-
-<span class="cm"># For loop — range(5) = 0,1,2,3,4</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):
-    <span class="fn">print</span>(<span class="var">i</span>)
-
-<span class="cm"># range(start, stop, step)</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, <span class="num">6</span>):      <span class="cm"># 2,3,4,5</span>
-    <span class="fn">print</span>(<span class="var">i</span>)
-
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>, <span class="num">1</span>, -<span class="num">1</span>):  <span class="cm"># 5,4,3,2 (reverse)</span>
-    <span class="fn">print</span>(<span class="var">i</span>)</code></div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook for range()</div>
-      <p>Think of a <strong>traffic light countdown</strong>: range(start, stop, step). Stop is always EXCLUDED (the light never shows the stop number). Step is your gear — positive goes forward, negative reverses.</p>
-    </div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-ifloops"></div>
-`,
-  quiz: [
-    { q: "What does range(2, 8, 2) produce?", opts: ["2, 4, 6, 8", "2, 4, 6", "0, 2, 4, 6", "2, 3, 4, 5, 6, 7"], ans: 1, explain: "Starts at 2, stops BEFORE 8, steps by 2. So: 2, 4, 6." },
-    { q: "How do you write 'else if' in Python?", opts: ["else if", "elseif", "elif", "else:if"], ans: 2, explain: "'elif' is Python's keyword. It's a contraction of 'else if'." },
-    { q: "What do you use for logical AND in Python?", opts: ["&&", "&", "and", "AND"], ans: 2, explain: "Python uses the English word 'and'. Same for 'or' and 'not'." }
-  ]
-},
-{
-  id: 'math',
-  title: '3. Math & Division',
-  emoji: '➗',
-  short: 'Math',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">➗ Math & Division Traps</div>
-  <div class="topic-subtitle">Python's division behaves differently — this trips people up in interviews</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Division: The Big Gotcha</span><span class="card-badge">critical</span>
-  </div>
-  <div class="card-body open">
-    <table>
-      <tr><th>Operation</th><th>Result</th><th>Why</th></tr>
-      <tr><td><code>5 / 2</code></td><td><code>2.5</code></td><td>Python divides decimally by default</td></tr>
-      <tr><td><code>5 // 2</code></td><td><code>2</code></td><td>// = floor division (rounds DOWN)</td></tr>
-      <tr><td><code>-3 // 2</code></td><td><code>-2</code></td><td>⚠️ rounds DOWN not toward zero!</td></tr>
-      <tr><td><code>int(-3 / 2)</code></td><td><code>-1</code></td><td>Convert float → truncates toward zero</td></tr>
-    </table>
-    <div class="gotcha">
-      <div class="g-title">⚠️ The Trap</div>
-      <p>Most languages (Java, C++) truncate toward zero: <code>-3 / 2 = -1</code>. Python floors: <code>-3 // 2 = -2</code>. When dealing with negative integer division, use <code>int(a / b)</code> to get C-like behavior.</p>
-    </div>
-    <div class="code-block"><code><span class="cm"># Safe way for negative division</span>
-<span class="fn">int</span>(-<span class="num">3</span> / <span class="num">2</span>)   <span class="cm"># → -1  ✅ truncates toward zero</span>
-
-<span class="cm"># Math helpers</span>
-<span class="kw">import</span> math
-math.<span class="fn">floor</span>(<span class="num">3.9</span>)   <span class="cm"># → 3</span>
-math.<span class="fn">ceil</span>(<span class="num">3.1</span>)    <span class="cm"># → 4</span>
-math.<span class="fn">sqrt</span>(<span class="num">16</span>)     <span class="cm"># → 4.0</span>
-<span class="num">2</span> ** <span class="num">3</span>            <span class="cm"># → 8  (power)</span>
-
-<span class="cm"># Infinity — Python ints never overflow</span>
-<span class="fn">float</span>(<span class="str">"inf"</span>)   <span class="cm"># max sentinel</span>
-<span class="fn">float</span>(<span class="str">"-inf"</span>)  <span class="cm"># min sentinel</span></code></div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>// floors, / floats.</strong> For negatives, if you want the answer Java gives you — wrap it: <code>int(a / b)</code>."</p>
-    </div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-math"></div>
-`,
-  quiz: [
-    { q: "What does -7 // 2 produce in Python?", opts: ["-3", "-4", "-3.5", "3"], ans: 1, explain: "-7 / 2 = -3.5, and floor(-3.5) = -4. Python floors, not truncates." },
-    { q: "How do you get the result Java would give for -7 / 2?", opts: ["-7 // 2", "math.trunc(-7/2)", "int(-7 / 2)", "Both B and C"], ans: 3, explain: "int(-7/2) truncates toward zero → -3. math.trunc does the same. Both work." },
-    { q: "In Python, what is 2 ** 10?", opts: ["20", "1024", "512", "Error"], ans: 1, explain: "** is the power operator. 2^10 = 1024." }
-  ]
-},
-{
-  id: 'arrays',
-  title: '4. Arrays (Lists)',
-  emoji: '📋',
-  short: 'Arrays',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">📋 Arrays — Called "Lists" in Python</div>
-  <div class="topic-subtitle">Dynamic, flexible, and packed with features</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Core Operations</span><span class="card-badge">essential</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="var">nums</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
-<span class="var">nums</span>.<span class="fn">append</span>(<span class="num">4</span>)      <span class="cm"># push to end  → O(1)</span>
-<span class="var">nums</span>.<span class="fn">pop</span>()           <span class="cm"># pop from end → O(1)</span>
-<span class="var">nums</span>.<span class="fn">insert</span>(<span class="num">1</span>, <span class="num">7</span>)    <span class="cm"># insert at index 1 → O(n) ⚠️</span>
-<span class="var">nums</span>[<span class="num">0</span>]              <span class="cm"># index → O(1)</span>
-<span class="var">nums</span>[-<span class="num">1</span>]             <span class="cm"># last element (not out of bounds!)</span>
-<span class="fn">len</span>(<span class="var">nums</span>)            <span class="cm"># length</span></code></div>
-    <div class="gotcha">
-      <div class="g-title">⚠️ Negative Indexing Trap</div>
-      <p><code>nums[-1]</code> does NOT crash — it gives you the LAST element. <code>nums[-2]</code> gives second-to-last. This is intentional Python behavior.</p>
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Slicing, Init, Sorting</span><span class="card-badge">powerful</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="cm"># Initialize with default values</span>
-<span class="var">arr</span> = [<span class="num">0</span>] * <span class="num">5</span>          <span class="cm"># [0, 0, 0, 0, 0]</span>
-
-<span class="cm"># Slicing — [start:stop] stop is excluded</span>
-<span class="var">nums</span>[<span class="num">1</span>:<span class="num">3</span>]              <span class="cm"># index 1 and 2 (not 3)</span>
-
-<span class="cm"># Sorting</span>
-<span class="var">nums</span>.<span class="fn">sort</span>()            <span class="cm"># ascending</span>
-<span class="var">nums</span>.<span class="fn">sort</span>(reverse=<span class="kw">True</span>)  <span class="cm"># descending</span>
-<span class="var">nums</span>.<span class="fn">sort</span>(key=<span class="kw">lambda</span> <span class="var">x</span>: <span class="fn">len</span>(<span class="var">x</span>))  <span class="cm"># custom sort</span>
-
-<span class="cm"># Reverse in place</span>
-<span class="var">nums</span>.<span class="fn">reverse</span>()
-
-<span class="cm"># List comprehension</span>
-<span class="var">squares</span> = [<span class="var">i</span>*<span class="var">i</span> <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)]   <span class="cm"># [0,1,4,9,16]</span></code></div>
-    <div class="gotcha">
-      <div class="g-title">⚠️ 2D Array Trap</div>
-      <div class="code-block"><code><span class="cm"># WRONG — all rows are the SAME list</span>
-<span class="var">bad</span> = [[<span class="num">0</span>] * <span class="num">4</span>] * <span class="num">4</span>
-
-<span class="cm"># CORRECT — each row is independent</span>
-<span class="var">grid</span> = [[<span class="num">0</span>] * <span class="num">4</span> <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>)]</code></div>
-    </div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook for 2D Grid</div>
-      <p>"<strong>Multiply pixels, not rows.</strong> Multiplying a list gives you copies of the same pointer. Use a comprehension to create truly separate rows."</p>
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Looping Through Arrays</span><span class="card-badge">patterns</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="var">nums</span> = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>]
-
-<span class="cm"># Just values</span>
-<span class="kw">for</span> <span class="var">n</span> <span class="kw">in</span> <span class="var">nums</span>:
-    <span class="fn">print</span>(<span class="var">n</span>)
-
-<span class="cm"># Index + value together</span>
-<span class="kw">for</span> <span class="var">i</span>, <span class="var">n</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">nums</span>):
-    <span class="fn">print</span>(<span class="var">i</span>, <span class="var">n</span>)
-
-<span class="cm"># Two arrays in parallel</span>
-<span class="kw">for</span> <span class="var">a</span>, <span class="var">b</span> <span class="kw">in</span> <span class="fn">zip</span>(<span class="var">nums1</span>, <span class="var">nums2</span>):
-    <span class="fn">print</span>(<span class="var">a</span>, <span class="var">b</span>)
-
-<span class="cm"># Unpacking a pair list</span>
-<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]   <span class="cm"># unpack directly</span></code></div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-arrays"></div>
-`,
-  quiz: [
-    { q: "nums = [1,2,3,4,5]. What is nums[-2]?", opts: ["5", "4", "Error", "None"], ans: 1, explain: "Negative indexing wraps from the end. -1 is last (5), -2 is second-to-last (4)." },
-    { q: "What's the CORRECT way to make a 3x3 grid of zeros?", opts: ["[[0]*3]*3", "[[0]*3 for _ in range(3)]", "[0*9]", "list(0)*9"], ans: 1, explain: "Using *3 on a list copies the same reference. The comprehension creates 3 independent rows." },
-    { q: "nums[1:4] on [10,20,30,40,50] gives:", opts: ["[10,20,30,40]", "[20,30,40]", "[20,30,40,50]", "[30,40]"], ans: 1, explain: "Slicing is [start:stop) — includes index 1,2,3 but NOT 4. So 20,30,40." }
-  ]
-},
-{
-  id: 'strings',
-  title: '5. Strings',
-  emoji: '🔤',
-  short: 'Strings',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">🔤 Strings</div>
-  <div class="topic-subtitle">Immutable sequences — every modification creates a new string</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Key String Operations</span><span class="card-badge">essential</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="var">s</span> = <span class="str">"hello"</span>
-
-<span class="cm"># Immutable — can't modify in place</span>
-<span class="var">s</span>[<span class="num">0</span>] = <span class="str">'H'</span>       <span class="cm"># ❌ TypeError</span>
-<span class="var">s</span> = <span class="str">'H'</span> + <span class="var">s</span>[<span class="num">1</span>:]  <span class="cm"># ✅ creates NEW string — O(n)</span>
-
-<span class="cm"># Slicing works same as arrays</span>
-<span class="var">s</span>[<span class="num">1</span>:<span class="num">3</span>]            <span class="cm"># "el"</span>
-
-<span class="cm"># Convert types</span>
-<span class="fn">int</span>(<span class="str">"123"</span>)         <span class="cm"># → 123</span>
-<span class="fn">str</span>(<span class="num">123</span>)           <span class="cm"># → "123"</span>
-
-<span class="cm"># ASCII value</span>
-<span class="fn">ord</span>(<span class="str">'a'</span>)           <span class="cm"># → 97</span>
-<span class="fn">ord</span>(<span class="str">'b'</span>)           <span class="cm"># → 98</span>
-
-<span class="cm"># Join a list of strings</span>
-<span class="str">""</span>.<span class="fn">join</span>([<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>])      <span class="cm"># "abc"</span>
-<span class="str">" "</span>.<span class="fn">join</span>([<span class="str">"hello"</span>, <span class="str">"world"</span>])  <span class="cm"># "hello world"</span></code></div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>Strings are frozen arrays.</strong> You can read, slice, loop — but every change bakes a new string. Think of it like a photograph — you can't erase part of a photo, you reprint it."</p>
-    </div>
-    <div class="tip"><div class="t-title">💡 Interview Tip</div><p>Concatenating strings in a loop is O(n²). Use a list and <code>"".join(list)</code> at the end for O(n).</p></div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-strings"></div>
-`,
-  quiz: [
-    { q: "s = 'hello'. What happens when you do s[0] = 'H'?", opts: ["s becomes 'Hello'", "TypeError — strings are immutable", "It silently does nothing", "s becomes 'H'"], ans: 1, explain: "Strings are immutable in Python. You cannot modify a character in place. You must create a new string." },
-    { q: "What does ord('a') return?", opts: ["'a'", "1", "97", "65"], ans: 2, explain: "ord() returns the ASCII value. 'a' = 97, 'A' = 65." },
-    { q: "How do you join ['x','y','z'] with dashes?", opts: ["['x','y','z'].join('-')", "join(['x','y','z'], '-')", "'-'.join(['x','y','z'])", "'-'.append(['x','y','z'])"], ans: 2, explain: "The delimiter string calls .join(list). So '-'.join(['x','y','z']) = 'x-y-z'." }
-  ]
-},
-{
-  id: 'hashmaps',
-  title: '6. HashMaps & Sets',
-  emoji: '🗂️',
-  short: 'Hash Maps',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">🗂️ HashMaps (dict) & HashSets (set)</div>
-  <div class="topic-subtitle">The most used data structures in coding interviews</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">HashMap (Dictionary)</span><span class="card-badge">essential</span>
-  </div>
-  <div class="card-body open">
-    <div class="analogy">
-      <p><span class="em">Analogy:</span> A HashMap is like a <strong>real-world dictionary</strong> — you look up a word (key) and get its definition (value) in O(1). No scanning every page.</p>
-    </div>
-    <div class="code-block"><code><span class="var">scores</span> = {}
-<span class="var">scores</span>[<span class="str">"Alice"</span>] = <span class="num">88</span>
-<span class="var">scores</span>[<span class="str">"Bob"</span>]   = <span class="num">75</span>
-
-<span class="cm"># Check if key exists</span>
-<span class="str">"Alice"</span> <span class="kw">in</span> <span class="var">scores</span>   <span class="cm"># True — O(1)</span>
-
-<span class="cm"># Remove</span>
-<span class="var">scores</span>.<span class="fn">pop</span>(<span class="str">"Bob"</span>)
-
-<span class="cm"># Loop patterns</span>
-<span class="kw">for</span> <span class="var">key</span> <span class="kw">in</span> <span class="var">scores</span>:              <span class="cm"># keys only</span>
-    <span class="fn">print</span>(<span class="var">key</span>, <span class="var">scores</span>[<span class="var">key</span>])
-
-<span class="kw">for</span> <span class="var">val</span> <span class="kw">in</span> <span class="var">scores</span>.<span class="fn">values</span>():     <span class="cm"># values only</span>
-    <span class="fn">print</span>(<span class="var">val</span>)
-
-<span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">scores</span>.<span class="fn">items</span>():    <span class="cm"># both</span>
-    <span class="fn">print</span>(<span class="var">k</span>, <span class="var">v</span>)
-
-<span class="cm"># Dict comprehension</span>
-<span class="var">squares</span> = {<span class="var">i</span>: <span class="var">i</span>**<span class="num">2</span> <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)}</code></div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">HashSet</span><span class="card-badge">essential</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="var">seen</span> = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
-<span class="var">seen</span>.<span class="fn">add</span>(<span class="num">4</span>)         <span class="cm"># O(1)</span>
-<span class="num">3</span> <span class="kw">in</span> <span class="var">seen</span>            <span class="cm"># True — O(1)</span>
-<span class="var">seen</span>.<span class="fn">remove</span>(<span class="num">2</span>)      <span class="cm"># O(1)</span>
-
-<span class="cm"># No duplicates allowed</span>
-{<span class="num">1</span>, <span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>}          <span class="cm"># → {1, 2}</span>
-
-<span class="cm"># Set comprehension</span>
-<span class="var">evens</span> = {<span class="var">i</span> <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>) <span class="kw">if</span> <span class="var">i</span> % <span class="num">2</span> == <span class="num">0</span>}</code></div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>Set = bouncer at a club</strong>. No duplicates get in. Lookup is instant — the bouncer doesn't scan the list, they check IDs instantly (hash)."</p>
-    </div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-hashmaps"></div>
-`,
-  quiz: [
-    { q: "How do you check if key 'x' exists in dict d?", opts: ["d.has_key('x')", "'x' in d", "d.contains('x')", "d.get('x') != None"], ans: 1, explain: "The 'in' operator checks keys in O(1). has_key() doesn't exist in Python 3." },
-    { q: "What does {1,1,2,2,3} evaluate to?", opts: ["{1,1,2,2,3}", "{1,2,3}", "[1,2,3]", "Error"], ans: 1, explain: "Sets automatically deduplicate. {1,1,2,2,3} → {1,2,3}." },
-    { q: "To loop through BOTH keys and values of dict d, use:", opts: ["for k, v in d:", "for k, v in d.items():", "for k in d.keys(), v in d.values():", "for k, v in zip(d):"], ans: 1, explain: "d.items() returns (key, value) pairs. Unpack them with 'for k, v in d.items()'." }
-  ]
-},
-{
-  id: 'queues',
-  title: '7. Queues & Stacks',
-  emoji: '📬',
-  short: 'Queue/Stack',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">📬 Queues & Stacks</div>
-  <div class="topic-subtitle">Lists work as stacks. Use deque for efficient queues.</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Stack (use a plain list)</span><span class="card-badge">O(1)</span>
-  </div>
-  <div class="card-body open">
-    <div class="analogy"><p><span class="em">Analogy:</span> A stack is like a <strong>pile of plates</strong> — last in, first out. You always add/remove from the top.</p></div>
-    <div class="code-block"><code><span class="var">stack</span> = []
-<span class="var">stack</span>.<span class="fn">append</span>(<span class="num">1</span>)    <span class="cm"># push</span>
-<span class="var">stack</span>.<span class="fn">append</span>(<span class="num">2</span>)
-<span class="var">stack</span>.<span class="fn">pop</span>()         <span class="cm"># pop → 2 (last in, first out)</span></code></div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Queue (use deque)</span><span class="card-badge">O(1) both ends</span>
-  </div>
-  <div class="card-body open">
-    <div class="analogy"><p><span class="em">Analogy:</span> A queue is like a <strong>line at a coffee shop</strong> — first in, first out. You add to the back, remove from the front.</p></div>
-    <div class="code-block"><code><span class="kw">from</span> collections <span class="kw">import</span> deque
-
-<span class="var">q</span> = <span class="fn">deque</span>()
-<span class="var">q</span>.<span class="fn">append</span>(<span class="num">1</span>)         <span class="cm"># add to right</span>
-<span class="var">q</span>.<span class="fn">append</span>(<span class="num">2</span>)
-<span class="var">q</span>.<span class="fn">popleft</span>()          <span class="cm"># remove from left → 1 (FIFO)</span>
-
-<span class="cm"># Double-ended: can also add/remove from left</span>
-<span class="var">q</span>.<span class="fn">appendleft</span>(<span class="num">0</span>)     <span class="cm"># add to left</span>
-<span class="var">q</span>.<span class="fn">pop</span>()              <span class="cm"># remove from right</span></code></div>
-    <div class="gotcha">
-      <div class="g-title">⚠️ Why not list.pop(0)?</div>
-      <p>list.pop(0) is O(n) because it shifts every element. deque.popleft() is O(1). Always use deque for queues in interviews.</p>
-    </div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>deque = double-ended queue</strong>. It's like a hot dog — you can eat from either end. Use it whenever you need O(1) operations on both sides."</p>
-    </div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-queues"></div>
-`,
-  quiz: [
-    { q: "Why should you use deque instead of list for a queue?", opts: ["deque is prettier", "list.pop(0) is O(n); deque.popleft() is O(1)", "deque allows duplicates", "list doesn't have pop()"], ans: 1, explain: "Removing from the front of a list shifts all elements — O(n). deque is designed for O(1) from both ends." },
-    { q: "stack = [1,2,3]. What does stack.pop() return?", opts: ["1", "2", "3", "Error"], ans: 2, explain: "pop() with no argument removes and returns the LAST element. Stacks are LIFO." }
-  ]
-},
-{
-  id: 'heaps',
-  title: '8. Heaps',
-  emoji: '⛰️',
-  short: 'Heaps',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">⛰️ Heaps (Priority Queue)</div>
-  <div class="topic-subtitle">Always get the min (or max) in O(log n)</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Min Heap (default)</span><span class="card-badge">heapq</span>
-  </div>
-  <div class="card-body open">
-    <div class="analogy"><p><span class="em">Analogy:</span> A heap is like a <strong>hospital triage</strong> — no matter who arrives, the sickest patient (smallest number) is always treated first.</p></div>
-    <div class="code-block"><code><span class="kw">import</span> heapq
-
-<span class="var">h</span> = []
-heapq.<span class="fn">heappush</span>(<span class="var">h</span>, <span class="num">3</span>)
-heapq.<span class="fn">heappush</span>(<span class="var">h</span>, <span class="num">1</span>)
-heapq.<span class="fn">heappush</span>(<span class="var">h</span>, <span class="num">4</span>)
-
-<span class="var">h</span>[<span class="num">0</span>]                   <span class="cm"># peek min → 1 (always!)</span>
-heapq.<span class="fn">heappop</span>(<span class="var">h</span>)       <span class="cm"># removes and returns 1</span>
-
-<span class="cm"># Build from existing list in O(n)</span>
-<span class="var">nums</span> = [<span class="num">5</span>, <span class="num">2</span>, <span class="num">8</span>, <span class="num">1</span>]
-heapq.<span class="fn">heapify</span>(<span class="var">nums</span>)    <span class="cm"># in-place, O(n)</span></code></div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Max Heap (negate trick)</span><span class="card-badge">workaround</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="cm"># Python only has min heap — fake max heap by negating</span>
-<span class="var">h</span> = []
-heapq.<span class="fn">heappush</span>(<span class="var">h</span>, -<span class="num">3</span>)   <span class="cm"># push -3 instead of 3</span>
-heapq.<span class="fn">heappush</span>(<span class="var">h</span>, -<span class="num">1</span>)
-heapq.<span class="fn">heappush</span>(<span class="var">h</span>, -<span class="num">4</span>)
-
-<span class="var">max_val</span> = -<span class="var">h</span>[<span class="num">0</span>]          <span class="cm"># negate back → 4</span>
-<span class="var">val</span> = -heapq.<span class="fn">heappop</span>(<span class="var">h</span>)  <span class="cm"># negate popped → 4</span></code></div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>Flip the number, flip the result.</strong> Push -x to turn a min heap into a max heap. Always negate again on the way out."</p>
-    </div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-heaps"></div>
-`,
-  quiz: [
-    { q: "After heappush(h, 5), heappush(h, 2), heappush(h, 8)... what is h[0]?", opts: ["5", "2", "8", "Undefined"], ans: 1, explain: "h[0] always holds the MINIMUM value in a min heap. That's 2." },
-    { q: "How do you implement a max heap in Python?", opts: ["heapq.maxheap()", "Use -x when pushing, -x when popping", "import maxheap", "heapq.heappush(h, x, reverse=True)"], ans: 1, explain: "Python has no built-in max heap. The standard trick is to negate all values." }
-  ]
-},
-{
-  id: 'functions',
-  title: '9. Functions & Classes',
-  emoji: '🔧',
-  short: 'Functions',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">🔧 Functions, Closures & Classes</div>
-  <div class="topic-subtitle">Nested functions are powerful in recursive problems</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Functions & Nested Functions</span><span class="card-badge">key pattern</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="kw">def</span> <span class="fn">multiply</span>(<span class="var">n</span>, <span class="var">m</span>):
-    <span class="kw">return</span> <span class="var">n</span> * <span class="var">m</span>
-
-<span class="cm"># Nested function — has access to outer variables</span>
-<span class="kw">def</span> <span class="fn">outer</span>(<span class="var">a</span>, <span class="var">b</span>):
-    <span class="var">c</span> = <span class="num">10</span>
-    <span class="kw">def</span> <span class="fn">inner</span>():
-        <span class="fn">print</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span>)  <span class="cm"># can see a, b, c!</span>
-    <span class="fn">inner</span>()              <span class="cm"># no args needed</span></code></div>
-    <div class="gotcha">
-      <div class="g-title">⚠️ The nonlocal Gotcha</div>
-      <div class="code-block"><code><span class="kw">def</span> <span class="fn">outer</span>():
-    <span class="var">count</span> = <span class="num">0</span>
-    <span class="kw">def</span> <span class="fn">inner</span>():
-        <span class="cm"># count += 1  ← ❌ ERROR without nonlocal</span>
-        <span class="kw">nonlocal</span> <span class="var">count</span>   <span class="cm"># ✅ now we can modify it</span>
-        <span class="var">count</span> += <span class="num">1</span>
-    <span class="fn">inner</span>()
-    <span class="fn">print</span>(<span class="var">count</span>)  <span class="cm"># 1</span></code></div>
-      <p>You can READ outer variables freely. To REASSIGN them, declare <code>nonlocal varname</code>. Mutating objects (like lists) is fine without nonlocal.</p>
-    </div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>Reading is free. Writing needs permission.</strong> To write to an outer variable, ask for permission with <code>nonlocal</code>. Mutating (like list.append) doesn't need permission."</p>
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Classes</span><span class="card-badge">syntax</span>
-  </div>
-  <div class="card-body open">
-    <div class="code-block"><code><span class="kw">class</span> <span class="fn">MyClass</span>:
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, <span class="var">nums</span>):   <span class="cm"># constructor</span>
-        <span class="kw">self</span>.<span class="var">nums</span> = <span class="var">nums</span>         <span class="cm"># member variable</span>
-        <span class="kw">self</span>.<span class="var">size</span> = <span class="fn">len</span>(<span class="var">nums</span>)
-
-    <span class="kw">def</span> <span class="fn">get_size</span>(<span class="kw">self</span>):          <span class="cm"># self is always first</span>
-        <span class="kw">return</span> <span class="kw">self</span>.<span class="var">size</span>
-
-    <span class="kw">def</span> <span class="fn">double_size</span>(<span class="kw">self</span>):
-        <span class="kw">return</span> <span class="kw">self</span>.<span class="fn">get_size</span>() * <span class="num">2</span>  <span class="cm"># call another method</span></code></div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-functions"></div>
-`,
-  quiz: [
-    { q: "Inner function wants to modify outer variable 'total'. What must it do first?", opts: ["Nothing, it just works", "declare: nonlocal total", "declare: global total", "Pass total as parameter"], ans: 1, explain: "To reassign an outer variable inside a nested function, declare 'nonlocal varname'. Reading it is free." },
-    { q: "In a Python class method, what does 'self' represent?", opts: ["The class itself", "The current instance (like 'this' in Java)", "The parent class", "A required parameter with no use"], ans: 1, explain: "'self' refers to the current instance of the class. It's like 'this' in Java/C++. It must be the first parameter of every method." }
-  ]
-},
-{
-  id: 'tuples',
-  title: '10. Tuples & Quick Ref',
-  emoji: '📌',
-  short: 'Tuples + Ref',
-  content: `
-<div class="topic-header">
-  <div class="topic-title">📌 Tuples & Full Cheat Sheet</div>
-  <div class="topic-subtitle">Tuples = immutable lists. Essential as hashmap keys.</div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">Tuples</span><span class="card-badge">hashable</span>
-  </div>
-  <div class="card-body open">
-    <div class="analogy"><p><span class="em">Analogy:</span> A list is a <strong>whiteboard</strong> — you can erase and rewrite. A tuple is a <strong>stone tablet</strong> — written once, never changed. Because it never changes, it can be used as a key.</p></div>
-    <div class="code-block"><code><span class="var">t</span> = (<span class="num">1</span>, <span class="num">2</span>)
-<span class="var">t</span>[<span class="num">0</span>]           <span class="cm"># 1 — can read</span>
-<span class="var">t</span>[<span class="num">0</span>] = <span class="num">5</span>       <span class="cm"># ❌ TypeError — immutable</span>
-
-<span class="cm"># USE CASE: tuple as hashmap key</span>
-<span class="var">d</span> = {}
-<span class="var">d</span>[(<span class="num">1</span>, <span class="num">2</span>)] = <span class="str">"point"</span>   <span class="cm"># ✅ tuple is hashable</span>
-
-<span class="var">s</span> = {(<span class="num">0</span>,<span class="num">0</span>), (<span class="num">1</span>,<span class="num">1</span>)}     <span class="cm"># ✅ set of tuples (e.g. visited grid cells)</span>
-
-<span class="cm"># List key → FAILS</span>
-<span class="var">d</span>[[<span class="num">1</span>,<span class="num">2</span>]] = <span class="str">"x"</span>         <span class="cm"># ❌ TypeError: list is not hashable</span></code></div>
-    <div class="memory-hook">
-      <div class="mh-title">🧠 Memory Hook</div>
-      <p>"<strong>Immutable = hashable = usable as a key.</strong> If you need a (row, col) pair as a dictionary key or set element, use a tuple, not a list."</p>
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <div class="card-header" onclick="toggleCard(this)">
-    <span class="card-title">⚡ Full Cheat Sheet</span><span class="card-badge">reference</span>
-  </div>
-  <div class="card-body open">
-    <div class="cheatsheet">
-      <div class="cs-item"><div class="cs-title">Variables</div><code>n = 0 / n = "str" / n = None</code><code>a, b = 1, 2</code><code>n += 1 (not n++)</code></div>
-      <div class="cs-item"><div class="cs-title">Loops</div><code>for i in range(5)</code><code>for i in range(2,6)</code><code>for i in range(5,0,-1)</code></div>
-      <div class="cs-item"><div class="cs-title">Division</div><code>5/2 → 2.5 (float)</code><code>5//2 → 2 (floor)</code><code>int(-3/2) → -1 (truncate)</code></div>
-      <div class="cs-item"><div class="cs-title">List</div><code>a.append(x) / a.pop()</code><code>a[1:3] / a[-1]</code><code>[0]*n / list comprehension</code></div>
-      <div class="cs-item"><div class="cs-title">String</div><code>immutable — new on change</code><code>ord('a') → 97</code><code>delim.join(list)</code></div>
-      <div class="cs-item"><div class="cs-title">HashMap</div><code>d = {} / d[k] = v</code><code>k in d / d.pop(k)</code><code>d.items() / d.values()</code></div>
-      <div class="cs-item"><div class="cs-title">HashSet</div><code>s = {1,2,3} / s.add(x)</code><code>x in s / s.remove(x)</code><code>no duplicates</code></div>
-      <div class="cs-item"><div class="cs-title">Deque</div><code>from collections import deque</code><code>q.append / q.popleft()</code><code>O(1) both ends</code></div>
-      <div class="cs-item"><div class="cs-title">Heap</div><code>import heapq</code><code>heappush(h,x) / heappop(h)</code><code>max heap: push -x, pop -x</code></div>
-      <div class="cs-item"><div class="cs-title">Tuples</div><code>t = (1,2) — immutable</code><code>usable as dict/set key</code><code>list key → TypeError</code></div>
-      <div class="cs-item"><div class="cs-title">Enumerate/Zip</div><code>for i,v in enumerate(a)</code><code>for a,b in zip(l1,l2)</code></div>
-      <div class="cs-item"><div class="cs-title">nonlocal</div><code>read outer var: free</code><code>write outer var: nonlocal x</code><code>mutate object: no keyword</code></div>
-    </div>
-  </div>
-</div>
-
-<div class="quiz-section" id="quiz-tuples"></div>
-`,
-  quiz: [
-    { q: "Why can a tuple be a dictionary key but a list cannot?", opts: ["Tuples are smaller", "Tuples are immutable and therefore hashable", "Lists don't support __hash__", "Both B and C"], ans: 3, explain: "Hashability requires immutability. Lists are mutable so Python doesn't implement __hash__ for them. Tuples are immutable and hashable." },
-    { q: "In BFS/DFS, what's the ideal way to store 'visited' grid cells like (row, col)?", opts: ["A list of lists", "A set of tuples: {(r,c)}", "A dict with string keys 'r,c'", "A 2D boolean array only"], ans: 1, explain: "A set of tuples gives O(1) lookup and is the cleanest way. {(r,c)} is the standard pattern for grid problems." }
-  ]
-}
+// ─── PYODIDE INIT ───────────────────────────────────────────────
+let pyodide = null;
+let pyReady = false;
+
+const lbar = document.getElementById('lbar');
+const ltxt = document.getElementById('ltxt');
+const loader = document.getElementById('loader');
+
+const steps = [
+  [10, 'Fetching Python runtime…'],
+  [30, 'Loading standard library…'],
+  [60, 'Initializing interpreter…'],
+  [85, 'Warming up…'],
+  [100, 'Ready!'],
 ];
 
-let score = 0;
-let answered = {};
-let done = new Set();
+async function initPyodide() {
+  let step = 0;
+  const tick = setInterval(() => {
+    if (step < steps.length - 1) {
+      lbar.style.width = steps[step][0] + '%';
+      ltxt.textContent = steps[step][1];
+      step++;
+    }
+  }, 600);
 
-function buildNav() {
-  const nav = document.getElementById('nav');
-  topics.forEach((t, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-btn' + (i===0?' active':'');
-    btn.id = 'nav-'+t.id;
-    btn.textContent = t.emoji + ' ' + t.short;
-    btn.onclick = () => showTopic(i);
-    nav.appendChild(btn);
+  pyodide = await loadPyodide();
+  clearInterval(tick);
+  lbar.style.width = '100%';
+  ltxt.textContent = 'Ready!';
+  pyReady = true;
+
+  setTimeout(() => {
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 700);
+    // Enable all run buttons
+    document.querySelectorAll('.btn-run').forEach(b => b.disabled = false);
+  }, 400);
+}
+
+// ─── BUILD EDITORS ──────────────────────────────────────────────
+function buildEditors() {
+  document.querySelectorAll('[data-code]').forEach((placeholder, idx) => {
+    const code = placeholder.getAttribute('data-code');
+    const id = 'ed_' + idx;
+    const originalCode = code;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-wrap';
+    wrap.innerHTML = `
+      <div class="editor-topbar">
+        <div class="editor-dots">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+        </div>
+        <div class="editor-label">PYTHON</div>
+        <div class="editor-actions">
+          <button class="btn-reset" onclick="resetEditor('${id}')">RESET</button>
+          <button class="btn-run" id="run_${id}" onclick="runCode('${id}')" disabled>
+            <svg viewBox="0 0 10 10" fill="currentColor"><polygon points="0,0 10,5 0,10"/></svg>
+            RUN
+          </button>
+        </div>
+      </div>
+      <div class="editor-body">
+        <div class="line-nums" id="ln_${id}"></div>
+        <textarea class="code-textarea" id="${id}" spellcheck="false"></textarea>
+      </div>
+      <div class="output-wrap" id="out_${id}">
+        <div class="output-header">
+          <span class="output-label" id="outlbl_${id}">OUTPUT</span>
+          <button class="clear-btn" onclick="clearOutput('${id}')">CLEAR</button>
+        </div>
+        <div class="output-content" id="outcontent_${id}"></div>
+      </div>`;
+
+    placeholder.replaceWith(wrap);
+
+    const ta = document.getElementById(id);
+    ta.value = code;
+    ta.setAttribute('data-original', code);
+    updateLineNums(id);
+
+    ta.addEventListener('input', () => updateLineNums(id));
+    ta.addEventListener('keydown', (e) => handleTab(e, id));
+    ta.addEventListener('scroll', () => syncScroll(id));
   });
 }
 
-function showTopic(idx) {
-  const t = topics[idx];
-  const content = document.getElementById('content');
-  content.innerHTML = `<div class="topic active">${t.content}</div>`;
+function updateLineNums(id) {
+  const ta = document.getElementById(id);
+  const ln = document.getElementById('ln_' + id);
+  const lines = ta.value.split('\n').length;
+  ln.innerHTML = Array.from({length: lines}, (_, i) => i+1).join('<br>');
+}
 
-  // Build quizzes
-  if (t.quiz) {
-    const qContainer = document.getElementById('quiz-'+t.id);
-    if (qContainer) {
-      qContainer.innerHTML = '<div style="margin-top:20px;margin-bottom:8px;color:#58a6ff;font-weight:700;font-size:0.9em;">🧠 Test Your Understanding</div>';
-      t.quiz.forEach((q, qi) => {
-        const key = t.id+'-'+qi;
-        const div = document.createElement('div');
-        div.className = 'quiz-q';
-        const isAnswered = answered[key] !== undefined;
-        div.innerHTML = `<div class="quiz-question">${qi+1}. ${q.q}</div>
-          <div class="quiz-options">
-            ${q.opts.map((o,oi) => {
-              let cls = 'quiz-opt';
-              if (isAnswered) {
-                if (oi === q.ans) cls += ' correct';
-                else if (oi === answered[key] && oi !== q.ans) cls += ' wrong';
-              }
-              return `<button class="${cls}" onclick="answer('${key}',${oi},${q.ans},'${t.id}',${qi})" ${isAnswered?'disabled':''}>${o}</button>`;
-            }).join('')}
-          </div>
-          <div class="quiz-feedback ${isAnswered?(answered[key]===q.ans?'ok':'bad'):''} ${isAnswered?'show':''}" id="fb-${key}">
-            ${isAnswered?(answered[key]===q.ans?'✅ ':'❌ ')+q.explain:''}
-          </div>`;
-        qContainer.appendChild(div);
-      });
-    }
+function syncScroll(id) {
+  const ta = document.getElementById(id);
+  const ln = document.getElementById('ln_' + id);
+  ln.scrollTop = ta.scrollTop;
+}
+
+function handleTab(e, id) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const ta = document.getElementById(id);
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(end);
+    ta.selectionStart = ta.selectionEnd = start + 4;
+    updateLineNums(id);
+  }
+}
+
+function resetEditor(id) {
+  const ta = document.getElementById(id);
+  ta.value = ta.getAttribute('data-original');
+  updateLineNums(id);
+  clearOutput(id);
+}
+
+function clearOutput(id) {
+  const out = document.getElementById('out_' + id);
+  const content = document.getElementById('outcontent_' + id);
+  out.classList.remove('visible');
+  content.innerHTML = '';
+}
+
+// ─── RUN CODE ───────────────────────────────────────────────────
+async function runCode(id) {
+  if (!pyReady) return;
+  const ta = document.getElementById(id);
+  const out = document.getElementById('out_' + id);
+  const content = document.getElementById('outcontent_' + id);
+  const lbl = document.getElementById('outlbl_' + id);
+  const btn = document.getElementById('run_' + id);
+
+  const code = ta.value;
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 10 10" fill="currentColor"><polygon points="0,0 10,5 0,10"/></svg> RUNNING';
+
+  out.classList.add('visible');
+  content.innerHTML = '<span class="out-running">Running…</span>';
+  lbl.className = 'output-label run';
+  lbl.textContent = 'RUNNING';
+
+  // Small delay so UI updates render
+  await new Promise(r => setTimeout(r, 30));
+
+  try {
+    let stdout = '';
+    pyodide.setStdout({ batched: (text) => { stdout += text + '\n'; } });
+    pyodide.setStderr({ batched: (text) => { stdout += 'ERROR: ' + text + '\n'; } });
+
+    await pyodide.runPythonAsync(code);
+
+    content.innerHTML = stdout
+      ? '<span class="out-stdout">' + escHtml(stdout.trimEnd()) + '</span>'
+      : '<span class="out-stdout" style="opacity:0.5;">(no output)</span>';
+    lbl.className = 'output-label ok';
+    lbl.textContent = 'OUTPUT';
+  } catch (err) {
+    const msg = err.message || String(err);
+    content.innerHTML = '<span class="out-error">' + escHtml(msg) + '</span>';
+    lbl.className = 'output-label err';
+    lbl.textContent = 'ERROR';
   }
 
-  document.querySelectorAll('.nav-btn').forEach((b,i) => {
-    b.className = 'nav-btn' + (done.has(topics[i].id)?' done':'') + (i===idx?' active':'');
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 10 10" fill="currentColor"><polygon points="0,0 10,5 0,10"/></svg> RUN';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── NAV ────────────────────────────────────────────────────────
+function goTo(id) {
+  document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+const sections = document.querySelectorAll('.section');
+const navBtns  = document.querySelectorAll('.nb');
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      const idx = [...sections].findIndex(s => s.id === id);
+      navBtns.forEach((b,i) => b.classList.toggle('active', i === idx));
+    }
   });
+}, {threshold: 0.25});
+sections.forEach(s => io.observe(s));
 
-  const pct = Math.round(((idx+1)/topics.length)*100);
-  document.getElementById('prog-fill').style.width = pct+'%';
-  document.getElementById('prog-label').textContent = `Topic ${idx+1} of ${topics.length}`;
+// ─── BACK TO TOP ────────────────────────────────────────────────
+const btt = document.getElementById('btt');
+window.addEventListener('scroll', () => btt.classList.toggle('show', scrollY > 500));
 
-  // Add bottom nav
-  const bnav = document.createElement('div');
-  bnav.className = 'bottom-nav';
-  bnav.innerHTML = `
-    <button class="btn btn-secondary" onclick="showTopic(${idx-1})" ${idx===0?'disabled':''}>← Prev</button>
-    <button class="btn btn-primary" onclick="showTopic(${idx+1})" ${idx===topics.length-1?'disabled':''}>Next →</button>
-  `;
-  document.querySelector('.topic').appendChild(bnav);
-
-  document.querySelector('.content').scrollTop = 0;
-  window.scrollTo(0,0);
-}
-
-function answer(key, chosen, correct, topicId, qi) {
-  if (answered[key] !== undefined) return;
-  answered[key] = chosen;
-
-  const isRight = chosen === correct;
-  if (isRight) { score += 10; document.getElementById('score-label').textContent = score+' pts'; }
-
-  // Check if whole topic quiz done
-  const t = topics.find(x=>x.id===topicId);
-  const allDone = t.quiz.every((_,i) => answered[topicId+'-'+i] !== undefined);
-  if (allDone) done.add(topicId);
-
-  // Re-render
-  const idx = topics.findIndex(x=>x.id===topicId);
-  showTopic(idx);
-  // Scroll to quiz
-  setTimeout(() => {
-    const fb = document.getElementById('fb-'+key);
-    if (fb) fb.scrollIntoView({behavior:'smooth',block:'center'});
-  }, 100);
-}
-
-function toggleCard(header) {
-  const body = header.nextElementSibling;
-  body.classList.toggle('open');
-}
-
-buildNav();
-showTopic(0);
+// ─── BOOT ───────────────────────────────────────────────────────
+buildEditors();
+initPyodide();
 </script>
 </body>
 </html>
