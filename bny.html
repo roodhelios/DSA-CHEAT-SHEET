@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BNY Mellon DSA — Full Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--bg4:#21262d;
+  --border:#30363d;--border2:#444c56;
+  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --accent:#f78166;--blue:#388bfd;--blue2:#58a6ff;
+  --green:#3fb950;--green2:#56d364;
+  --yellow:#d29922;--yellow2:#e3b341;
+  --red:#f85149;--red2:#ff6b6b;--purple:#bc8cff;
+  --teal:#39d353;
+  --easy:#00b8a3;--medium:#ffc01e;--hard:#ff375f;
+  --bny:#c8a96e;--r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ─── TOPBAR ─── */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;height:48px;gap:12px;flex-shrink:0}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--accent);white-space:nowrap}
+.logo sub{color:var(--bny);font-size:10px;font-family:'DM Sans',sans-serif;font-weight:600;letter-spacing:.04em;vertical-align:middle;margin-left:4px}
+.topic-tabs{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+.topic-tabs::-webkit-scrollbar{display:none}
+.ttab{padding:4px 11px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--text2);border:none;background:none;transition:all .14s;display:flex;align-items:center;gap:4px}
+.ttab:hover{background:var(--bg4);color:var(--text)}
+.ttab.active{background:var(--accent);color:#fff}
+.ttab .cnt{font-size:9px;background:rgba(255,255,255,.18);padding:1px 5px;border-radius:8px}
+.ttab.active .cnt{background:rgba(0,0,0,.2)}
+.sdot-wrap{display:flex;align-items:center;gap:5px;font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--text3);white-space:nowrap}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--yellow2);animation:pulse 1s infinite}
+.sdot.ok{background:var(--green2);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ─── LAYOUT ─── */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* ─── LEFT PANEL ─── */
+.left{width:270px;min-width:180px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.lhead{padding:9px 11px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.lhead-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.prog{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--text3)}
+.plist{overflow-y:auto;flex:1;padding:5px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.pitem{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:6px;cursor:pointer;transition:all .11s;border:1px solid transparent;margin-bottom:2px}
+.pitem:hover{background:var(--bg3);border-color:var(--border)}
+.pitem.active{background:var(--bg4);border-color:var(--border2)}
+.pitem.solved .pnum{color:var(--green2)!important}
+.pnum{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text3);min-width:16px}
+.ptitle{font-size:12px;font-weight:500;flex:1;line-height:1.3}
+.bny-star{font-size:10px;color:var(--bny);flex-shrink:0;title:'Real BNY question'}
+.dbadge{font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap;flex-shrink:0}
+.de{background:rgba(0,184,163,.15);color:var(--easy)}
+.dm{background:rgba(255,192,30,.12);color:var(--medium)}
+.dh{background:rgba(255,55,95,.12);color:var(--hard)}
+
+/* ─── RIGHT ─── */
+.right{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.prob-area{flex:1;display:flex;overflow:hidden}
+
+/* ─── DESC PANE ─── */
+.desc-pane{width:45%;min-width:260px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.dtabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.dtab{padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;transition:all .13s}
+.dtab:hover{color:var(--text)}
+.dtab.active{color:var(--text);border-bottom-color:var(--accent)}
+.dcontent{flex:1;overflow-y:auto;padding:16px 18px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+
+/* problem description */
+.pmain-title{font-size:18px;font-weight:700;line-height:1.3;margin-bottom:7px}
+.pmeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.tag{font-size:10.5px;padding:2px 7px;border-radius:9px;background:var(--bg4);color:var(--text2);border:1px solid var(--border)}
+.bny-badge{font-size:10px;padding:2px 7px;border-radius:9px;background:rgba(200,169,110,.12);color:var(--bny);border:1px solid rgba(200,169,110,.3);font-weight:600}
+.pbody{font-size:13px;line-height:1.75;color:#cdd5df}
+.pbody p{margin-bottom:11px}
+.pbody strong{color:var(--text);font-weight:600}
+.pbody ul,.pbody ol{margin:6px 0 11px 18px}
+.pbody li{margin-bottom:3px}
+.pbody code{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--bg4);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:var(--purple)}
+.exblock{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 13px;margin:9px 0;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.65}
+.exlabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:5px}
+.exk{color:var(--blue2);font-weight:600}
+.exv{color:var(--yellow2)}
+.exex{color:var(--text3);font-size:11px}
+.conblock{background:var(--bg3);border-left:3px solid var(--border2);padding:9px 13px;margin-top:13px;border-radius:0 5px 5px 0}
+.conlabel{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:5px}
+.con{font-size:12px;color:var(--text2);line-height:1.75;font-family:'JetBrains Mono',monospace}
+
+/* pattern note */
+.pattern-note{background:rgba(56,139,253,.07);border:1px solid rgba(56,139,253,.2);border-radius:var(--r);padding:11px 13px;margin-bottom:14px}
+.pn-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue2);margin-bottom:5px}
+.pn-body{font-size:12.5px;line-height:1.65;color:#9dc4fb}
+.pn-body code{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(56,139,253,.12);padding:1px 5px;border-radius:3px;color:var(--blue2)}
+
+/* answer section */
+.ans-section{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.show-ans-btn{width:100%;padding:10px 14px;background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--r);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.show-ans-btn:hover{background:var(--bg4);border-color:var(--accent);color:var(--accent)}
+.show-ans-btn.open{border-style:solid;border-color:rgba(63,185,80,.5);color:var(--green2);background:rgba(63,185,80,.05)}
+.ans-body{margin-top:12px;display:none}
+.ans-body.open{display:block}
+.ans-code{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.72;color:#a9b1bd;overflow-x:auto;white-space:pre}
+.kw{color:#ff79c6}.fn2{color:#50fa7b}.cm{color:#6272a4;font-style:italic}.st{color:#f1fa8c}.nm{color:#bd93f9}.bi{color:#8be9fd}
+.complexity{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.cpill{padding:3px 10px;border-radius:5px;font-size:11px;font-family:'JetBrains Mono',monospace}
+.ctime{background:rgba(56,139,253,.1);border:1px solid rgba(56,139,253,.22);color:var(--blue2)}
+.cspace{background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.22);color:var(--green2)}
+.load-btn{margin-top:9px;padding:6px 12px;background:var(--bg4);border:1px solid var(--border2);border-radius:5px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:500;cursor:pointer;transition:all .13s}
+.load-btn:hover{color:var(--text);border-color:var(--text3)}
+
+/* hint blocks */
+.hint-block{background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:7px;overflow:hidden}
+.hint-toggle{width:100%;text-align:left;padding:9px 12px;background:none;border:none;cursor:pointer;color:var(--blue2);font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;display:flex;justify-content:space-between;align-items:center}
+.hint-toggle:hover{background:var(--bg4)}
+.hint-inner{display:none;padding:0 12px 12px;font-size:12.5px;line-height:1.65;color:var(--text2)}
+.hint-inner code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg4);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:var(--purple)}
+
+/* ─── EDITOR ─── */
+.editor-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.etoolbar{display:flex;align-items:center;padding:0 12px;height:40px;background:var(--bg2);border-bottom:1px solid var(--border);gap:7px;flex-shrink:0}
+.langbadge{font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--blue2);background:rgba(56,139,253,.1);border:1px solid rgba(56,139,253,.2);padding:2px 7px;border-radius:4px}
+.etoolbar-r{margin-left:auto;display:flex;gap:6px;align-items:center}
+.btn{padding:5px 13px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;transition:all .13s;font-family:'DM Sans',sans-serif;border:none}
+.btn-reset{background:transparent;color:var(--text3);border:1px solid transparent;font-size:11.5px;padding:5px 8px}
+.btn-reset:hover{color:var(--text2);border-color:var(--border)}
+.btn-run{background:var(--bg4);color:var(--text);border:1px solid var(--border2)}
+.btn-run:hover{background:var(--bg3);border-color:var(--text3)}
+.btn-submit{background:var(--green);color:#0d1117}
+.btn-submit:hover{background:var(--green2)}
+.editor-wrap{flex:1;overflow:hidden}
+.CodeMirror{height:100%!important;font-family:'JetBrains Mono',monospace!important;font-size:12.5px!important;line-height:1.65!important}
+.CodeMirror-scroll{height:100%!important}
+
+/* ─── CONSOLE ─── */
+.console-area{height:200px;flex-shrink:0;border-top:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg)}
+.ctabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.ctab{padding:6px 13px;font-size:11.5px;font-weight:500;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;transition:all .13s}
+.ctab:hover{color:var(--text)}
+.ctab.active{color:var(--text);border-bottom-color:var(--accent)}
+.cbody{flex:1;overflow-y:auto;padding:7px 11px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.tcase{display:flex;align-items:flex-start;gap:7px;padding:6px 9px;border-radius:5px;background:var(--bg2);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;margin-bottom:4px}
+.tcase.pass{border-color:rgba(63,185,80,.4);background:rgba(63,185,80,.05)}
+.tcase.fail{border-color:rgba(248,81,73,.4);background:rgba(248,81,73,.05)}
+.tico{font-size:12px;flex-shrink:0;margin-top:1px}
+.tdet{flex:1}
+.tlab{font-size:9.5px;color:var(--text3);margin-bottom:2px}
+.tio{display:flex;gap:12px;flex-wrap:wrap}
+.tk{color:var(--blue2)}.tv{color:var(--yellow2)}.tg{color:var(--red2)}
+.res-sum{display:flex;align-items:center;gap:9px;padding:5px 0 7px}
+.rpill{font-size:12px;font-weight:700;padding:3px 11px;border-radius:5px}
+.rpass{background:rgba(63,185,80,.15);color:var(--green2)}
+.rfail{background:rgba(248,81,73,.12);color:var(--red2)}
+.rdet{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.cout{font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.65;color:var(--text2);white-space:pre-wrap}
+.csuccess{color:var(--green2)}.cerror{color:var(--red2)}.cinfo{color:var(--blue2)}
+
+/* empty */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:8px;text-align:center}
+.empty-icon{font-size:32px;opacity:.4}
+.empty-text{font-size:13px}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">BNY DSA <sub>FULL PREP</sub></div>
+  <div class="topic-tabs" id="topicTabs"></div>
+  <div class="sdot-wrap"><div class="sdot" id="sdot"></div><span id="stext">Loading Python…</span></div>
+</div>
+
+<div class="main">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="lhead">
+      <span class="lhead-title" id="listTitle">Problems</span>
+      <span class="prog" id="prog">0/0</span>
+    </div>
+    <div class="plist" id="plist"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="prob-area">
+      <!-- Description -->
+      <div class="desc-pane">
+        <div class="dtabs">
+          <button class="dtab active" onclick="switchDTab('desc',this)">Description</button>
+          <button class="dtab" onclick="switchDTab('pattern',this)">Pattern Guide</button>
+          <button class="dtab" onclick="switchDTab('hints',this)">Hints</button>
+        </div>
+        <div class="dcontent" id="dcontent">
+          <div class="empty"><div class="empty-icon">👈</div><div class="empty-text">Select a topic tab above,<br>then pick a problem</div></div>
+        </div>
+      </div>
+      <!-- Editor -->
+      <div class="editor-pane">
+        <div class="etoolbar">
+          <span class="langbadge">Python 3</span>
+          <div class="etoolbar-r">
+            <button class="btn btn-reset" onclick="resetCode()">↺ Reset</button>
+            <button class="btn btn-run" onclick="runTests(false)">▶ Run Tests</button>
+            <button class="btn btn-submit" onclick="runTests(true)">✓ Submit</button>
+          </div>
+        </div>
+        <div class="editor-wrap"><textarea id="codeEditor"></textarea></div>
+      </div>
+    </div>
+    <!-- Console -->
+    <div class="console-area">
+      <div class="ctabs">
+        <button class="ctab active" onclick="switchCTab(this)">Test Results</button>
+        <button class="ctab" onclick="switchCTab(this)">Output</button>
+      </div>
+      <div class="cbody" id="cbody">
+        <div class="cout cinfo" id="initMsg">⏳ Initialising Python runtime — takes ~10s on first load…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// TOPICS
+// ════════════════════════════════════════════════════════════
+const TOPICS = [
+  {id:'hashmap',  name:'Hash Map'},
+  {id:'twoptr',   name:'Two Pointers'},
+  {id:'sliding',  name:'Sliding Window'},
+  {id:'stack',    name:'Stack'},
+  {id:'greedy',   name:'Greedy'},
+  {id:'dp',       name:'Dynamic Programming'},
+  {id:'graph',    name:'Graphs'},
+  {id:'heap',     name:'Heap'},
+];
+
+// Pattern guide text per topic
+const PATTERNS = {
+hashmap:`<div class="pn-label">📌 Pattern: Hash Map / Hash Table</div>
+<div class="pn-body">
+<p><strong>Core idea:</strong> Trade space for time. Store values you've seen (or need) in a dict so you can look them up in O(1) instead of scanning the array again.</p>
+<p><strong>Template:</strong><br><code>seen = {}<br>for i, val in enumerate(arr):<br>&nbsp;&nbsp;if need(val) in seen: # found it!<br>&nbsp;&nbsp;seen[val] = i</code></p>
+<p><strong>When to use:</strong> "two elements that sum to X", grouping/categorising, frequency counting, anagram detection, finding duplicates.</p>
+<p><strong>BNY questions using this:</strong> Two Sum ⭐, Group Anagrams ⭐, Roman to Integer ⭐, Count Vowel Substrings ⭐</p>
+</div>`,
+
+twoptr:`<div class="pn-label">📌 Pattern: Two Pointers</div>
+<div class="pn-body">
+<p><strong>Core idea:</strong> Two indices scanning the same array — either from both ends toward the middle, or one chasing the other. Eliminates the inner loop of O(n²) brute force.</p>
+<p><strong>Opposite ends template (sorted array):</strong><br><code>l, r = 0, len(arr)-1<br>while l &lt; r:<br>&nbsp;&nbsp;if condition: l+=1<br>&nbsp;&nbsp;else: r-=1</code></p>
+<p><strong>Same direction template (fast/slow):</strong><br><code>left = 0<br>for right in range(len(arr)):<br>&nbsp;&nbsp;if valid: process; left+=1</code></p>
+<p><strong>BNY questions using this:</strong> Move Zeroes ⭐, 3Sum ⭐, Reverse Words III ⭐</p>
+</div>`,
+
+sliding:`<div class="pn-label">📌 Pattern: Sliding Window</div>
+<div class="pn-body">
+<p><strong>Core idea:</strong> Maintain a window [left, right] that expands and contracts. Avoids recomputing from scratch — update incrementally.</p>
+<p><strong>Variable-size template:</strong><br><code>left = 0<br>for right in range(len(s)):<br>&nbsp;&nbsp;# expand: include s[right]<br>&nbsp;&nbsp;while window_invalid:<br>&nbsp;&nbsp;&nbsp;&nbsp;# shrink: exclude s[left]; left+=1<br>&nbsp;&nbsp;# update answer with window size</code></p>
+<p><strong>Fixed-size template:</strong><br><code>window = sum(arr[:k])<br>for i in range(k, len(arr)):<br>&nbsp;&nbsp;window += arr[i] - arr[i-k]</code></p>
+<p><strong>BNY questions using this:</strong> Longest Substring Without Repeating Chars ⭐</p>
+</div>`,
+
+stack:`<div class="pn-label">📌 Pattern: Stack / Monotonic Stack</div>
+<div class="pn-body">
+<p><strong>Core idea:</strong> LIFO structure. Use when you need the most recent element, need to "undo", or need to find the next greater/smaller element.</p>
+<p><strong>Monotonic decreasing stack:</strong> maintains elements in decreasing order — useful for "next greater element" style problems.<br><code>stack = []<br>for i, val in enumerate(arr):<br>&nbsp;&nbsp;while stack and arr[stack[-1]] &lt; val:<br>&nbsp;&nbsp;&nbsp;&nbsp;j = stack.pop() # found answer for j<br>&nbsp;&nbsp;stack.append(i)</code></p>
+<p><strong>BNY questions using this:</strong> Car Fleet ⭐, Remove Duplicate Letters ⭐</p>
+</div>`,
+
+greedy:`<div class="pn-label">📌 Pattern: Greedy</div>
+<div class="pn-body">
+<p><strong>Core idea:</strong> Make the locally optimal choice at each step. Works when the optimal substructure property holds — you don't need to reconsider past choices.</p>
+<p><strong>Proof trick:</strong> Show that choosing greedily never makes the global answer worse. Common in interval, jump-game, and scheduling problems.</p>
+<p><strong>Key BNY patterns:</strong><br>• Gas Station: reset start when tank goes negative<br>• Jump Game: track max reachable index<br>• Cake cuts: sort + find max gap<br>• Min groups: try group sizes downward</p>
+<p><strong>BNY questions using this:</strong> Gas Station ⭐, Car Fleet ⭐, Max Cake Area ⭐, Min Groups ⭐, Minimize Array Length ⭐</p>
+</div>`,
+
+dp:`<div class="pn-label">📌 Pattern: Dynamic Programming</div>
+<div class="pn-body">
+<p><strong>Core idea:</strong> Break problem into overlapping subproblems. Store solutions to avoid recomputing (memoisation top-down or tabulation bottom-up).</p>
+<p><strong>Expand-around-center (palindrome DP):</strong><br><code>for i in range(n):<br>&nbsp;&nbsp;expand(i, i)   # odd palindrome<br>&nbsp;&nbsp;expand(i, i+1) # even palindrome</code></p>
+<p><strong>Min taps → Jump Game II DP:</strong> convert tap ranges to max_reach array, then greedy sweep.</p>
+<p><strong>BNY questions using this:</strong> Palindromic Substrings ⭐, Longest Palindromic Substring ⭐, Min Taps to Water Garden ⭐, Count Monotonic Pairs II ⭐</p>
+</div>`,
+
+graph:`<div class="pn-label">📌 Pattern: Graph Traversal (DFS / BFS)</div>
+<div class="pn-body">
+<p><strong>DFS template:</strong><br><code>visited = set()<br>def dfs(node):<br>&nbsp;&nbsp;if node in visited: return<br>&nbsp;&nbsp;visited.add(node)<br>&nbsp;&nbsp;for nb in graph[node]: dfs(nb)</code></p>
+<p><strong>BFS template (multi-source):</strong><br><code>from collections import deque<br>q = deque(start_nodes)<br>while q:<br>&nbsp;&nbsp;node = q.popleft()<br>&nbsp;&nbsp;for nb in graph[node]:<br>&nbsp;&nbsp;&nbsp;&nbsp;if nb not visited: q.append(nb)</code></p>
+<p><strong>Rho-shaped graph (BNY specific):</strong> Each node has exactly one outgoing edge → paths always end in cycles. Detect cycle, assign cycle length, backfill tail distances.</p>
+<p><strong>BNY questions using this:</strong> Count Visited Nodes ⭐</p>
+</div>`,
+
+heap:`<div class="pn-label">📌 Pattern: Heap / Priority Queue</div>
+<div class="pn-body">
+<p><strong>Core idea:</strong> Python's <code>heapq</code> is a min-heap. For max-heap, negate values.</p>
+<p><strong>Template:</strong><br><code>import heapq<br>heap = []<br>heapq.heappush(heap, val)<br>smallest = heapq.heappop(heap)</code></p>
+<p><strong>K-th largest:</strong> maintain min-heap of size k — when it exceeds k, pop smallest. The top IS the k-th largest.</p>
+<p><strong>Two-heap pattern (BNY):</strong> one heap from the left side, one from the right side. Each round pop the cheaper of the two tops.</p>
+<p><strong>BNY questions using this:</strong> Total Cost to Hire K Workers ⭐</p>
+</div>`,
+};
+
+// ════════════════════════════════════════════════════════════
+// PROBLEMS  (bny:true = real BNY question from their data)
+// ════════════════════════════════════════════════════════════
+const PROBLEMS = [
+
+// ══════════ HASH MAP ══════════
+{id:1,topic:'hashmap',diff:'easy',title:'Two Sum',bny:true,
+tags:['Array','Hash Table'],
+desc:`<p>Given array <code>nums</code> and integer <code>target</code>, return <strong>indices</strong> of the two numbers that add up to <code>target</code>. Exactly one solution. Cannot reuse the same element.</p>`,
+examples:[
+  {i:'nums=[2,7,11,15], target=9',o:'[0,1]',e:'nums[0]+nums[1]=9'},
+  {i:'nums=[3,2,4], target=6',o:'[1,2]',e:''},
+  {i:'nums=[3,3], target=6',o:'[0,1]',e:''},
+],cons:['2 ≤ nums.length ≤ 10⁴','Exactly one valid answer'],
+hints:['For each number ask: what value do I <em>need</em>? It is <code>target - nums[i]</code>.','Store each number and its index in a dict as you go. Check if complement already exists before inserting.'],
+starter:`def twoSum(nums, target):
+    pass`,
+solution:`def twoSum(nums, target):
+    seen = {}           # value -> index
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:'twoSum([2,7,11,15],9)',exp:'[0, 1]'},
+  {call:'twoSum([3,2,4],6)',exp:'[1, 2]'},
+  {call:'twoSum([3,3],6)',exp:'[0, 1]'},
+  {call:'twoSum([1,5,3,2],4)',exp:'[0, 2]'},
+]},
+
+{id:2,topic:'hashmap',diff:'medium',title:'Group Anagrams',bny:true,
+tags:['Hash Table','Sorting'],
+desc:`<p>Given array of strings <code>strs</code>, group all anagrams together. Two strings are anagrams if sorted they are equal. Return list of groups (any order).</p>`,
+examples:[
+  {i:'strs=["eat","tea","tan","ate","nat","bat"]',o:'[["eat","tea","ate"],["tan","nat"],["bat"]]',e:''},
+  {i:'strs=[""]',o:'[[""]]',e:''},
+],cons:['1 ≤ strs.length ≤ 10⁴','lowercase only'],
+hints:['Sorted string = canonical key for all anagrams.','<code>defaultdict(list)</code> — append each string to <code>groups[tuple(sorted(s))]</code>.'],
+starter:`from collections import defaultdict
+
+def groupAnagrams(strs):
+    pass`,
+solution:`from collections import defaultdict
+
+def groupAnagrams(strs):
+    groups = defaultdict(list)
+    for s in strs:
+        key = tuple(sorted(s))   # "eat","tea","ate" → ('a','e','t')
+        groups[key].append(s)
+    return list(groups.values())`,
+tc:'O(n·k log k)',sc:'O(nk)',
+tests:[
+  {call:'sorted([sorted(g) for g in groupAnagrams(["eat","tea","tan","ate","nat","bat"])])',exp:`[['ate', 'eat', 'tea'], ['bat'], ['nat', 'tan']]`},
+  {call:"groupAnagrams([''])",exp:"[['']]"},
+  {call:"groupAnagrams(['a'])",exp:"[['a']]"},
+]},
+
+{id:3,topic:'hashmap',diff:'easy',title:'Roman to Integer',bny:true,
+tags:['Hash Table','Math','String'],
+desc:`<p>Convert roman numeral string <code>s</code> to integer. Rule: if a smaller symbol precedes a larger one, subtract it (e.g. <code>IV=4</code>, <code>IX=9</code>, <code>XL=40</code>, <code>CM=900</code>).</p>`,
+examples:[
+  {i:'s="III"',o:'3',e:''},
+  {i:'s="LVIII"',o:'58',e:'L=50,V=5,III=3'},
+  {i:'s="MCMXCIV"',o:'1994',e:'M+CM+XC+IV = 1000+900+90+4'},
+],cons:['Valid roman numeral in [1,3999]'],
+hints:['Build a dict mapping each symbol to its value.','Scan left to right. If current value < next value → subtract, else add.'],
+starter:`def romanToInt(s):
+    pass`,
+solution:`def romanToInt(s):
+    roman = {'I':1,'V':5,'X':10,'L':50,'C':100,'D':500,'M':1000}
+    result = 0
+    for i in range(len(s)):
+        if i+1 < len(s) and roman[s[i]] < roman[s[i+1]]:
+            result -= roman[s[i]]
+        else:
+            result += roman[s[i]]
+    return result`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'romanToInt("III")',exp:'3'},
+  {call:'romanToInt("LVIII")',exp:'58'},
+  {call:'romanToInt("MCMXCIV")',exp:'1994'},
+  {call:'romanToInt("IX")',exp:'9'},
+  {call:'romanToInt("XL")',exp:'40'},
+]},
+
+{id:4,topic:'hashmap',diff:'easy',title:'Count Vowel Substrings',bny:true,
+tags:['Hash Table','String'],
+desc:`<p>A <strong>vowel substring</strong> contains only vowels (a,e,i,o,u) AND includes all five. Given string <code>word</code>, return the count of vowel substrings.</p>`,
+examples:[
+  {i:'word="aeiouu"',o:'2',e:'"aeiou" and "aeiouu"'},
+  {i:'word="unicornarihan"',o:'0',e:''},
+  {i:'word="cuaieuouac"',o:'7',e:''},
+],cons:['1 ≤ word.length ≤ 100'],
+hints:['Brute force O(n²): two loops over all substrings.','Track vowels seen in a set. Break early when you hit a consonant.'],
+starter:`def countVowelSubstrings(word):
+    pass`,
+solution:`def countVowelSubstrings(word):
+    vowels = set('aeiou')
+    count = 0
+    for i in range(len(word)):
+        seen = set()
+        for j in range(i, len(word)):
+            if word[j] not in vowels:
+                break
+            seen.add(word[j])
+            if len(seen) == 5:
+                count += 1
+    return count`,
+tc:'O(n²)',sc:'O(1)',
+tests:[
+  {call:'countVowelSubstrings("aeiouu")',exp:'2'},
+  {call:'countVowelSubstrings("unicornarihan")',exp:'0'},
+  {call:'countVowelSubstrings("cuaieuouac")',exp:'7'},
+]},
+
+{id:5,topic:'hashmap',diff:'medium',title:'Valid Anagram (Warmup)',bny:false,
+tags:['Hash Table','String','Sorting'],
+desc:`<p>Given two strings <code>s</code> and <code>t</code>, return <code>True</code> if <code>t</code> is an anagram of <code>s</code>, otherwise <code>False</code>.</p>`,
+examples:[
+  {i:'s="anagram", t="nagaram"',o:'True',e:''},
+  {i:'s="rat", t="car"',o:'False',e:''},
+],cons:['1 ≤ s.length, t.length ≤ 5×10⁴','lowercase only'],
+hints:['Count character frequencies using a dict or Counter.','Two strings are anagrams ↔ their frequency maps are equal.'],
+starter:`from collections import Counter
+
+def isAnagram(s, t):
+    pass`,
+solution:`from collections import Counter
+
+def isAnagram(s, t):
+    return Counter(s) == Counter(t)`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'isAnagram("anagram","nagaram")',exp:'True'},
+  {call:'isAnagram("rat","car")',exp:'False'},
+  {call:'isAnagram("ab","a")',exp:'False'},
+  {call:'isAnagram("a","a")',exp:'True'},
+]},
+
+// ══════════ TWO POINTERS ══════════
+{id:6,topic:'twoptr',diff:'easy',title:'Move Zeroes',bny:true,
+tags:['Array','Two Pointers'],
+desc:`<p>Given integer array <code>nums</code>, move all <code>0</code>s to the end while keeping relative order of non-zero elements. <strong>In-place</strong>, no extra array.</p>`,
+examples:[
+  {i:'nums=[0,1,0,3,12]',o:'[1,3,12,0,0]',e:''},
+  {i:'nums=[0]',o:'[0]',e:''},
+  {i:'nums=[1,0,0,2,3]',o:'[1,2,3,0,0]',e:''},
+],cons:['1 ≤ nums.length ≤ 10⁴','In-place'],
+hints:['<code>left</code> pointer = position to place the next non-zero element.','When <code>nums[right] != 0</code>, swap to position <code>left</code> and advance <code>left</code>.'],
+starter:`def moveZeroes(nums):
+    # modify in-place
+    return nums`,
+solution:`def moveZeroes(nums):
+    left = 0
+    for right in range(len(nums)):
+        if nums[right] != 0:
+            nums[left], nums[right] = nums[right], nums[left]
+            left += 1
+    return nums`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'moveZeroes([0,1,0,3,12])',exp:'[1, 3, 12, 0, 0]'},
+  {call:'moveZeroes([0])',exp:'[0]'},
+  {call:'moveZeroes([1,0,0,2,3])',exp:'[1, 2, 3, 0, 0]'},
+  {call:'moveZeroes([0,0,1])',exp:'[1, 0, 0]'},
+]},
+
+{id:7,topic:'twoptr',diff:'medium',title:'3Sum',bny:true,
+tags:['Array','Two Pointers','Sorting'],
+desc:`<p>Given integer array <code>nums</code>, return all unique triplets <code>[a,b,c]</code> where <code>a+b+c==0</code>. No duplicate triplets.</p>`,
+examples:[
+  {i:'nums=[-1,0,1,2,-1,-4]',o:'[[-1,-1,2],[-1,0,1]]',e:''},
+  {i:'nums=[0,1,1]',o:'[]',e:''},
+  {i:'nums=[0,0,0]',o:'[[0,0,0]]',e:''},
+],cons:['3 ≤ nums.length ≤ 3000'],
+hints:['Sort the array. Fix <code>nums[i]</code>, then two-pointer on the rest searching for sum = <code>-nums[i]</code>.','Skip duplicates: if <code>nums[i]==nums[i-1]</code> skip. Also skip duplicate pointer positions after finding a triplet.'],
+starter:`def threeSum(nums):
+    pass`,
+solution:`def threeSum(nums):
+    nums.sort()
+    result = []
+    for i in range(len(nums)-2):
+        if i > 0 and nums[i] == nums[i-1]:
+            continue
+        l, r = i+1, len(nums)-1
+        while l < r:
+            s = nums[i]+nums[l]+nums[r]
+            if s == 0:
+                result.append([nums[i],nums[l],nums[r]])
+                while l<r and nums[l]==nums[l+1]: l+=1
+                while l<r and nums[r]==nums[r-1]: r-=1
+                l+=1; r-=1
+            elif s < 0: l+=1
+            else: r-=1
+    return result`,
+tc:'O(n²)',sc:'O(n)',
+tests:[
+  {call:'sorted(threeSum([-1,0,1,2,-1,-4]))',exp:'[[-1, -1, 2], [-1, 0, 1]]'},
+  {call:'threeSum([0,1,1])',exp:'[]'},
+  {call:'threeSum([0,0,0])',exp:'[[0, 0, 0]]'},
+]},
+
+{id:8,topic:'twoptr',diff:'easy',title:'Reverse Words in a String III',bny:true,
+tags:['Two Pointers','String'],
+desc:`<p>Given string <code>s</code>, reverse the characters in each word while preserving word order and spaces.</p>`,
+examples:[
+  {i:"s=\"Let's take LeetCode contest\"",o:"\"s'teL ekat edoCteeL tsetnoc\"",e:'Each word reversed'},
+  {i:'s="God Ding"',o:'"doG gniD"',e:''},
+],cons:['1 ≤ s.length ≤ 5×10⁴','Single spaces between words'],
+hints:['Split on spaces, reverse each word with <code>[::-1]</code>, join back.'],
+starter:`def reverseWords(s):
+    pass`,
+solution:`def reverseWords(s):
+    return ' '.join(word[::-1] for word in s.split())`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:`reverseWords("Let's take LeetCode contest")`,exp:`s'teL ekat edoCteeL tsetnoc`},
+  {call:'reverseWords("God Ding")',exp:'doG gniD'},
+  {call:'reverseWords("hello")',exp:'olleh'},
+]},
+
+{id:9,topic:'twoptr',diff:'medium',title:'Container With Most Water (Warmup)',bny:false,
+tags:['Array','Two Pointers','Greedy'],
+desc:`<p><code>height[i]</code> is the height of a vertical line. Find two lines forming a container that holds the most water. Return max area.</p>`,
+examples:[
+  {i:'height=[1,8,6,2,5,4,8,3,7]',o:'49',e:'Lines at idx 1 and 8: min(8,7)×7=49'},
+  {i:'height=[1,1]',o:'1',e:''},
+],cons:['2 ≤ height.length ≤ 10⁵'],
+hints:['Start pointers at both ends. Area = <code>min(h[l],h[r])*(r-l)</code>.','Move the shorter wall inward — only a taller wall can improve.'],
+starter:`def maxWater(height):
+    pass`,
+solution:`def maxWater(height):
+    l, r = 0, len(height)-1
+    best = 0
+    while l < r:
+        area = min(height[l],height[r])*(r-l)
+        best = max(best,area)
+        if height[l] < height[r]: l+=1
+        else: r-=1
+    return best`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'maxWater([1,8,6,2,5,4,8,3,7])',exp:'49'},
+  {call:'maxWater([1,1])',exp:'1'},
+  {call:'maxWater([4,3,2,1,4])',exp:'16'},
+]},
+
+{id:10,topic:'twoptr',diff:'medium',title:'Sum of Distances',bny:true,
+tags:['Array','Hash Table','Prefix Sum'],
+desc:`<p>For each index <code>i</code>, compute the sum of <code>|i-j|</code> for every <code>j</code> where <code>nums[j]==nums[i]</code> and <code>j≠i</code>. Return the result array.</p>`,
+examples:[
+  {i:'nums=[1,3,1,1,2]',o:'[5,0,3,4,0]',e:'i=0: |0-2|+|0-3|=5'},
+  {i:'nums=[0,5,3]',o:'[0,0,0]',e:'All unique'},
+],cons:['1 ≤ nums.length ≤ 10⁵'],
+hints:['Group indices by value in a dict.','For each group use prefix sums: left cost for position j = <code>idx*j - prefix[j-1]</code>; right cost = <code>prefix[-1]-prefix[j] - idx*(n-j-1)</code>.'],
+starter:`from collections import defaultdict
+
+def distance(nums):
+    pass`,
+solution:`from collections import defaultdict
+
+def distance(nums):
+    positions = defaultdict(list)
+    for i, n in enumerate(nums):
+        positions[n].append(i)
+    result = [0]*len(nums)
+    for indices in positions.values():
+        n = len(indices)
+        prefix = list(indices)
+        for j in range(1,n): prefix[j]+=prefix[j-1]
+        for j, idx in enumerate(indices):
+            left = prefix[j-1] if j>0 else 0
+            right = prefix[-1]-prefix[j]
+            result[idx] = idx*j - left + right - idx*(n-j-1)
+    return result`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:'distance([1,3,1,1,2])',exp:'[5, 0, 3, 4, 0]'},
+  {call:'distance([0,5,3])',exp:'[0, 0, 0]'},
+  {call:'distance([1,1])',exp:'[1, 1]'},
+]},
+
+// ══════════ SLIDING WINDOW ══════════
+{id:11,topic:'sliding',diff:'easy',title:'Best Time to Buy and Sell Stock (Warmup)',bny:true,
+tags:['Array','Sliding Window'],
+desc:`<p><code>prices[i]</code> = stock price on day i. Buy once, sell on a later day. Return <strong>maximum profit</strong>. Return 0 if no profit is possible.</p>`,
+examples:[
+  {i:'prices=[7,1,5,3,6,4]',o:'5',e:'Buy at 1 (day 2), sell at 6 (day 5)'},
+  {i:'prices=[7,6,4,3,1]',o:'0',e:'Prices only fall'},
+],cons:['1 ≤ prices.length ≤ 10⁵'],
+hints:['Track the minimum price seen so far.','For each price: profit = price - min_so_far. Keep a running max.'],
+starter:`def maxProfit(prices):
+    pass`,
+solution:`def maxProfit(prices):
+    min_price = float('inf')
+    max_profit = 0
+    for price in prices:
+        min_price = min(min_price, price)
+        max_profit = max(max_profit, price - min_price)
+    return max_profit`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'maxProfit([7,1,5,3,6,4])',exp:'5'},
+  {call:'maxProfit([7,6,4,3,1])',exp:'0'},
+  {call:'maxProfit([1,2])',exp:'1'},
+  {call:'maxProfit([2,4,1])',exp:'2'},
+]},
+
+{id:12,topic:'sliding',diff:'medium',title:'Longest Substring Without Repeating Characters',bny:true,
+tags:['Sliding Window','Hash Table','String'],
+desc:`<p>Given string <code>s</code>, find the length of the <strong>longest substring</strong> with no repeating characters.</p>`,
+examples:[
+  {i:'s="abcabcbb"',o:'3',e:'"abc"'},
+  {i:'s="bbbbb"',o:'1',e:'"b"'},
+  {i:'s="pwwkew"',o:'3',e:'"wke"'},
+],cons:['0 ≤ s.length ≤ 5×10⁴'],
+hints:['Sliding window with <code>left</code>/<code>right</code>. Map each char to its last seen index.','When you hit a repeat: jump left to <code>max(left, last_seen[c]+1)</code> — the max ensures left never moves backward.'],
+starter:`def lengthOfLongestSubstring(s):
+    pass`,
+solution:`def lengthOfLongestSubstring(s):
+    last = {}          # char -> last seen index
+    left = best = 0
+    for right, c in enumerate(s):
+        if c in last and last[c] >= left:
+            left = last[c]+1
+        last[c] = right
+        best = max(best, right-left+1)
+    return best`,
+tc:'O(n)',sc:'O(min(n,m))',
+tests:[
+  {call:'lengthOfLongestSubstring("abcabcbb")',exp:'3'},
+  {call:'lengthOfLongestSubstring("bbbbb")',exp:'1'},
+  {call:'lengthOfLongestSubstring("pwwkew")',exp:'3'},
+  {call:'lengthOfLongestSubstring("")',exp:'0'},
+]},
+
+{id:13,topic:'sliding',diff:'medium',title:'Minimum Size Subarray Sum (Warmup)',bny:false,
+tags:['Array','Sliding Window'],
+desc:`<p>Given positive integer array <code>nums</code> and <code>target</code>, return the <strong>minimal length</strong> of a subarray with sum ≥ target. Return 0 if none.</p>`,
+examples:[
+  {i:'target=7, nums=[2,3,1,2,4,3]',o:'2',e:'[4,3] has sum 7'},
+  {i:'target=4, nums=[1,4,4]',o:'1',e:'[4]'},
+  {i:'target=11, nums=[1,1,1,1,1,1,1,1]',o:'0',e:''},
+],cons:['1 ≤ target ≤ 10⁹','1 ≤ nums[i] ≤ 10⁴'],
+hints:['Expand right. When sum ≥ target, shrink from left and update minimum.'],
+starter:`def minSubArrayLen(target, nums):
+    pass`,
+solution:`def minSubArrayLen(target, nums):
+    left = total = 0
+    best = float('inf')
+    for right in range(len(nums)):
+        total += nums[right]
+        while total >= target:
+            best = min(best, right-left+1)
+            total -= nums[left]; left+=1
+    return 0 if best==float('inf') else best`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'minSubArrayLen(7,[2,3,1,2,4,3])',exp:'2'},
+  {call:'minSubArrayLen(4,[1,4,4])',exp:'1'},
+  {call:'minSubArrayLen(11,[1,1,1,1,1,1,1,1])',exp:'0'},
+]},
+
+{id:14,topic:'sliding',diff:'medium',title:'Longest Repeating Character Replacement (Warmup)',bny:false,
+tags:['String','Sliding Window'],
+desc:`<p>Given uppercase string <code>s</code> and integer <code>k</code>, you can replace any char up to k times. Return the length of the longest substring containing only one distinct letter after replacements.</p>`,
+examples:[
+  {i:'s="ABAB", k=2',o:'4',e:'Replace Bs → "AAAA"'},
+  {i:'s="AABABBA", k=1',o:'4',e:''},
+],cons:['s is uppercase','0 ≤ k ≤ s.length'],
+hints:['Window valid when <code>window_size - max_freq ≤ k</code>.','Key: max_freq never needs to decrease — once you find a good value it persists.'],
+starter:`def characterReplacement(s, k):
+    pass`,
+solution:`def characterReplacement(s, k):
+    count = {}
+    left = max_freq = best = 0
+    for right in range(len(s)):
+        count[s[right]] = count.get(s[right],0)+1
+        max_freq = max(max_freq, count[s[right]])
+        if (right-left+1)-max_freq > k:
+            count[s[left]] -= 1; left+=1
+        best = max(best, right-left+1)
+    return best`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'characterReplacement("ABAB",2)',exp:'4'},
+  {call:'characterReplacement("AABABBA",1)',exp:'4'},
+  {call:'characterReplacement("AAAA",0)',exp:'4'},
+]},
+
+// ══════════ STACK ══════════
+{id:15,topic:'stack',diff:'medium',title:'Car Fleet',bny:true,
+tags:['Array','Stack','Sorting'],
+desc:`<p>n cars head to <code>target</code> miles away. <code>position[i]</code> and <code>speed[i]</code> given. A faster car that catches a slower one joins its fleet and slows down. Return the <strong>number of fleets</strong> that arrive.</p>`,
+examples:[
+  {i:'target=12, position=[10,8,0,5,3], speed=[2,4,1,1,3]',o:'3',e:'3 separate fleets'},
+  {i:'target=10, position=[3], speed=[3]',o:'1',e:''},
+],cons:['1 ≤ n ≤ 10⁵','All positions unique'],
+hints:['Sort by position descending (closest to target first). Arrival time = (target-pos)/speed.','Stack: if current car takes longer than the stack top it forms a new fleet. Otherwise it merges.'],
+starter:`def carFleet(target, position, speed):
+    pass`,
+solution:`def carFleet(target, position, speed):
+    pairs = sorted(zip(position,speed), reverse=True)
+    stack = []
+    for pos, spd in pairs:
+        t = (target-pos)/spd
+        if not stack or t > stack[-1]:
+            stack.append(t)
+    return len(stack)`,
+tc:'O(n log n)',sc:'O(n)',
+tests:[
+  {call:'carFleet(12,[10,8,0,5,3],[2,4,1,1,3])',exp:'3'},
+  {call:'carFleet(10,[3],[3])',exp:'1'},
+  {call:'carFleet(10,[6,8],[3,2])',exp:'2'},
+  {call:'carFleet(100,[0,2,4],[4,2,1])',exp:'1'},
+]},
+
+{id:16,topic:'stack',diff:'medium',title:'Remove Duplicate Letters',bny:true,
+tags:['Stack','Greedy','Monotonic Stack'],
+desc:`<p>Remove duplicate letters so each letter appears <strong>exactly once</strong> and the result is the <strong>lexicographically smallest</strong> possible.</p>`,
+examples:[
+  {i:'s="bcabc"',o:'"abc"',e:''},
+  {i:'s="cbacdcbc"',o:'"acdb"',e:''},
+],cons:['1 ≤ s.length ≤ 10⁴','lowercase only'],
+hints:['Track <code>last_occurrence[c]</code> — can you still use this char later?','Monotonic stack: pop top when (top > current) AND (top still appears later). Use a seen set to skip duplicates.'],
+starter:`def removeDuplicateLetters(s):
+    pass`,
+solution:`def removeDuplicateLetters(s):
+    last = {c:i for i,c in enumerate(s)}
+    stack, seen = [], set()
+    for i, c in enumerate(s):
+        if c in seen: continue
+        while stack and c < stack[-1] and last[stack[-1]] > i:
+            seen.discard(stack.pop())
+        stack.append(c); seen.add(c)
+    return ''.join(stack)`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'removeDuplicateLetters("bcabc")',exp:'abc'},
+  {call:'removeDuplicateLetters("cbacdcbc")',exp:'acdb'},
+  {call:'removeDuplicateLetters("abcd")',exp:'abcd'},
+]},
+
+{id:17,topic:'stack',diff:'easy',title:'Valid Parentheses (Warmup)',bny:false,
+tags:['String','Stack'],
+desc:`<p>Given string <code>s</code> of only brackets <code>(){}[]</code>, return <code>True</code> if it is valid (every opener closed in correct order).</p>`,
+examples:[
+  {i:'s="()"',o:'True',e:''},{i:'s="()[]{}"',o:'True',e:''},{i:'s="(]"',o:'False',e:''},{i:'s="([)]"',o:'False',e:''},
+],cons:['1 ≤ s.length ≤ 10⁴'],
+hints:['Push opening brackets. On closing bracket, check if stack top matches.','Empty stack on pop attempt → False. Non-empty stack at end → False.'],
+starter:`def isValid(s):
+    pass`,
+solution:`def isValid(s):
+    stack = []
+    mapping = {')':'(',']':'[','}':'{'}
+    for c in s:
+        if c in mapping:
+            top = stack.pop() if stack else '#'
+            if mapping[c] != top: return False
+        else:
+            stack.append(c)
+    return not stack`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:'isValid("()")',exp:'True'},
+  {call:'isValid("()[]{}")',exp:'True'},
+  {call:'isValid("(]")',exp:'False'},
+  {call:'isValid("{[]}")',exp:'True'},
+  {call:'isValid("([)]")',exp:'False'},
+]},
+
+{id:18,topic:'stack',diff:'medium',title:'Daily Temperatures (Warmup)',bny:false,
+tags:['Array','Monotonic Stack'],
+desc:`<p>Given <code>temperatures</code> array, for each day return the number of days until a warmer day. Return 0 if no warmer day exists.</p>`,
+examples:[
+  {i:'temperatures=[73,74,75,71,69,72,76,73]',o:'[1,1,4,2,1,1,0,0]',e:''},
+  {i:'temperatures=[30,40,50,60]',o:'[1,1,1,0]',e:''},
+],cons:['1 ≤ temperatures.length ≤ 10⁵'],
+hints:['Monotonic decreasing stack of indices.','When current > temperatures[stack.top()], pop and set answer[popped] = i - popped.'],
+starter:`def dailyTemperatures(temperatures):
+    pass`,
+solution:`def dailyTemperatures(temperatures):
+    answer = [0]*len(temperatures)
+    stack = []
+    for i, temp in enumerate(temperatures):
+        while stack and temperatures[stack[-1]] < temp:
+            j = stack.pop()
+            answer[j] = i-j
+        stack.append(i)
+    return answer`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:'dailyTemperatures([73,74,75,71,69,72,76,73])',exp:'[1, 1, 4, 2, 1, 1, 0, 0]'},
+  {call:'dailyTemperatures([30,40,50,60])',exp:'[1, 1, 1, 0]'},
+  {call:'dailyTemperatures([30,60,90])',exp:'[1, 1, 0]'},
+]},
+
+// ══════════ GREEDY ══════════
+{id:19,topic:'greedy',diff:'medium',title:'Gas Station',bny:true,
+tags:['Array','Greedy'],
+desc:`<p>n gas stations on a circular route. <code>gas[i]</code> = gas at station i. <code>cost[i]</code> = gas to travel to next station. Return starting index to complete the circuit, or <code>-1</code> if impossible.</p>`,
+examples:[
+  {i:'gas=[1,2,3,4,5], cost=[3,4,5,1,2]',o:'3',e:'Start at station 3'},
+  {i:'gas=[2,3,4], cost=[3,4,3]',o:'-1',e:''},
+],cons:['1 ≤ n ≤ 10⁵'],
+hints:['If total gas < total cost → impossible, return -1.','Greedy: if tank goes negative at station k, reset start to k+1 and tank to 0.'],
+starter:`def canCompleteCircuit(gas, cost):
+    pass`,
+solution:`def canCompleteCircuit(gas, cost):
+    if sum(gas) < sum(cost):
+        return -1
+    start = tank = 0
+    for i in range(len(gas)):
+        tank += gas[i]-cost[i]
+        if tank < 0:
+            start = i+1; tank = 0
+    return start`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'canCompleteCircuit([1,2,3,4,5],[3,4,5,1,2])',exp:'3'},
+  {call:'canCompleteCircuit([2,3,4],[3,4,3])',exp:'-1'},
+  {call:'canCompleteCircuit([5,1,2,3,4],[4,4,1,5,1])',exp:'4'},
+]},
+
+{id:20,topic:'greedy',diff:'medium',title:'Max Area of Cake After Cuts',bny:true,
+tags:['Array','Greedy','Sorting'],
+desc:`<p>Cake of size <code>h × w</code>. After cutting at every position in <code>horizontalCuts</code> and <code>verticalCuts</code>, return the <strong>maximum piece area</strong> mod 10⁹+7.</p>`,
+examples:[
+  {i:'h=5,w=4,hCuts=[1,2,4],vCuts=[1,3]',o:'4',e:'Max h-gap=2, v-gap=2 → 4'},
+  {i:'h=5,w=4,hCuts=[3,1],vCuts=[1]',o:'6',e:''},
+],cons:['2 ≤ h,w ≤ 10⁹'],
+hints:['Sort cuts. Max height gap = max diff between consecutive horizontal cuts (include 0 and h as boundaries).','Multiply max h-gap × max v-gap, mod 10⁹+7.'],
+starter:`def maxArea(h, w, horizontalCuts, verticalCuts):
+    pass`,
+solution:`def maxArea(h, w, horizontalCuts, verticalCuts):
+    MOD = 10**9+7
+    hc = sorted(horizontalCuts)
+    vc = sorted(verticalCuts)
+    max_h = max(hc[0], h-hc[-1], *[hc[i]-hc[i-1] for i in range(1,len(hc))])
+    max_v = max(vc[0], w-vc[-1], *[vc[i]-vc[i-1] for i in range(1,len(vc))])
+    return (max_h*max_v)%MOD`,
+tc:'O(h log h + v log v)',sc:'O(1)',
+tests:[
+  {call:'maxArea(5,4,[1,2,4],[1,3])',exp:'4'},
+  {call:'maxArea(5,4,[3,1],[1])',exp:'6'},
+  {call:'maxArea(1000000000,1000000000,[2],[2])',exp:'49'},
+]},
+
+{id:21,topic:'greedy',diff:'medium',title:'Minimize Length of Array Using Operations',bny:true,
+tags:['Array','Math','Greedy','Number Theory'],
+desc:`<p>Given array <code>nums</code>, you can pick any two elements where one is NOT a multiple of the other, and replace the larger with their remainder (<code>big % small</code>). Return the <strong>minimum possible array length</strong>.</p>`,
+examples:[
+  {i:'nums=[1,4,3,1]',o:'1',e:'1 is not a multiple of 3/4 → keep reducing'},
+  {i:'nums=[5,5,5,10,5]',o:'2',e:''},
+],cons:['1 ≤ nums[i] ≤ 10⁹'],
+hints:['Find the minimum element.','If any element is NOT a multiple of min_val → min_val can reduce it further. Eventually everything collapses to 1 element.','If ALL elements are multiples of min_val: each non-min element can pair with one copy of min_val. Count how many min_val copies are needed.'],
+starter:`def minimizeArrayLength(nums):
+    pass`,
+solution:`def minimizeArrayLength(nums):
+    min_val = min(nums)
+    for num in nums:
+        if num % min_val != 0:
+            return 1   # GCD is smaller than min → whole array collapses
+    # All multiples of min_val — each non-min can be zeroed by one copy of min_val
+    non_min = sum(1 for n in nums if n != min_val)
+    min_count = nums.count(min_val)
+    removable = min(non_min, min_count)
+    return len(nums) - removable`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'minimizeArrayLength([1,4,3,1])',exp:'2'},
+  {call:'minimizeArrayLength([5,5,5,10,5])',exp:'4'},
+  {call:'minimizeArrayLength([2,3,4])',exp:'1'},
+  {call:'minimizeArrayLength([6,6,6])',exp:'3'},
+]},
+
+{id:22,topic:'greedy',diff:'medium',title:'Minimum Number of Groups for Valid Assignment',bny:true,
+tags:['Hash Table','Greedy'],
+desc:`<p>Assign balls (labeled by <code>nums</code>) into groups where group sizes differ by at most 1, and balls with different labels must be in different groups. Return <strong>minimum number of groups</strong>.</p>`,
+examples:[
+  {i:'nums=[3,2,3,2,3]',o:'2',e:'Frequencies: {3:3,2:2}'},
+  {i:'nums=[10,10,10,3,1,1]',o:'4',e:''},
+],cons:['1 ≤ nums.length ≤ 10⁵'],
+hints:['Count frequencies. Find min_freq.','Try each group size from min_freq down to 1. For each size, check if all freq values can be split into groups of size or size+1.'],
+starter:`from collections import Counter
+
+def minGroupsForValidAssignment(nums):
+    pass`,
+solution:`from collections import Counter
+
+def minGroupsForValidAssignment(nums):
+    freq = Counter(nums)
+    counts = list(freq.values())
+    min_c = min(counts)
+    for size in range(min_c+1, 0, -1):
+        total = 0; valid = True
+        for c in counts:
+            q, r = divmod(c, size)
+            if r == 0: total += q
+            elif r == q or r == c: total += q+1
+            else: valid = False; break
+        if valid: return total
+    return len(nums)`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:'minGroupsForValidAssignment([3,2,3,2,3])',exp:'2'},
+  {call:'minGroupsForValidAssignment([10,10,10,3,1,1])',exp:'4'},
+  {call:'minGroupsForValidAssignment([1])',exp:'1'},
+]},
+
+{id:23,topic:'greedy',diff:'medium',title:'Jump Game (Warmup)',bny:false,
+tags:['Array','Greedy'],
+desc:`<p><code>nums[i]</code> = max jump from index i. Can you reach the last index starting from index 0?</p>`,
+examples:[
+  {i:'nums=[2,3,1,1,4]',o:'True',e:''},{i:'nums=[3,2,1,0,4]',o:'False',e:'Always stuck at index 3'},
+],cons:['1 ≤ nums.length ≤ 10⁴'],
+hints:['Track the farthest index reachable. If you ever step beyond it → False.'],
+starter:`def canJump(nums):
+    pass`,
+solution:`def canJump(nums):
+    max_reach = 0
+    for i, jump in enumerate(nums):
+        if i > max_reach: return False
+        max_reach = max(max_reach, i+jump)
+    return True`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'canJump([2,3,1,1,4])',exp:'True'},
+  {call:'canJump([3,2,1,0,4])',exp:'False'},
+  {call:'canJump([0])',exp:'True'},
+]},
+
+// ══════════ DYNAMIC PROGRAMMING ══════════
+{id:24,topic:'dp',diff:'medium',title:'Palindromic Substrings',bny:true,
+tags:['Two Pointers','String','DP'],
+desc:`<p>Given string <code>s</code>, return the <strong>number of palindromic substrings</strong>. Every single character is a palindrome; so is "aa", "aba", etc.</p>`,
+examples:[
+  {i:'s="abc"',o:'3',e:'"a","b","c"'},
+  {i:'s="aaa"',o:'6',e:'"a"×3, "aa"×2, "aaa"'},
+],cons:['1 ≤ s.length ≤ 1000'],
+hints:['Every single char = 1 palindrome. Expand from each center.','For each index i: try odd palindrome expand(i,i) and even expand(i,i+1).'],
+starter:`def countSubstrings(s):
+    pass`,
+solution:`def countSubstrings(s):
+    count = 0
+    n = len(s)
+    def expand(l, r):
+        nonlocal count
+        while l>=0 and r<n and s[l]==s[r]:
+            count+=1; l-=1; r+=1
+    for i in range(n):
+        expand(i,i)    # odd
+        expand(i,i+1)  # even
+    return count`,
+tc:'O(n²)',sc:'O(1)',
+tests:[
+  {call:'countSubstrings("abc")',exp:'3'},
+  {call:'countSubstrings("aaa")',exp:'6'},
+  {call:'countSubstrings("racecar")',exp:'10'},
+  {call:'countSubstrings("a")',exp:'1'},
+]},
+
+{id:25,topic:'dp',diff:'medium',title:'Longest Palindromic Substring',bny:true,
+tags:['Two Pointers','String','DP'],
+desc:`<p>Given string <code>s</code>, return the <strong>longest palindromic substring</strong>.</p>`,
+examples:[
+  {i:'s="babad"',o:'"bab"',e:'"aba" also valid'},
+  {i:'s="cbbd"',o:'"bb"',e:''},
+],cons:['1 ≤ s.length ≤ 1000'],
+hints:['Expand around center for both odd and even.','Track the longest palindrome found (start index + length).'],
+starter:`def longestPalindrome(s):
+    pass`,
+solution:`def longestPalindrome(s):
+    res = ""
+    def expand(l, r):
+        while l>=0 and r<len(s) and s[l]==s[r]:
+            l-=1; r+=1
+        return s[l+1:r]
+    for i in range(len(s)):
+        odd = expand(i,i); even = expand(i,i+1)
+        if len(odd)>len(res): res=odd
+        if len(even)>len(res): res=even
+    return res`,
+tc:'O(n²)',sc:'O(1)',
+tests:[
+  {call:'longestPalindrome("babad") in ["bab","aba"]',exp:'True'},
+  {call:'longestPalindrome("cbbd")',exp:'bb'},
+  {call:'longestPalindrome("a")',exp:'a'},
+]},
+
+{id:26,topic:'dp',diff:'hard',title:'Minimum Taps to Water a Garden',bny:true,
+tags:['Array','DP','Greedy'],
+desc:`<p>Garden spans x=0 to x=n. Tap i (at position i) can water <code>[i-ranges[i], i+ranges[i]]</code>. Return the <strong>minimum taps</strong> to open to water the entire garden <code>[0,n]</code>, or <code>-1</code> if impossible.</p>`,
+examples:[
+  {i:'n=5, ranges=[3,4,1,1,0,0]',o:'1',e:'Tap 1 with range 4 covers [-3,5] ⊇ [0,5]'},
+  {i:'n=3, ranges=[0,0,0,0]',o:'-1',e:'No tap covers anything'},
+],cons:['1 ≤ n ≤ 10⁴','0 ≤ ranges[i] ≤ 100'],
+hints:['Convert to Jump Game II: build a <code>max_reach</code> array where <code>max_reach[left] = max right</code> each tap can cover.','Greedy sweep: maintain <code>current_end</code> and <code>farthest</code>. When you pass <code>current_end</code>, increment tap count.'],
+starter:`def minTaps(n, ranges):
+    pass`,
+solution:`def minTaps(n, ranges):
+    max_reach = [0]*(n+1)
+    for i, r in enumerate(ranges):
+        l = max(0,i-r); ri = min(n,i+r)
+        max_reach[l] = max(max_reach[l],ri)
+    taps = cur = far = 0
+    for i in range(n+1):
+        if i > far: return -1
+        if i > cur: taps+=1; cur=far
+        far = max(far, max_reach[i])
+    return taps`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:'minTaps(5,[3,4,1,1,0,0])',exp:'1'},
+  {call:'minTaps(3,[0,0,0,0])',exp:'-1'},
+  {call:'minTaps(7,[1,2,1,0,2,1,0,1])',exp:'3'},
+]},
+
+{id:27,topic:'dp',diff:'hard',title:'Find Count of Monotonic Pairs II',bny:true,
+tags:['Array','Math','DP','Prefix Sum'],
+desc:`<p>Count pairs of non-negative integer arrays <code>(arr1, arr2)</code> where: <code>arr1[i]+arr2[i]=nums[i]</code> for all i, <code>arr1</code> is non-decreasing, <code>arr2</code> is non-increasing. Return count mod 10⁹+7.</p>`,
+examples:[
+  {i:'nums=[2,3,2]',o:'4',e:''},{i:'nums=[5,5,5,5]',o:'126',e:''},
+],cons:['1 ≤ nums.length ≤ 2000','1 ≤ nums[i] ≤ 1000'],
+hints:['Let dp[v] = number of ways where arr1[i]=v. Iterate positions and update dp.','Transition: prev_v must satisfy 0 ≤ prev_v ≤ min(v, nums[i-1]) AND prev_v ≥ v-(nums[i]-nums[i-1]). Use prefix sums to sum the valid range in O(max_val).'],
+starter:`def countOfPairs(nums):
+    pass`,
+solution:`def countOfPairs(nums):
+    MOD = 10**9+7
+    max_v = max(nums)
+    dp = [1]*(max_v+1)
+    for i in range(1, len(nums)):
+        diff = nums[i]-nums[i-1]
+        pre = [0]*(max_v+2)
+        for v in range(max_v+1): pre[v+1]=(pre[v]+dp[v])%MOD
+        new_dp = [0]*(max_v+1)
+        for v in range(nums[i]+1):
+            hi = min(v - max(0, diff), nums[i-1])
+            if 0 <= hi: new_dp[v]=(pre[hi+1]-pre[0])%MOD
+        dp = new_dp
+    return sum(dp)%MOD`,
+tc:'O(n·max_val)',sc:'O(max_val)',
+tests:[
+  {call:'countOfPairs([2,3,2])',exp:'4'},
+  {call:'countOfPairs([5,5,5,5])',exp:'126'},
+  {call:'countOfPairs([1])',exp:'2'},
+]},
+
+{id:28,topic:'dp',diff:'easy',title:'Climbing Stairs (Warmup)',bny:false,
+tags:['DP','Math'],
+desc:`<p>n stairs, take 1 or 2 steps at a time. How many distinct ways to reach the top?</p>`,
+examples:[{i:'n=2',o:'2',e:'1+1 or 2'},{i:'n=3',o:'3',e:'1+1+1,1+2,2+1'}],
+cons:['1 ≤ n ≤ 45'],
+hints:['ways(n) = ways(n-1) + ways(n-2). It is Fibonacci.'],
+starter:`def climbStairs(n):
+    pass`,
+solution:`def climbStairs(n):
+    if n<=2: return n
+    a,b = 1,2
+    for _ in range(3,n+1): a,b = b,a+b
+    return b`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'climbStairs(2)',exp:'2'},
+  {call:'climbStairs(3)',exp:'3'},
+  {call:'climbStairs(5)',exp:'8'},
+  {call:'climbStairs(10)',exp:'89'},
+]},
+
+// ══════════ GRAPHS ══════════
+{id:29,topic:'graph',diff:'hard',title:'Count Visited Nodes in a Directed Graph',bny:true,
+tags:['Graph','DP','Memoization'],
+desc:`<p>Directed graph: <code>edges[i]</code> = the single outgoing edge from node i. For each node, return how many <strong>distinct nodes</strong> you visit starting from it (including itself).</p>`,
+examples:[
+  {i:'edges=[1,2,0,0]',o:'[3,3,3,4]',e:'0→1→2→0 is a cycle of 3. Node 3 visits those 3 + itself = 4.'},
+  {i:'edges=[1,2,3,4,0]',o:'[5,5,5,5,5]',e:'One big cycle of 5'},
+],cons:['2 ≤ n ≤ 10⁵'],
+hints:['Since each node has exactly one edge, paths form "rho" shapes: a tail leading into a cycle.','1. Follow edges until you revisit a node or hit a solved node. 2. If new cycle found: assign cycle_length to all cycle nodes. 3. Walk tail backward: each node = 1 + next node score.'],
+starter:`def countVisitedNodes(edges):
+    pass`,
+solution:`def countVisitedNodes(edges):
+    n = len(edges)
+    result = [0]*n
+    for start in range(n):
+        if result[start]: continue
+        path, visited = [], {}
+        node = start
+        while node not in visited and result[node]==0:
+            visited[node]=len(path)
+            path.append(node)
+            node=edges[node]
+        if result[node]==0:   # new cycle
+            cycle_len=len(path)-visited[node]
+            for i in range(visited[node],len(path)):
+                result[path[i]]=cycle_len
+        tail_val=result[node]
+        for p in reversed(path[:visited.get(node,len(path))]):
+            tail_val+=1; result[p]=tail_val
+    return result`,
+tc:'O(n)',sc:'O(n)',
+tests:[
+  {call:'countVisitedNodes([1,2,0,0])',exp:'[3, 3, 3, 4]'},
+  {call:'countVisitedNodes([1,2,3,4,0])',exp:'[5, 5, 5, 5, 5]'},
+  {call:'countVisitedNodes([1,0,0])',exp:'[2, 2, 3]'},
+]},
+
+{id:30,topic:'graph',diff:'medium',title:'Number of Islands (Warmup)',bny:false,
+tags:['Array','DFS','Matrix'],
+desc:`<p>2D grid of <code>"1"</code>(land) and <code>"0"</code>(water). Return the number of islands. Islands are connected land (horizontal/vertical).</p>`,
+examples:[
+  {i:'grid=[["1","1","0"],["0","1","0"],["0","0","1"]]',o:'2',e:''},
+],cons:['1 ≤ m,n ≤ 300'],
+hints:['DFS from each unvisited "1". Mark visited cells as "0" to avoid revisiting.','Count how many DFS calls you start.'],
+starter:`def numIslands(grid):
+    pass`,
+solution:`def numIslands(grid):
+    if not grid: return 0
+    count = 0
+    def dfs(r,c):
+        if r<0 or r>=len(grid) or c<0 or c>=len(grid[0]) or grid[r][c]!='1': return
+        grid[r][c]='0'
+        for dr,dc in [(0,1),(0,-1),(1,0),(-1,0)]: dfs(r+dr,c+dc)
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            if grid[r][c]=='1': count+=1; dfs(r,c)
+    return count`,
+tc:'O(m·n)',sc:'O(m·n)',
+tests:[
+  {call:'numIslands([["1","1","0"],["0","1","0"],["0","0","1"]])',exp:'2'},
+  {call:'numIslands([["1","1","1"],["0","1","0"],["1","1","1"]])',exp:'1'},
+]},
+
+{id:31,topic:'graph',diff:'medium',title:'Course Schedule (Cycle Detection)',bny:false,
+tags:['Graph','DFS','Topological Sort'],
+desc:`<p><code>prerequisites[i]=[a,b]</code> means take b before a. Return <code>True</code> if you can finish all <code>numCourses</code> courses (no cycle).</p>`,
+examples:[
+  {i:'numCourses=2, prerequisites=[[1,0]]',o:'True',e:'Take 0 then 1'},
+  {i:'numCourses=2, prerequisites=[[1,0],[0,1]]',o:'False',e:'Cycle'},
+],cons:['1 ≤ numCourses ≤ 2000'],
+hints:['Build adjacency list. DFS with 3 states: 0=unvisited, 1=visiting, 2=done.','If you reach state=1 during DFS → cycle.'],
+starter:`def canFinish(numCourses, prerequisites):
+    pass`,
+solution:`def canFinish(numCourses, prerequisites):
+    adj = [[] for _ in range(numCourses)]
+    for a,b in prerequisites: adj[b].append(a)
+    state = [0]*numCourses
+    def dfs(node):
+        if state[node]==1: return False
+        if state[node]==2: return True
+        state[node]=1
+        for nb in adj[node]:
+            if not dfs(nb): return False
+        state[node]=2; return True
+    return all(dfs(i) for i in range(numCourses))`,
+tc:'O(V+E)',sc:'O(V+E)',
+tests:[
+  {call:'canFinish(2,[[1,0]])',exp:'True'},
+  {call:'canFinish(2,[[1,0],[0,1]])',exp:'False'},
+  {call:'canFinish(3,[[1,0],[2,1]])',exp:'True'},
+]},
+
+{id:32,topic:'graph',diff:'medium',title:'Rotting Oranges (Multi-source BFS)',bny:false,
+tags:['Array','BFS','Matrix'],
+desc:`<p>Grid: 0=empty, 1=fresh, 2=rotten. Each minute rotten oranges rot adjacent fresh ones. Return min minutes until all rotten, or -1.</p>`,
+examples:[
+  {i:'grid=[[2,1,1],[1,1,0],[0,1,1]]',o:'4',e:''},
+  {i:'grid=[[2,1,1],[0,1,1],[1,0,1]]',o:'-1',e:'Bottom-left isolated'},
+],cons:['1 ≤ m,n ≤ 10'],
+hints:['BFS from all rotten oranges simultaneously.','Count fresh oranges. Each BFS level = 1 min. If fresh > 0 after → -1.'],
+starter:`from collections import deque
+
+def orangesRotting(grid):
+    pass`,
+solution:`from collections import deque
+
+def orangesRotting(grid):
+    rows,cols = len(grid),len(grid[0])
+    q,fresh = deque(),0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c]==2: q.append((r,c,0))
+            elif grid[r][c]==1: fresh+=1
+    minutes=0
+    while q:
+        r,c,t=q.popleft()
+        for dr,dc in [(0,1),(0,-1),(1,0),(-1,0)]:
+            nr,nc=r+dr,c+dc
+            if 0<=nr<rows and 0<=nc<cols and grid[nr][nc]==1:
+                grid[nr][nc]=2; fresh-=1; minutes=max(minutes,t+1); q.append((nr,nc,t+1))
+    return -1 if fresh>0 else minutes`,
+tc:'O(m·n)',sc:'O(m·n)',
+tests:[
+  {call:'orangesRotting([[2,1,1],[1,1,0],[0,1,1]])',exp:'4'},
+  {call:'orangesRotting([[2,1,1],[0,1,1],[1,0,1]])',exp:'-1'},
+  {call:'orangesRotting([[0,2]])',exp:'0'},
+]},
+
+// ══════════ HEAP ══════════
+{id:33,topic:'heap',diff:'medium',title:'Total Cost to Hire K Workers',bny:true,
+tags:['Array','Two Pointers','Heap'],
+desc:`<p>In <code>k</code> sessions, hire the cheapest worker from either the first or last <code>candidates</code> workers remaining. Return total cost. Ties broken by smallest index.</p>`,
+examples:[
+  {i:'costs=[17,12,10,2,7,2,11,20,8], k=3, candidates=4',o:'11',e:'Hire 2+2+7=11'},
+  {i:'costs=[1,2,4,1], k=3, candidates=3',o:'4',e:''},
+],cons:['1 ≤ costs.length ≤ 10⁵'],
+hints:['Two min-heaps: left (front candidates) and right (back candidates).','Each round: pop min of both heap tops. Refill from the freed side with next available worker.'],
+starter:`import heapq
+
+def totalCost(costs, k, candidates):
+    pass`,
+solution:`import heapq
+
+def totalCost(costs, k, candidates):
+    l, r = 0, len(costs)-1
+    lh, rh = [], []
+    for _ in range(candidates):
+        if l<=r: heapq.heappush(lh,costs[l]); l+=1
+    for _ in range(candidates):
+        if l<=r: heapq.heappush(rh,costs[r]); r-=1
+    total=0
+    for _ in range(k):
+        lv=lh[0] if lh else float('inf')
+        rv=rh[0] if rh else float('inf')
+        if lv<=rv:
+            total+=heapq.heappop(lh)
+            if l<=r: heapq.heappush(lh,costs[l]); l+=1
+        else:
+            total+=heapq.heappop(rh)
+            if l<=r: heapq.heappush(rh,costs[r]); r-=1
+    return total`,
+tc:'O((k+c)log c)',sc:'O(c)',
+tests:[
+  {call:'totalCost([17,12,10,2,7,2,11,20,8],3,4)',exp:'11'},
+  {call:'totalCost([1,2,4,1],3,3)',exp:'4'},
+  {call:'totalCost([1],1,1)',exp:'1'},
+]},
+
+{id:34,topic:'heap',diff:'medium',title:'Kth Largest Element (Warmup)',bny:false,
+tags:['Array','Heap'],
+desc:`<p>Given array <code>nums</code> and integer <code>k</code>, return the <strong>kth largest</strong> element.</p>`,
+examples:[
+  {i:'nums=[3,2,1,5,6,4], k=2',o:'5',e:''},
+  {i:'nums=[3,2,3,1,2,4,5,5,6], k=4',o:'4',e:''},
+],cons:['1 ≤ k ≤ nums.length ≤ 10⁵'],
+hints:['Min-heap of size k. Pop smallest when size exceeds k.','After all elements, heap top = kth largest.'],
+starter:`import heapq
+
+def findKthLargest(nums, k):
+    pass`,
+solution:`import heapq
+
+def findKthLargest(nums, k):
+    heap = []
+    for num in nums:
+        heapq.heappush(heap, num)
+        if len(heap) > k: heapq.heappop(heap)
+    return heap[0]`,
+tc:'O(n log k)',sc:'O(k)',
+tests:[
+  {call:'findKthLargest([3,2,1,5,6,4],2)',exp:'5'},
+  {call:'findKthLargest([3,2,3,1,2,4,5,5,6],4)',exp:'4'},
+  {call:'findKthLargest([1],1)',exp:'1'},
+]},
+
+{id:35,topic:'heap',diff:'medium',title:'Top K Frequent Elements (Warmup)',bny:false,
+tags:['Array','Hash Table','Heap'],
+desc:`<p>Return the <code>k</code> most frequent elements from <code>nums</code>. Order does not matter.</p>`,
+examples:[
+  {i:'nums=[1,1,1,2,2,3], k=2',o:'[1,2]',e:''},
+  {i:'nums=[1], k=1',o:'[1]',e:''},
+],cons:['1 ≤ k ≤ distinct count'],
+hints:['Count frequencies with Counter. Use <code>heapq.nlargest(k, freq, key=freq.get)</code>.'],
+starter:`from collections import Counter
+import heapq
+
+def topKFrequent(nums, k):
+    pass`,
+solution:`from collections import Counter
+import heapq
+
+def topKFrequent(nums, k):
+    freq = Counter(nums)
+    return heapq.nlargest(k, freq.keys(), key=freq.get)`,
+tc:'O(n log k)',sc:'O(n)',
+tests:[
+  {call:'sorted(topKFrequent([1,1,1,2,2,3],2))',exp:'[1, 2]'},
+  {call:'topKFrequent([1],1)',exp:'[1]'},
+]},
+
+{id:36,topic:'heap',diff:'medium',title:'Task Scheduler (Warmup)',bny:false,
+tags:['Array','Greedy','Heap'],
+desc:`<p>CPU tasks (letters A-Z) with cooldown <code>n</code>: same task must wait n intervals. Return minimum intervals needed (idle time counts).</p>`,
+examples:[
+  {i:'tasks=["A","A","A","B","B","B"], n=2',o:'8',e:'A→B→idle→A→B→idle→A→B'},
+  {i:'tasks=["A","A","A","B","B","B"], n=0',o:'6',e:''},
+],cons:['1 ≤ tasks.length ≤ 10⁴','0 ≤ n ≤ 100'],
+hints:['Formula: <code>max(len(tasks), (max_freq-1)*(n+1) + count_of_max_freq_tasks)</code>.'],
+starter:`from collections import Counter
+
+def leastInterval(tasks, n):
+    pass`,
+solution:`from collections import Counter
+
+def leastInterval(tasks, n):
+    freq = Counter(tasks)
+    max_freq = max(freq.values())
+    max_count = sum(1 for v in freq.values() if v==max_freq)
+    return max(len(tasks), (max_freq-1)*(n+1)+max_count)`,
+tc:'O(n)',sc:'O(1)',
+tests:[
+  {call:'leastInterval(["A","A","A","B","B","B"],2)',exp:'8'},
+  {call:'leastInterval(["A","A","A","B","B","B"],0)',exp:'6'},
+]},
+];
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let curTopic='hashmap', curProb=null, curDTab='desc';
+let pyodide=null;
+let solved=new Set(JSON.parse(localStorage.getItem('bny_v4')||'[]'));
+let ansOpen={};
+let editor;
+
+// ════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  editor=CodeMirror.fromTextArea(document.getElementById('codeEditor'),{
+    mode:'python',theme:'dracula',lineNumbers:true,
+    matchBrackets:true,autoCloseBrackets:true,
+    indentUnit:4,tabSize:4,indentWithTabs:false,
+    extraKeys:{Tab:cm=>cm.execCommand('insertSoftTab')},
+  });
+  buildTopicTabs();
+  loadTopic('hashmap');
+  initPy();
+});
+
+async function initPy(){
+  try{
+    pyodide=await window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'});
+    document.getElementById('sdot').classList.add('ok');
+    document.getElementById('stext').textContent='Python ready';
+    document.getElementById('initMsg').innerHTML='<span class="csuccess">✓ Python ready — select a problem and hit Run Tests.</span>';
+  }catch(e){
+    document.getElementById('stext').textContent='Failed';
+    document.getElementById('initMsg').innerHTML='<span class="cerror">✗ Python failed — please refresh the page.</span>';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// TOPIC TABS
+// ════════════════════════════════════════════════════════════
+function buildTopicTabs(){
+  const c=document.getElementById('topicTabs');
+  c.innerHTML='';
+  TOPICS.forEach(t=>{
+    const all=PROBLEMS.filter(p=>p.topic===t.id);
+    const sol=all.filter(p=>solved.has(p.id)).length;
+    const b=document.createElement('button');
+    b.className='ttab'+(t.id===curTopic?' active':'');
+    b.innerHTML=`${t.name}<span class="cnt">${sol}/${all.length}</span>`;
+    b.onclick=()=>loadTopic(t.id,b);
+    c.appendChild(b);
+  });
+}
+
+function loadTopic(id,btn){
+  curTopic=id;
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  else{const i=TOPICS.findIndex(t=>t.id===id);document.querySelectorAll('.ttab')[i]?.classList.add('active');}
+  buildProbList();
+}
+
+// ════════════════════════════════════════════════════════════
+// PROBLEM LIST
+// ════════════════════════════════════════════════════════════
+function buildProbList(){
+  const probs=PROBLEMS.filter(p=>p.topic===curTopic);
+  const sol=probs.filter(p=>solved.has(p.id)).length;
+  document.getElementById('listTitle').textContent=TOPICS.find(t=>t.id===curTopic)?.name||'';
+  document.getElementById('prog').textContent=`${sol}/${probs.length}`;
+  const list=document.getElementById('plist');
+  list.innerHTML='';
+  probs.forEach((p,i)=>{
+    const isSol=solved.has(p.id);
+    const d=document.createElement('div');
+    d.className='pitem'+(curProb?.id===p.id?' active':'')+(isSol?' solved':'');
+    d.onclick=()=>loadProb(p,d);
+    d.innerHTML=`<span class="pnum">${isSol?'✓':(i+1)}</span><span class="ptitle">${p.title}</span>${p.bny?'<span class="bny-star" title="Real BNY question">⭐</span>':''}<span class="dbadge d${p.diff[0]}">${p.diff[0].toUpperCase()+p.diff.slice(1)}</span>`;
+    list.appendChild(d);
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// LOAD PROBLEM
+// ════════════════════════════════════════════════════════════
+function loadProb(p,el){
+  curProb=p;
+  curDTab='desc';
+  if(ansOpen[p.id]===undefined) ansOpen[p.id]=false;
+  document.querySelectorAll('.pitem').forEach(e=>e.classList.remove('active'));
+  el?.classList.add('active');
+  editor.setValue(p.starter);
+  editor.clearHistory();
+  renderDTab('desc');
+  document.querySelectorAll('.dtab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.getElementById('cbody').innerHTML='<div class="cout cinfo">Click ▶ Run Tests to check your code.</div>';
+  document.querySelectorAll('.ctab').forEach((t,i)=>t.classList.toggle('active',i===0));
+}
+
+// ════════════════════════════════════════════════════════════
+// DESCRIPTION TABS
+// ════════════════════════════════════════════════════════════
+function switchDTab(tab,btn){
+  curDTab=tab;
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderDTab(tab);
+}
+
+function renderDTab(tab){
+  const c=document.getElementById('dcontent');
+  if(!curProb){
+    c.innerHTML='<div class="empty"><div class="empty-icon">👈</div><div class="empty-text">Select a problem to begin</div></div>';
+    return;
+  }
+  const p=curProb;
+  if(tab==='desc'){
+    const exH=p.examples.map((ex,i)=>`<div class="exblock"><div class="exlabel">Example ${i+1}</div><div><span class="exk">Input: </span><span class="exv">${esc(ex.i)}</span></div><div><span class="exk">Output: </span><span class="exv">${esc(ex.o)}</span></div>${ex.e?`<div><span class="exk">Explanation: </span><span class="exex">${esc(ex.e)}</span></div>`:''}</div>`).join('');
+    const conH=p.cons.map(cc=>`<div class="con">• ${cc}</div>`).join('');
+    const tagH=`<span class="dbadge d${p.diff[0]}">${p.diff[0].toUpperCase()+p.diff.slice(1)}</span>`+(p.bny?`<span class="bny-badge">⭐ Real BNY Question</span>`:'')+p.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+    const isOpen=ansOpen[p.id];
+    c.innerHTML=`
+      <div style="margin-bottom:7px"><div class="pmain-title">${p.title}</div><div class="pmeta">${tagH}</div></div>
+      <div class="pbody">
+        ${p.desc}${exH}
+        <div class="conblock"><div class="conlabel">Constraints</div>${conH}</div>
+        <div class="ans-section">
+          <button class="show-ans-btn${isOpen?' open':''}" onclick="toggleAns()">
+            ${isOpen?'🙈 Hide Answer':'💡 Show Answer'}
+          </button>
+          <div class="ans-body${isOpen?' open':''}" id="ansBody">
+            <div class="ans-code">${hlPy(p.solution)}</div>
+            <div class="complexity">
+              <span class="cpill ctime">⏱ Time: ${p.tc}</span>
+              <span class="cpill cspace">💾 Space: ${p.sc}</span>
+            </div>
+            <button class="load-btn" onclick="loadSolEditor()">📋 Load into Editor</button>
+          </div>
+        </div>
+      </div>`;
+  } else if(tab==='pattern'){
+    const pt=PATTERNS[curTopic]||'<div class="pn-body">No pattern guide for this topic.</div>';
+    c.innerHTML=`<div class="pattern-note">${pt}</div>`;
+  } else {
+    const hH=p.hints.map((h,i)=>`
+      <div class="hint-block">
+        <button class="hint-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block';this.querySelector('em').textContent=this.nextElementSibling.style.display==='block'?'▴':'▾'">
+          💡 Hint ${i+1} <em style="font-style:normal">▾</em>
+        </button>
+        <div class="hint-inner">${h}</div>
+      </div>`).join('');
+    c.innerHTML=`<div style="padding-top:4px">${hH}</div>`;
+  }
+}
+
+function toggleAns(){
+  if(!curProb) return;
+  ansOpen[curProb.id]=!ansOpen[curProb.id];
+  renderDTab('desc');
+  if(ansOpen[curProb.id]) setTimeout(()=>document.getElementById('ansBody')?.scrollIntoView({behavior:'smooth',block:'nearest'}),60);
+}
+function loadSolEditor(){if(curProb)editor.setValue(curProb.solution);}
+function resetCode(){if(curProb)editor.setValue(curProb.starter);}
+function switchCTab(btn){document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+
+// ════════════════════════════════════════════════════════════
+// RUN TESTS
+// ════════════════════════════════════════════════════════════
+async function runTests(isSubmit){
+  if(!pyodide){showC('<span class="cerror">Python not ready yet.</span>');return;}
+  if(!curProb){showC('<span class="cerror">Select a problem first.</span>');return;}
+  const code=editor.getValue();
+  const p=curProb;
+  showC('<span class="cinfo">Running…</span>');
+  document.querySelectorAll('.ctab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  const results=[];
+  for(const tc of p.tests){
+    const full=`
+import sys,re,math,types
+from collections import defaultdict,Counter,deque
+from typing import List,Optional
+import heapq
+${code}
+__res__=str(${tc.call})`;
+    try{
+      const out=[];
+      pyodide.setStdout({batched:s=>out.push(s)});
+      pyodide.setStderr({batched:s=>out.push('ERR:'+s)});
+      await pyodide.runPythonAsync(full);
+      const got=pyodide.globals.get('__res__');
+      results.push({call:tc.call,exp:tc.exp,got,pass:got.trim()===tc.exp.trim(),stdout:out.join('\n')});
+    }catch(e){
+      const msg=String(e).split('\n').filter(l=>!l.includes('<exec>')).slice(-2).join(' ');
+      results.push({call:tc.call,exp:tc.exp,got:msg,pass:false,isErr:true});
+    }
+  }
+  const passed=results.filter(r=>r.pass).length;
+  const allPass=passed===results.length;
+  let html=`<div class="res-sum"><span class="rpill ${allPass?'rpass':'rfail'}">${allPass?'✓ Accepted':'✗ Wrong Answer'}</span><span class="rdet">${passed}/${results.length} tests passed</span></div>`;
+  results.forEach((r,i)=>{
+    html+=`<div class="tcase ${r.pass?'pass':'fail'}"><div class="tico">${r.pass?'✅':r.isErr?'🔴':'❌'}</div><div class="tdet"><div class="tlab">Test ${i+1}</div><div class="tio"><span><span class="tk">call: </span><span class="tv">${esc(r.call)}</span></span><span><span class="tk">expected: </span><span class="tv">${esc(r.exp)}</span></span>${!r.pass?`<span><span class="tk">got: </span><span class="tg">${esc(String(r.got))}</span></span>`:''}</div>${r.stdout?`<div style="color:var(--text3);font-size:10.5px;margin-top:2px">stdout: ${esc(r.stdout)}</div>`:''}</div></div>`;
+  });
+  document.getElementById('cbody').innerHTML=html;
+  if(allPass&&isSubmit){
+    solved.add(p.id);
+    localStorage.setItem('bny_v4',JSON.stringify([...solved]));
+    buildProbList();buildTopicTabs();
+    document.getElementById('cbody').insertAdjacentHTML('afterbegin',`<div style="padding:8px 12px;margin-bottom:7px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.4);border-radius:6px;color:var(--green2);font-weight:600;font-size:12.5px">🎉 Solved! Marked as complete.</div>`);
+  }
+}
+
+function showC(html){document.getElementById('cbody').innerHTML=`<div class="cout">${html}</div>`;}
+
+// ════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════
+function hlPy(code){
+  // Highlight line by line so comments don't bleed
+  return code.split('\n').map(line=>{
+    const ci=findCmt(line);
+    if(ci!==-1){
+      return hlTok(escH(line.slice(0,ci)))+'<span class="cm">'+escH(line.slice(ci))+'</span>';
+    }
+    return hlTok(escH(line));
+  }).join('\n');
+}
+function findCmt(line){
+  let inS=false,sc='';
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(inS){if(c===sc&&line[i-1]!=='\\')inS=false;}
+    else if(c==='"'||c==="'"){inS=true;sc=c;}
+    else if(c==='#')return i;
+  }
+  return -1;
+}
+function hlTok(safe){
+  // strings
+  safe=safe.replace(/(&#39;[^]*?&#39;|&quot;[^]*?&quot;)/g,m=>`<span class="st">${m}</span>`);
+  // keywords (not inside already-wrapped spans)
+  safe=safe.replace(/\b(def|class|return|if|else|elif|while|for|in|import|from|not|and|or|is|None|True|False|pass|break|continue|lambda|nonlocal|global|with|as|try|except|raise|finally|yield|self)\b/g,m=>`<span class="kw">${m}</span>`);
+  // numbers
+  safe=safe.replace(/\b(\d+(?:\.\d+)?)\b/g,m=>`<span class="nm">${m}</span>`);
+  return safe;
+}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
