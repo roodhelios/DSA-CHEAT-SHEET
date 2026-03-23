@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Interactive Study Guide — ECCDLO 5014</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a40;
+    --accent1: #7c3aed;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --accent4: #10b981;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --code-bg: #0f0f1a;
+    --node-size: 44px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 2rem;
+    height: 60px;
+  }
+  header h1 {
+    font-size: 1rem; font-weight: 800; letter-spacing: 0.12em;
+    color: var(--accent2); text-transform: uppercase; white-space: nowrap;
+  }
+  nav { display: flex; gap: 0.3rem; overflow-x: auto; flex: 1; }
+  nav button {
+    background: none; border: none; color: var(--text-muted);
+    font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.8rem;
+    border-radius: 6px; cursor: pointer; white-space: nowrap;
+    transition: all 0.2s;
+  }
+  nav button:hover { color: var(--text); background: var(--surface2); }
+  nav button.active { color: var(--accent2); background: rgba(6,182,212,0.1); }
+
+  /* ── MAIN LAYOUT ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+  .section { display: none; animation: fadeUp 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center; padding: 4rem 2rem 3rem;
+    border: 1px solid var(--border); border-radius: 16px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.12), transparent 70%);
+    margin-bottom: 2rem;
+  }
+  .hero h2 { font-size: 2.8rem; font-weight: 800; line-height: 1.1; }
+  .hero h2 span { color: var(--accent2); }
+  .hero p { color: var(--text-dim); margin: 1rem auto; max-width: 520px; font-size: 0.95rem; }
+  .module-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 1rem; margin-top: 2rem; }
+  .module-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.2rem; cursor: pointer; transition: all 0.25s;
+    text-align: left;
+  }
+  .module-card:hover { border-color: var(--accent1); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(124,58,237,0.2); }
+  .module-card .num { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; color: var(--accent1); text-transform: uppercase; }
+  .module-card h3 { font-size: 0.9rem; font-weight: 700; margin-top: 0.4rem; }
+  .module-card p { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+  /* ── CARDS & SECTIONS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem;
+  }
+  .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent2); }
+  .card h4 { font-size: 0.85rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--accent3); }
+  .card p, .card li { font-size: 0.85rem; line-height: 1.7; color: var(--text-dim); }
+  .card ul { padding-left: 1.2rem; }
+  .card li { margin-bottom: 0.3rem; }
+
+  .section-title {
+    font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem; border-bottom: 2px solid var(--border);
+    color: var(--accent1);
+  }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem; overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    line-height: 1.8; margin: 0.8rem 0;
+  }
+  .kw  { color: #c792ea; }
+  .fn  { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .cm  { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .op  { color: #89ddff; }
+
+  /* ── INTERACTIVE VISUALIZER ── */
+  .viz-container {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem;
+  }
+  .viz-container h3 { font-size: 0.9rem; font-weight: 700; color: var(--accent3); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .viz-controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600;
+    padding: 0.4rem 1rem; border: 1px solid; border-radius: 6px; cursor: pointer;
+    transition: all 0.2s; background: none;
+  }
+  .btn-primary { border-color: var(--accent1); color: var(--accent1); }
+  .btn-primary:hover { background: var(--accent1); color: white; }
+  .btn-secondary { border-color: var(--accent2); color: var(--accent2); }
+  .btn-secondary:hover { background: var(--accent2); color: var(--bg); }
+  .btn-danger { border-color: var(--accent5); color: var(--accent5); }
+  .btn-danger:hover { background: var(--accent5); color: white; }
+  .btn-success { border-color: var(--accent4); color: var(--accent4); }
+  .btn-success:hover { background: var(--accent4); color: var(--bg); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  input[type=number], input[type=text] {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+    padding: 0.4rem 0.7rem; width: 80px; outline: none;
+  }
+  input:focus { border-color: var(--accent2); }
+  input[type=text] { width: 130px; }
+
+  .viz-stage {
+    min-height: 80px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    padding: 1rem; background: var(--code-bg); border-radius: 8px; position: relative;
+  }
+  .viz-log {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent4);
+    background: var(--code-bg); border-radius: 6px; padding: 0.5rem 0.8rem;
+    margin-top: 0.6rem; min-height: 28px; border-left: 3px solid var(--accent4);
+  }
+
+  /* Stack / Queue nodes */
+  .node {
+    width: var(--node-size); height: var(--node-size); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700;
+    border: 2px solid; transition: all 0.3s; position: relative;
+    flex-shrink: 0;
+  }
+  .node.stack-node { border-color: var(--accent1); background: rgba(124,58,237,0.15); color: var(--accent1); }
+  .node.queue-node { border-color: var(--accent2); background: rgba(6,182,212,0.12); color: var(--accent2); }
+  .node.top-node { border-color: var(--accent3); background: rgba(245,158,11,0.15); color: var(--accent3); box-shadow: 0 0 12px rgba(245,158,11,0.35); }
+  .node.front-node { border-color: var(--accent4); background: rgba(16,185,129,0.12); color: var(--accent4); box-shadow: 0 0 12px rgba(16,185,129,0.3); }
+  .node.pop-anim { animation: popOut 0.4s forwards; }
+  .node.push-anim { animation: pushIn 0.3s forwards; }
+  @keyframes popOut { to { opacity: 0; transform: scale(0.5) translateY(-20px); } }
+  @keyframes pushIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+  .label-tag {
+    position: absolute; top: -18px; font-size: 0.58rem; letter-spacing: 0.06em;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600; text-transform: uppercase;
+  }
+  .arrow-right { color: var(--text-muted); font-size: 1rem; align-self: center; }
+
+  /* ── TREE VISUALIZER ── */
+  #tree-svg { width: 100%; overflow: visible; display: block; }
+  .tree-node circle { transition: all 0.3s; }
+  .tree-node text { font-family: 'JetBrains Mono', monospace; font-size: 13px; fill: white; font-weight: 700; }
+  .tree-edge { stroke: var(--border); stroke-width: 2; }
+  .tree-node.highlight circle { fill: var(--accent3) !important; }
+  .tree-node.visited circle  { fill: var(--accent4) !important; }
+
+  /* ── LINKED LIST VIZ ── */
+  .ll-node {
+    display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+  .ll-box {
+    display: flex; border: 2px solid var(--accent2); border-radius: 6px; overflow: hidden;
+    background: rgba(6,182,212,0.08);
+  }
+  .ll-data {
+    padding: 0.4rem 0.7rem; color: var(--accent2); font-weight: 700; border-right: 2px solid var(--accent2);
+  }
+  .ll-ptr {
+    padding: 0.4rem 0.5rem; color: var(--text-muted); font-size: 0.65rem;
+    display: flex; align-items: center;
+  }
+  .ll-arrow { color: var(--text-muted); margin: 0 4px; font-size: 1.1rem; align-self: center; }
+  .ll-null { color: var(--accent5); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; align-self: center; }
+
+  /* ── INFIX/POSTFIX ── */
+  .token {
+    display: inline-block; padding: 0.3rem 0.6rem; border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700;
+    margin: 2px; transition: all 0.3s;
+  }
+  .token.operand { background: rgba(16,185,129,0.15); border: 1px solid var(--accent4); color: var(--accent4); }
+  .token.operator { background: rgba(245,158,11,0.15); border: 1px solid var(--accent3); color: var(--accent3); }
+  .token.paren { background: rgba(124,58,237,0.15); border: 1px solid var(--accent1); color: var(--accent1); }
+  .token.current { box-shadow: 0 0 12px rgba(255,255,255,0.3); transform: scale(1.12); }
+  .step-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+  .step-table th { background: var(--surface2); color: var(--accent2); padding: 0.5rem; border: 1px solid var(--border); text-align: left; }
+  .step-table td { padding: 0.45rem 0.5rem; border: 1px solid var(--border); color: var(--text-dim); }
+  .step-table tr.active-row td { background: rgba(124,58,237,0.1); color: var(--text); }
+
+  /* ── GRAPH ── */
+  #graph-svg { width: 100%; height: 340px; }
+  .g-node circle { cursor: pointer; transition: all 0.3s; }
+  .g-node text { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: white; font-weight: 700; pointer-events: none; }
+  .g-edge { stroke: var(--border); stroke-width: 2; }
+  .g-edge.traversed { stroke: var(--accent4); stroke-width: 3; animation: edgePulse 0.5s ease; }
+  .g-node.visited circle { fill: var(--accent4) !important; }
+  .g-node.current circle { fill: var(--accent3) !important; box-shadow: 0 0 20px yellow; }
+  @keyframes edgePulse { from { stroke-opacity: 0; } to { stroke-opacity: 1; } }
+  .edge-weight { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: var(--accent3); font-weight: 700; }
+
+  /* ── QUIZ ── */
+  .quiz-q { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; margin-bottom: 1rem; }
+  .quiz-q p { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.8rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-opt {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 7px;
+    padding: 0.6rem 1rem; font-size: 0.82rem; cursor: pointer; text-align: left;
+    font-family: 'Syne', sans-serif; color: var(--text-dim); transition: all 0.2s;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent2); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent4); background: rgba(16,185,129,0.12); color: var(--accent4); }
+  .quiz-opt.wrong { border-color: var(--accent5); background: rgba(239,68,68,0.1); color: var(--accent5); }
+  .quiz-feedback { font-size: 0.78rem; margin-top: 0.5rem; padding: 0.4rem 0.7rem; border-radius: 5px; }
+  .quiz-feedback.ok { background: rgba(16,185,129,0.1); color: var(--accent4); }
+  .quiz-feedback.nope { background: rgba(239,68,68,0.1); color: var(--accent5); }
+  .score-bar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .score-bar span { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--accent3); }
+
+  /* ── TABLES ── */
+  table.info-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  table.info-table th { background: var(--surface2); color: var(--accent2); padding: 0.5rem 0.7rem; border: 1px solid var(--border); text-align: left; font-weight: 700; }
+  table.info-table td { padding: 0.45rem 0.7rem; border: 1px solid var(--border); color: var(--text-dim); }
+  table.info-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── COMPLEXITY BADGE ── */
+  .badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; margin: 0 3px; }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--accent4); border: 1px solid var(--accent4); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--accent3); border: 1px solid var(--accent3); }
+  .badge-red { background: rgba(239,68,68,0.12); color: var(--accent5); border: 1px solid var(--accent5); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── GRID HELPERS ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 680px) { .two-col { grid-template-columns: 1fr; } }
+
+  .tag { display: inline-block; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 4px; background: rgba(124,58,237,0.15); color: var(--accent1); border: 1px solid var(--accent1); margin-left: 0.4rem; vertical-align: middle; }
+  hr.dim { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ DSA Guide</h1>
+  <nav id="nav">
+    <button class="active" onclick="show('home',this)">Home</button>
+    <button onclick="show('m1',this)">M1 · Intro</button>
+    <button onclick="show('m2',this)">M2 · Stack & Queue</button>
+    <button onclick="show('m3',this)">M3 · Linked List</button>
+    <button onclick="show('m4a',this)">M4 · Trees</button>
+    <button onclick="show('m4b',this)">M4 · Graphs</button>
+    <button onclick="show('quiz',this)">🎯 Quiz</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<section id="home" class="section active">
+  <div class="hero">
+    <h2>ECCDLO 5014<br><span>Data Structures & Algorithms</span></h2>
+    <p>Interactive visualisations, live code runners, and a quiz — everything you need to nail the exam.</p>
+  </div>
+  <div class="module-grid">
+    <div class="module-card" onclick="show('m1',nav.children[1])">
+      <div class="num">Module 1</div>
+      <h3>Intro to DSA</h3>
+      <p>ADT, data types, complexity</p>
+    </div>
+    <div class="module-card" onclick="show('m2',nav.children[2])">
+      <div class="num">Module 2</div>
+      <h3>Stack & Queue</h3>
+      <p>LIFO/FIFO, postfix eval, circular Q</p>
+    </div>
+    <div class="module-card" onclick="show('m3',nav.children[3])">
+      <div class="num">Module 3</div>
+      <h3>Linked List</h3>
+      <p>SLL, DLL, CLL, polynomial ADT</p>
+    </div>
+    <div class="module-card" onclick="show('m4a',nav.children[4])">
+      <div class="num">Module 4A</div>
+      <h3>Trees</h3>
+      <p>BST, traversals, heaps, Huffman</p>
+    </div>
+    <div class="module-card" onclick="show('m4b',nav.children[5])">
+      <div class="num">Module 4B</div>
+      <h3>Graphs</h3>
+      <p>BFS, DFS, Dijkstra, MST</p>
+    </div>
+    <div class="module-card" onclick="show('quiz',nav.children[6])">
+      <div class="num">Quiz</div>
+      <h3>Test Yourself</h3>
+      <p>20 exam-style questions</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ MODULE 1 ═══════════════ -->
+<section id="m1" class="section">
+  <div class="section-title">Module 1 — Introduction to DSA</div>
+
+  <div class="two-col">
+    <div class="card">
+      <h3>What is a Data Structure?</h3>
+      <p>A meaningful way of <strong>arranging and storing</strong> data for efficient utilization and processing. The right choice depends on the <em>nature of data</em> and <em>operations required</em>.</p>
+      <h4>Linear vs Non-Linear</h4>
+      <table class="info-table" style="margin-top:0.5rem">
+        <tr><th>Linear</th><th>Non-Linear</th></tr>
+        <tr><td>Sequential arrangement</td><td>Hierarchical arrangement</td></tr>
+        <tr><td>One predecessor/successor</td><td>Multiple children/parents</td></tr>
+        <tr><td>Array, Stack, Queue, LL</td><td>Tree, Graph</td></tr>
+        <tr><td>Simpler traversal</td><td>Complex traversal</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>ADT — Abstract Data Type</h3>
+      <p>Defines <strong>what</strong> data is stored and <strong>what operations</strong> exist — hiding implementation (black box).</p>
+      <h4>Bag ADT Example</h4>
+      <pre><span class="kw">class</span> <span class="fn">Bag</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(self):    <span class="cm"># create empty bag</span>
+    self.items = []
+
+  <span class="kw">def</span> <span class="fn">__len__</span>(self):
+    <span class="kw">return</span> <span class="fn">len</span>(self.items)
+
+  <span class="kw">def</span> <span class="fn">add</span>(self, item):
+    self.items.append(item)
+
+  <span class="kw">def</span> <span class="fn">contains</span>(self, item):
+    <span class="kw">return</span> item <span class="kw">in</span> self.items</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Complexity Quick Reference</h3>
+    <table class="info-table">
+      <tr><th>Operation</th><th>Array</th><th>Linked List</th><th>BST (avg)</th><th>Hash Table</th></tr>
+      <tr><td>Access</td><td><span class="badge badge-green">O(1)</span></td><td><span class="badge badge-yellow">O(n)</span></td><td><span class="badge badge-yellow">O(log n)</span></td><td><span class="badge badge-green">O(1)</span></td></tr>
+      <tr><td>Search</td><td><span class="badge badge-yellow">O(n)</span></td><td><span class="badge badge-yellow">O(n)</span></td><td><span class="badge badge-yellow">O(log n)</span></td><td><span class="badge badge-green">O(1)</span></td></tr>
+      <tr><td>Insert</td><td><span class="badge badge-yellow">O(n)</span></td><td><span class="badge badge-green">O(1)</span></td><td><span class="badge badge-yellow">O(log n)</span></td><td><span class="badge badge-green">O(1)</span></td></tr>
+      <tr><td>Delete</td><td><span class="badge badge-yellow">O(n)</span></td><td><span class="badge badge-green">O(1)</span></td><td><span class="badge badge-yellow">O(log n)</span></td><td><span class="badge badge-green">O(1)</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ MODULE 2 ═══════════════ -->
+<section id="m2" class="section">
+  <div class="section-title">Module 2 — Stack & Queue</div>
+
+  <!-- STACK VISUALIZER -->
+  <div class="viz-container">
+    <h3>🥞 Stack Visualizer — LIFO</h3>
+    <div class="viz-controls">
+      <input type="number" id="stack-input" placeholder="value" min="-999" max="999">
+      <button class="btn btn-primary" onclick="stackPush()">Push</button>
+      <button class="btn btn-danger" onclick="stackPop()">Pop</button>
+      <button class="btn btn-secondary" onclick="stackPeek()">Peek</button>
+      <button class="btn btn-success" onclick="stackReset()">Reset</button>
+    </div>
+    <div class="viz-stage" id="stack-stage">
+      <span style="color:var(--text-muted);font-size:0.8rem;font-family:monospace">Stack is empty — push something!</span>
+    </div>
+    <div class="viz-log" id="stack-log">Ready.</div>
+  </div>
+
+  <!-- QUEUE VISUALIZER -->
+  <div class="viz-container">
+    <h3>🚶 Queue Visualizer — FIFO</h3>
+    <div class="viz-controls">
+      <input type="number" id="queue-input" placeholder="value" min="-999" max="999">
+      <button class="btn btn-primary" onclick="queueEnqueue()">Enqueue</button>
+      <button class="btn btn-danger" onclick="queueDequeue()">Dequeue</button>
+      <button class="btn btn-success" onclick="queueReset()">Reset</button>
+    </div>
+    <div class="viz-stage" id="queue-stage" style="flex-direction:row;align-items:center">
+      <span style="color:var(--text-muted);font-size:0.8rem;font-family:monospace">Queue is empty</span>
+    </div>
+    <div class="viz-log" id="queue-log">Ready.</div>
+  </div>
+
+  <!-- INFIX → POSTFIX -->
+  <div class="viz-container">
+    <h3>🔄 Infix → Postfix Converter</h3>
+    <div class="viz-controls">
+      <input type="text" id="infix-input" value="A*B+C*D" style="width:200px">
+      <button class="btn btn-primary" onclick="convertPostfix()">Convert & Animate</button>
+      <button class="btn btn-success" onclick="stepPostfix()">Step →</button>
+      <button class="btn btn-secondary" onclick="resetPostfix()">Reset</button>
+    </div>
+    <div style="margin-bottom:0.8rem">
+      <span style="font-size:0.75rem;color:var(--text-muted);font-family:monospace">
+        Tokens: </span><span id="token-display"></span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+      <div>
+        <div style="font-size:0.72rem;color:var(--accent2);font-family:monospace;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.06em">Stack</div>
+        <div id="pf-stack-display" style="min-height:40px;display:flex;gap:4px;flex-wrap:wrap;align-items:center"></div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--accent4);font-family:monospace;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.06em">Output</div>
+        <div id="pf-output-display" style="min-height:40px;display:flex;gap:4px;flex-wrap:wrap;align-items:center"></div>
+      </div>
+    </div>
+    <div id="pf-steps-table"></div>
+    <div class="viz-log" id="pf-log">Enter an infix expression and click Convert.</div>
+  </div>
+
+  <!-- STACK CODE -->
+  <div class="card">
+    <h3>Stack Implementation (Python)</h3>
+    <pre><span class="kw">class</span> <span class="fn">Stack</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(self):
+    self._data = []                   <span class="cm"># internal list</span>
+
+  <span class="kw">def</span> <span class="fn">is_empty</span>(self): <span class="kw">return</span> <span class="fn">len</span>(self._data) == <span class="num">0</span>
+  <span class="kw">def</span> <span class="fn">__len__</span>(self):  <span class="kw">return</span> <span class="fn">len</span>(self._data)
+
+  <span class="kw">def</span> <span class="fn">push</span>(self, item):
+    self._data.append(item)           <span class="cm"># O(1)</span>
+
+  <span class="kw">def</span> <span class="fn">pop</span>(self):
+    <span class="kw">if</span> self.is_empty(): <span class="kw">raise</span> <span class="fn">Exception</span>(<span class="str">"Empty stack"</span>)
+    <span class="kw">return</span> self._data.pop()           <span class="cm"># O(1)</span>
+
+  <span class="kw">def</span> <span class="fn">peek</span>(self):
+    <span class="kw">if</span> self.is_empty(): <span class="kw">raise</span> <span class="fn">Exception</span>(<span class="str">"Empty stack"</span>)
+    <span class="kw">return</span> self._data[<span class="op">-</span><span class="num">1</span>]             <span class="cm"># O(1) — no removal</span></pre>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h3>Queue Implementation (Python)</h3>
+      <pre><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">class</span> <span class="fn">Queue</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(self): self._q = deque()
+  <span class="kw">def</span> <span class="fn">is_empty</span>(self): <span class="kw">return</span> <span class="fn">len</span>(self._q)==<span class="num">0</span>
+  <span class="kw">def</span> <span class="fn">enqueue</span>(self, v): self._q.append(v)
+  <span class="kw">def</span> <span class="fn">dequeue</span>(self):
+    <span class="kw">if</span> self.is_empty():
+      <span class="kw">raise</span> <span class="fn">Exception</span>(<span class="str">"Empty queue"</span>)
+    <span class="kw">return</span> self._q.popleft()         <span class="cm"># O(1)</span></pre>
+    </div>
+    <div class="card">
+      <h3>Postfix Evaluation (Python)</h3>
+      <pre><span class="kw">def</span> <span class="fn">eval_postfix</span>(expr):
+  s = []
+  <span class="kw">for</span> tok <span class="kw">in</span> expr.split():
+    <span class="kw">if</span> tok.lstrip(<span class="str">'-'</span>).isdigit():
+      s.append(<span class="fn">int</span>(tok))
+    <span class="kw">else</span>:
+      b, a = s.pop(), s.pop()
+      <span class="kw">if</span>   tok==<span class="str">'+'</span>: s.append(a+b)
+      <span class="kw">elif</span> tok==<span class="str">'-'</span>: s.append(a-b)
+      <span class="kw">elif</span> tok==<span class="str">'*'</span>: s.append(a*b)
+      <span class="kw">elif</span> tok==<span class="str">'/'</span>: s.append(a//b)
+  <span class="kw">return</span> s[<span class="num">0</span>]
+
+<span class="cm"># Example: "3 4 + 2 *" → 14</span>
+<span class="fn">print</span>(<span class="fn">eval_postfix</span>(<span class="str">"3 4 + 2 *"</span>))</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ MODULE 3 ═══════════════ -->
+<section id="m3" class="section">
+  <div class="section-title">Module 3 — Linked List</div>
+
+  <!-- SLL VISUALIZER -->
+  <div class="viz-container">
+    <h3>🔗 Singly Linked List Visualizer</h3>
+    <div class="viz-controls">
+      <input type="number" id="ll-val" placeholder="value">
+      <button class="btn btn-primary" onclick="llInsertFront()">Insert Front</button>
+      <button class="btn btn-secondary" onclick="llInsertEnd()">Insert End</button>
+      <button class="btn btn-danger" onclick="llDelete()">Delete Front</button>
+      <button class="btn btn-success" onclick="llReset()">Reset</button>
+    </div>
+    <div class="viz-stage" id="ll-stage" style="overflow-x:auto;flex-wrap:nowrap;min-height:70px">
+      <span style="color:var(--text-muted);font-size:0.8rem;font-family:monospace">List is empty — insert a value!</span>
+    </div>
+    <div class="viz-log" id="ll-log">Ready.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h3>SLL Node & Insert Front</h3>
+      <pre><span class="kw">class</span> <span class="fn">Node</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(self, data):
+    self.data = data
+    self.next = <span class="kw">None</span>
+
+<span class="kw">def</span> <span class="fn">insert_front</span>(head, data):
+  new = <span class="fn">Node</span>(data)
+  new.next = head   <span class="cm"># link before changing head</span>
+  head = new
+  <span class="kw">return</span> head       <span class="cm"># new head</span>
+
+<span class="kw">def</span> <span class="fn">insert_end</span>(head, data):
+  new = <span class="fn">Node</span>(data)
+  <span class="kw">if not</span> head: <span class="kw">return</span> new
+  cur = head
+  <span class="kw">while</span> cur.next: cur = cur.next
+  cur.next = new
+  <span class="kw">return</span> head</pre>
+    </div>
+    <div class="card">
+      <h3>SLL Delete & Traverse</h3>
+      <pre><span class="kw">def</span> <span class="fn">remove</span>(head, target):
+  cur, prev = head, <span class="kw">None</span>
+  <span class="kw">while</span> cur:
+    <span class="kw">if</span> cur.data == target:
+      <span class="kw">if not</span> prev: head = cur.next
+      <span class="kw">else</span>: prev.next = cur.next
+      <span class="kw">return</span> head
+    prev, cur = cur, cur.next
+  <span class="kw">return</span> head  <span class="cm"># not found</span>
+
+<span class="kw">def</span> <span class="fn">traverse</span>(head):
+  cur = head
+  <span class="kw">while</span> cur:
+    <span class="fn">print</span>(cur.data, end=<span class="str">" → "</span>)
+    cur = cur.next
+  <span class="fn">print</span>(<span class="str">"None"</span>)</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>DLL Node Structure</h3>
+    <pre><span class="kw">class</span> <span class="fn">DNode</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(self, data):
+    self.data = data
+    self.prev = <span class="kw">None</span>   <span class="cm"># link to previous node</span>
+    self.next = <span class="kw">None</span>   <span class="cm"># link to next node</span>
+
+<span class="kw">def</span> <span class="fn">insert_front_DLL</span>(head, data):
+  new = <span class="fn">DNode</span>(data)
+  new.next = head
+  <span class="kw">if</span> head: head.prev = new   <span class="cm"># set back-link</span>
+  <span class="kw">return</span> new               <span class="cm"># new head</span></pre>
+    <h4>Array vs Linked List</h4>
+    <table class="info-table" style="margin-top:0.5rem">
+      <tr><th>Feature</th><th>Array</th><th>Linked List</th></tr>
+      <tr><td>Access</td><td>O(1) random</td><td>O(n) sequential</td></tr>
+      <tr><td>Insert/Delete</td><td>O(n) shift needed</td><td>O(1) with pointer</td></tr>
+      <tr><td>Memory</td><td>Contiguous, static</td><td>Non-contiguous, dynamic</td></tr>
+      <tr><td>Cache</td><td>Cache-friendly</td><td>Cache-unfriendly</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ MODULE 4A — TREES ═══════════════ -->
+<section id="m4a" class="section">
+  <div class="section-title">Module 4A — Trees</div>
+
+  <!-- BST VISUALIZER -->
+  <div class="viz-container">
+    <h3>🌳 Binary Search Tree Visualizer</h3>
+    <div class="viz-controls">
+      <input type="number" id="bst-val" placeholder="value" min="-999" max="999">
+      <button class="btn btn-primary" onclick="bstInsert()">Insert</button>
+      <button class="btn btn-danger" onclick="bstDelete()">Delete</button>
+      <button class="btn btn-secondary" onclick="bstSearch()">Search</button>
+      <button class="btn btn-success" onclick="bstReset()">Reset</button>
+    </div>
+    <div class="viz-controls" style="margin-top:0.4rem">
+      <button class="btn btn-secondary" onclick="bstInorder()">Inorder</button>
+      <button class="btn btn-secondary" onclick="bstPreorder()">Preorder</button>
+      <button class="btn btn-secondary" onclick="bstPostorder()">Postorder</button>
+      <button class="btn" style="border-color:var(--text-muted);color:var(--text-muted)" onclick="bstLoadSample()">Load Sample</button>
+    </div>
+    <svg id="tree-svg" height="300"></svg>
+    <div class="viz-log" id="bst-log">Insert values to build your BST.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h3>BST Insert & Search</h3>
+      <pre><span class="kw">class</span> <span class="fn">BSTNode</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(self, v):
+    self.val = v
+    self.left = self.right = <span class="kw">None</span>
+
+<span class="kw">def</span> <span class="fn">insert</span>(root, v):
+  <span class="kw">if not</span> root: <span class="kw">return</span> <span class="fn">BSTNode</span>(v)
+  <span class="kw">if</span> v < root.val:
+    root.left  = <span class="fn">insert</span>(root.left, v)
+  <span class="kw">elif</span> v > root.val:
+    root.right = <span class="fn">insert</span>(root.right, v)
+  <span class="kw">return</span> root
+
+<span class="kw">def</span> <span class="fn">search</span>(root, target):
+  <span class="kw">if not</span> root <span class="kw">or</span> root.val==target:
+    <span class="kw">return</span> root
+  <span class="kw">if</span> target < root.val:
+    <span class="kw">return</span> <span class="fn">search</span>(root.left, target)
+  <span class="kw">return</span> <span class="fn">search</span>(root.right, target)</pre>
+    </div>
+    <div class="card">
+      <h3>BST Traversals</h3>
+      <pre><span class="kw">def</span> <span class="fn">inorder</span>(root, res=[]):
+  <span class="kw">if</span> root:
+    <span class="fn">inorder</span>(root.left, res)
+    res.append(root.val)   <span class="cm"># LNR: sorted!</span>
+    <span class="fn">inorder</span>(root.right, res)
+  <span class="kw">return</span> res
+
+<span class="kw">def</span> <span class="fn">preorder</span>(root, res=[]):
+  <span class="kw">if</span> root:
+    res.append(root.val)   <span class="cm"># NLR</span>
+    <span class="fn">preorder</span>(root.left, res)
+    <span class="fn">preorder</span>(root.right, res)
+  <span class="kw">return</span> res
+
+<span class="kw">def</span> <span class="fn">postorder</span>(root, res=[]):
+  <span class="kw">if</span> root:
+    <span class="fn">postorder</span>(root.left, res)
+    <span class="fn">postorder</span>(root.right, res)
+    res.append(root.val)   <span class="cm"># LRN</span>
+  <span class="kw">return</span> res</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Heap — Min-Heap Operations</h3>
+    <pre><span class="kw">import</span> heapq
+
+h = []
+heapq.heapify(h)
+
+heapq.heappush(h, <span class="num">5</span>)    <span class="cm"># push O(log n)</span>
+heapq.heappush(h, <span class="num">2</span>)
+heapq.heappush(h, <span class="num">8</span>)
+heapq.heappush(h, <span class="num">1</span>)
+
+<span class="fn">print</span>(h[<span class="num">0</span>])              <span class="cm"># peek min = 1  O(1)</span>
+m = heapq.heappop(h)    <span class="cm"># pop  min = 1  O(log n)</span>
+<span class="fn">print</span>(m, h)             <span class="cm"># 1, [2, 5, 8]</span>
+
+<span class="cm"># Array index formula:</span>
+<span class="cm"># parent(k)      = (k-1) // 2</span>
+<span class="cm"># left_child(k)  = 2*k + 1</span>
+<span class="cm"># right_child(k) = 2*k + 2</span></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ MODULE 4B — GRAPHS ═══════════════ -->
+<section id="m4b" class="section">
+  <div class="section-title">Module 4B — Graphs</div>
+
+  <!-- GRAPH TRAVERSAL -->
+  <div class="viz-container">
+    <h3>🗺️ Graph Traversal — BFS & DFS</h3>
+    <div class="viz-controls">
+      <button class="btn btn-primary" onclick="runBFS()">▶ Run BFS</button>
+      <button class="btn btn-secondary" onclick="runDFS()">▶ Run DFS</button>
+      <button class="btn btn-success" onclick="resetGraph()">Reset</button>
+      <span style="font-size:0.72rem;color:var(--text-muted);font-family:monospace;align-self:center">Start: node A</span>
+    </div>
+    <svg id="graph-svg"></svg>
+    <div class="viz-log" id="graph-log">Click BFS or DFS to begin traversal from node A.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h3>BFS Algorithm (Python)</h3>
+      <pre><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">def</span> <span class="fn">bfs</span>(graph, start):
+  visited = set()
+  queue   = deque([start])
+  visited.add(start)
+  order   = []
+
+  <span class="kw">while</span> queue:
+    v = queue.popleft()     <span class="cm"># dequeue</span>
+    order.append(v)
+    <span class="kw">for</span> w <span class="kw">in</span> graph[v]:
+      <span class="kw">if</span> w <span class="kw">not in</span> visited:
+        visited.add(w)
+        queue.append(w)     <span class="cm"># enqueue</span>
+
+  <span class="kw">return</span> order            <span class="cm"># BFS order</span>
+
+<span class="cm"># Time: O(V+E), Space: O(V)</span></pre>
+    </div>
+    <div class="card">
+      <h3>DFS Algorithm (Python)</h3>
+      <pre><span class="kw">def</span> <span class="fn">dfs</span>(graph, start):
+  visited = set()
+  stack   = [start]
+  order   = []
+
+  <span class="kw">while</span> stack:
+    v = stack.pop()         <span class="cm"># pop from stack</span>
+    <span class="kw">if</span> v <span class="kw">not in</span> visited:
+      visited.add(v)
+      order.append(v)
+      <span class="kw">for</span> w <span class="kw">in</span> graph[v]:
+        <span class="kw">if</span> w <span class="kw">not in</span> visited:
+          stack.append(w)   <span class="cm"># push neighbours</span>
+
+  <span class="kw">return</span> order            <span class="cm"># DFS order</span>
+
+<span class="cm"># Time: O(V+E), Space: O(V)</span></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Dijkstra's Shortest Path (Python)</h3>
+    <pre><span class="kw">import</span> heapq
+
+<span class="kw">def</span> <span class="fn">dijkstra</span>(graph, src):
+  <span class="cm"># graph = {node: [(neighbour, weight), ...]}</span>
+  dist = {v: float(<span class="str">'inf'</span>) <span class="kw">for</span> v <span class="kw">in</span> graph}
+  dist[src] = <span class="num">0</span>
+  pq = [(<span class="num">0</span>, src)]          <span class="cm"># (distance, node)</span>
+
+  <span class="kw">while</span> pq:
+    d, u = heapq.heappop(pq)
+    <span class="kw">if</span> d > dist[u]: <span class="kw">continue</span>  <span class="cm"># stale entry</span>
+    <span class="kw">for</span> v, w <span class="kw">in</span> graph[u]:
+      nd = dist[u] + w
+      <span class="kw">if</span> nd < dist[v]:
+        dist[v] = nd
+        heapq.heappush(pq, (nd, v))
+  <span class="kw">return</span> dist
+
+<span class="cm"># Example usage:</span>
+G = {<span class="str">'A'</span>:[(<span class="str">'B'</span>,<span class="num">4</span>),(<span class="str">'C'</span>,<span class="num">2</span>)], <span class="str">'B'</span>:[(<span class="str">'C'</span>,<span class="num">1</span>),(<span class="str">'D'</span>,<span class="num">5</span>)],
+     <span class="str">'C'</span>:[(<span class="str">'B'</span>,<span class="num">1</span>),(<span class="str">'D'</span>,<span class="num">8</span>)], <span class="str">'D'</span>:[]}
+<span class="fn">print</span>(<span class="fn">dijkstra</span>(G, <span class="str">'A'</span>))   <span class="cm"># {'A':0,'B':3,'C':2,'D':8}</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>Kruskal's MST (Python)</h3>
+    <pre><span class="kw">def</span> <span class="fn">kruskal</span>(edges, n):
+  <span class="cm"># edges = [(weight, u, v)]; n = number of nodes</span>
+  edges.sort()          <span class="cm"># sort by weight O(E log E)</span>
+  parent = <span class="fn">list</span>(<span class="fn">range</span>(n))
+
+  <span class="kw">def</span> <span class="fn">find</span>(x):          <span class="cm"># union-find</span>
+    <span class="kw">while</span> parent[x] != x: parent[x] = parent[parent[x]]; x = parent[x]
+    <span class="kw">return</span> x
+
+  mst, cost = [], <span class="num">0</span>
+  <span class="kw">for</span> w, u, v <span class="kw">in</span> edges:
+    pu, pv = <span class="fn">find</span>(u), <span class="fn">find</span>(v)
+    <span class="kw">if</span> pu != pv:          <span class="cm"># no cycle → add edge</span>
+      parent[pu] = pv
+      mst.append((u, v, w)); cost += w
+  <span class="kw">return</span> mst, cost</pre>
+  </div>
+</section>
+
+<!-- ═══════════════ QUIZ ═══════════════ -->
+<section id="quiz" class="section">
+  <div class="section-title">🎯 Exam Quiz — 20 Questions</div>
+  <div class="score-bar">
+    <span>Score: <span id="quiz-score">0</span> / <span id="quiz-total">0</span></span>
+    <button class="btn btn-success" onclick="resetQuiz()">Restart</button>
+  </div>
+  <div id="quiz-container"></div>
+</section>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════
+const nav = document.getElementById('nav');
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (id === 'm4b') drawGraph();
+  if (id === 'm4a' && bstNodes.length === 0) bstLoadSample();
+}
+
+// ═══════════════════════════════════════════
+//  STACK
+// ═══════════════════════════════════════════
+let stackData = [];
+function renderStack() {
+  const stage = document.getElementById('stack-stage');
+  if (stackData.length === 0) {
+    stage.innerHTML = '<span style="color:var(--text-muted);font-size:0.8rem;font-family:monospace">Stack is empty — push something!</span>';
+    return;
+  }
+  stage.innerHTML = '';
+  const col = document.createElement('div');
+  col.style.cssText = 'display:flex;flex-direction:column-reverse;gap:4px;align-items:center';
+  stackData.forEach((v, i) => {
+    const node = document.createElement('div');
+    node.className = 'node ' + (i === stackData.length - 1 ? 'top-node' : 'stack-node');
+    node.textContent = v;
+    if (i === stackData.length - 1) {
+      const lbl = document.createElement('span');
+      lbl.className = 'label-tag'; lbl.style.color = 'var(--accent3)'; lbl.textContent = 'TOP';
+      node.appendChild(lbl);
+    }
+    col.appendChild(node);
+  });
+  stage.appendChild(col);
+}
+function stackPush() {
+  const v = document.getElementById('stack-input').value;
+  if (v === '') return;
+  stackData.push(parseInt(v));
+  renderStack();
+  document.getElementById('stack-log').textContent = `Pushed ${v}. Stack size: ${stackData.length}`;
+  document.getElementById('stack-input').value = '';
+}
+function stackPop() {
+  if (!stackData.length) { document.getElementById('stack-log').textContent = '⚠ Stack underflow!'; return; }
+  const v = stackData.pop();
+  renderStack();
+  document.getElementById('stack-log').textContent = `Popped ${v}. Stack size: ${stackData.length}`;
+}
+function stackPeek() {
+  if (!stackData.length) { document.getElementById('stack-log').textContent = '⚠ Stack is empty!'; return; }
+  document.getElementById('stack-log').textContent = `Top = ${stackData[stackData.length-1]} (not removed)`;
+}
+function stackReset() { stackData = []; renderStack(); document.getElementById('stack-log').textContent = 'Stack cleared.'; }
+
+// ═══════════════════════════════════════════
+//  QUEUE
+// ═══════════════════════════════════════════
+let queueData = [];
+function renderQueue() {
+  const stage = document.getElementById('queue-stage');
+  if (!queueData.length) {
+    stage.innerHTML = '<span style="color:var(--text-muted);font-size:0.8rem;font-family:monospace">Queue is empty</span>';
+    return;
+  }
+  stage.innerHTML = '';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-size:0.6rem;font-family:monospace;color:var(--accent4);writing-mode:vertical-rl;transform:rotate(180deg);margin-right:6px';
+  lbl.textContent = 'FRONT';
+  stage.appendChild(lbl);
+  queueData.forEach((v, i) => {
+    const node = document.createElement('div');
+    node.className = 'node ' + (i === 0 ? 'front-node' : 'queue-node');
+    node.textContent = v;
+    stage.appendChild(node);
+    if (i < queueData.length - 1) {
+      const arr = document.createElement('span');
+      arr.className = 'arrow-right'; arr.textContent = '→';
+      stage.appendChild(arr);
+    }
+  });
+  const lbl2 = document.createElement('div');
+  lbl2.style.cssText = 'font-size:0.6rem;font-family:monospace;color:var(--accent1);writing-mode:vertical-rl;margin-left:6px';
+  lbl2.textContent = 'REAR';
+  stage.appendChild(lbl2);
+}
+function queueEnqueue() {
+  const v = document.getElementById('queue-input').value;
+  if (v === '') return;
+  queueData.push(parseInt(v));
+  renderQueue();
+  document.getElementById('queue-log').textContent = `Enqueued ${v} at rear. Size: ${queueData.length}`;
+  document.getElementById('queue-input').value = '';
+}
+function queueDequeue() {
+  if (!queueData.length) { document.getElementById('queue-log').textContent = '⚠ Queue underflow!'; return; }
+  const v = queueData.shift();
+  renderQueue();
+  document.getElementById('queue-log').textContent = `Dequeued ${v} from front. Size: ${queueData.length}`;
+}
+function queueReset() { queueData = []; renderQueue(); document.getElementById('queue-log').textContent = 'Queue cleared.'; }
+
+// ═══════════════════════════════════════════
+//  INFIX → POSTFIX
+// ═══════════════════════════════════════════
+const prec = {'+':1,'-':1,'*':2,'/':2,'^':3};
+let pfSteps = [], pfIdx = 0;
+
+function tokenize(expr) {
+  const tokens = [];
+  for (let ch of expr.replace(/\s/g,'')) tokens.push(ch);
+  return tokens;
+}
+function convertPostfix() {
+  const expr = document.getElementById('infix-input').value.trim();
+  const tokens = tokenize(expr);
+  pfSteps = []; pfIdx = 0;
+  let stack = [], output = [];
+  const rows = [];
+  for (let tok of tokens) {
+    let action;
+    if (/[A-Za-z0-9]/.test(tok)) {
+      output.push(tok); action = `Operand → output`;
+    } else if (tok === '(') {
+      stack.push(tok); action = `( → push to stack`;
+    } else if (tok === ')') {
+      while (stack.length && stack[stack.length-1] !== '(') output.push(stack.pop());
+      stack.pop(); action = `) → pop till (`;
+    } else {
+      while (stack.length && stack[stack.length-1] !== '(' && (prec[stack[stack.length-1]] >= prec[tok])) output.push(stack.pop());
+      stack.push(tok); action = `Operator, push to stack`;
+    }
+    rows.push({ tok, stack: [...stack], output: [...output], action });
+  }
+  while (stack.length) { output.push(stack.pop()); }
+  pfSteps = rows;
+  renderPFTable(rows, -1);
+  renderTokens(tokens, -1);
+  document.getElementById('pf-stack-display').innerHTML = '';
+  document.getElementById('pf-output-display').innerHTML = output.map(t => `<span class="token ${/[A-Za-z0-9]/.test(t)?'operand':'operator'}">${t}</span>`).join('');
+  document.getElementById('pf-log').textContent = `Postfix: ${output.join(' ')} — click Step → to animate`;
+}
+function renderTokens(toks, cur) {
+  document.getElementById('token-display').innerHTML = toks.map((t,i) => {
+    let cls = /[A-Za-z0-9]/.test(t) ? 'operand' : t==='('||t===')' ? 'paren' : 'operator';
+    return `<span class="token ${cls} ${i===cur?'current':''}">${t}</span>`;
+  }).join('');
+}
+function renderPFTable(rows, active) {
+  let html = `<table class="step-table"><tr><th>#</th><th>Token</th><th>Stack</th><th>Output</th><th>Action</th></tr>`;
+  rows.forEach((r,i) => {
+    html += `<tr class="${i===active?'active-row':''}">
+      <td>${i+1}</td><td><span class="token ${/[A-Za-z0-9]/.test(r.tok)?'operand':r.tok==='('||r.tok===')'?'paren':'operator'}">${r.tok}</span></td>
+      <td>${r.stack.join(' ')}</td><td>${r.output.join(' ')}</td><td>${r.action}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('pf-steps-table').innerHTML = html;
+}
+function stepPostfix() {
+  if (!pfSteps.length) { convertPostfix(); return; }
+  if (pfIdx >= pfSteps.length) { pfIdx = 0; }
+  const r = pfSteps[pfIdx];
+  const tokens = tokenize(document.getElementById('infix-input').value);
+  renderTokens(tokens, pfIdx);
+  renderPFTable(pfSteps, pfIdx);
+  document.getElementById('pf-stack-display').innerHTML = r.stack.map(t => `<span class="token ${prec[t]?'operator':'paren'}">${t}</span>`).join('');
+  document.getElementById('pf-output-display').innerHTML = r.output.map(t => `<span class="token ${/[A-Za-z0-9]/.test(t)?'operand':'operator'}">${t}</span>`).join('');
+  document.getElementById('pf-log').textContent = `Step ${pfIdx+1}: Token="${r.tok}" — ${r.action}`;
+  pfIdx++;
+}
+function resetPostfix() {
+  pfSteps = []; pfIdx = 0;
+  document.getElementById('token-display').innerHTML = '';
+  document.getElementById('pf-stack-display').innerHTML = '';
+  document.getElementById('pf-output-display').innerHTML = '';
+  document.getElementById('pf-steps-table').innerHTML = '';
+  document.getElementById('pf-log').textContent = 'Reset.';
+}
+
+// ═══════════════════════════════════════════
+//  LINKED LIST
+// ═══════════════════════════════════════════
+let llData = [];
+function renderLL() {
+  const stage = document.getElementById('ll-stage');
+  if (!llData.length) {
+    stage.innerHTML = '<span style="color:var(--text-muted);font-size:0.8rem;font-family:monospace">List is empty — insert a value!</span>';
+    return;
+  }
+  stage.innerHTML = '';
+  llData.forEach((v, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'll-node';
+    const box = document.createElement('div');
+    box.className = 'll-box';
+    const data = document.createElement('div');
+    data.className = 'll-data'; data.textContent = v;
+    const ptr = document.createElement('div');
+    ptr.className = 'll-ptr'; ptr.textContent = '→';
+    box.appendChild(data); box.appendChild(ptr);
+    wrap.appendChild(box);
+    stage.appendChild(wrap);
+    if (i < llData.length - 1) {
+      const arr = document.createElement('span');
+      arr.className = 'll-arrow'; arr.textContent = '→';
+      stage.appendChild(arr);
+    } else {
+      const arr = document.createElement('span');
+      arr.className = 'll-arrow'; arr.textContent = '→';
+      stage.appendChild(arr);
+      const nul = document.createElement('span');
+      nul.className = 'll-null'; nul.textContent = 'NULL';
+      stage.appendChild(nul);
+    }
+  });
+}
+function llInsertFront() {
+  const v = document.getElementById('ll-val').value;
+  if (v === '') return;
+  llData.unshift(parseInt(v));
+  renderLL();
+  document.getElementById('ll-log').textContent = `Inserted ${v} at front. Length: ${llData.length}`;
+  document.getElementById('ll-val').value = '';
+}
+function llInsertEnd() {
+  const v = document.getElementById('ll-val').value;
+  if (v === '') return;
+  llData.push(parseInt(v));
+  renderLL();
+  document.getElementById('ll-log').textContent = `Inserted ${v} at end. Length: ${llData.length}`;
+  document.getElementById('ll-val').value = '';
+}
+function llDelete() {
+  if (!llData.length) { document.getElementById('ll-log').textContent = '⚠ List is empty!'; return; }
+  const v = llData.shift();
+  renderLL();
+  document.getElementById('ll-log').textContent = `Deleted front node (${v}). Length: ${llData.length}`;
+}
+function llReset() { llData = []; renderLL(); document.getElementById('ll-log').textContent = 'List cleared.'; }
+
+// ═══════════════════════════════════════════
+//  BST VISUALIZER
+// ═══════════════════════════════════════════
+let bstRoot = null, bstNodes = [];
+class BSTNode { constructor(v){ this.val=v; this.left=this.right=null; } }
+function bstInsertNode(root, v) {
+  if (!root) return new BSTNode(v);
+  if (v < root.val) root.left = bstInsertNode(root.left, v);
+  else if (v > root.val) root.right = bstInsertNode(root.right, v);
+  return root;
+}
+function bstMinNode(root) { while (root.left) root=root.left; return root; }
+function bstDeleteNode(root, v) {
+  if (!root) return null;
+  if (v < root.val) { root.left = bstDeleteNode(root.left, v); }
+  else if (v > root.val) { root.right = bstDeleteNode(root.right, v); }
+  else {
+    if (!root.left) return root.right;
+    if (!root.right) return root.left;
+    const suc = bstMinNode(root.right);
+    root.val = suc.val;
+    root.right = bstDeleteNode(root.right, suc.val);
+  }
+  return root;
+}
+function bstInsert() {
+  const v = parseInt(document.getElementById('bst-val').value);
+  if (isNaN(v)) return;
+  bstRoot = bstInsertNode(bstRoot, v);
+  bstNodes.push(v);
+  drawBST(bstRoot);
+  document.getElementById('bst-log').textContent = `Inserted ${v}.`;
+  document.getElementById('bst-val').value = '';
+}
+function bstDelete() {
+  const v = parseInt(document.getElementById('bst-val').value);
+  if (isNaN(v)) return;
+  bstRoot = bstDeleteNode(bstRoot, v);
+  drawBST(bstRoot);
+  document.getElementById('bst-log').textContent = `Deleted ${v} (if existed).`;
+  document.getElementById('bst-val').value = '';
+}
+function bstSearch() {
+  const v = parseInt(document.getElementById('bst-val').value);
+  if (isNaN(v)) return;
+  const path = [];
+  let cur = bstRoot;
+  while (cur) {
+    path.push(cur.val);
+    if (v === cur.val) break;
+    cur = v < cur.val ? cur.left : cur.right;
+  }
+  drawBST(bstRoot, path, cur ? cur.val : null);
+  document.getElementById('bst-log').textContent = cur ? `Found ${v}! Path: ${path.join(' → ')}` : `${v} not found. Path tried: ${path.join(' → ')}`;
+}
+function bstInorder() {
+  const res = []; function io(n){ if(n){io(n.left);res.push(n.val);io(n.right);} } io(bstRoot);
+  drawBST(bstRoot, res); document.getElementById('bst-log').textContent = `Inorder (sorted): ${res.join(' → ')}`;
+}
+function bstPreorder() {
+  const res = []; function pr(n){ if(n){res.push(n.val);pr(n.left);pr(n.right);} } pr(bstRoot);
+  drawBST(bstRoot, res); document.getElementById('bst-log').textContent = `Preorder: ${res.join(' → ')}`;
+}
+function bstPostorder() {
+  const res = []; function po(n){ if(n){po(n.left);po(n.right);res.push(n.val);} } po(bstRoot);
+  drawBST(bstRoot, res); document.getElementById('bst-log').textContent = `Postorder: ${res.join(' → ')}`;
+}
+function bstReset() { bstRoot=null; bstNodes=[]; drawBST(null); document.getElementById('bst-log').textContent='BST cleared.'; }
+function bstLoadSample() {
+  bstRoot=null; bstNodes=[];
+  [60,25,100,35,17,80].forEach(v => bstRoot=bstInsertNode(bstRoot,v));
+  bstNodes=[60,25,100,35,17,80];
+  drawBST(bstRoot);
+  document.getElementById('bst-log').textContent='Sample BST loaded: 60, 25, 100, 35, 17, 80';
+}
+
+function drawBST(root, highlight=[], found=null) {
+  const svg = document.getElementById('tree-svg');
+  svg.innerHTML = '';
+  if (!root) { svg.setAttribute('height','80'); return; }
+  const W = svg.parentElement.clientWidth || 700;
+  const positions = {};
+  let height = 0;
+  function calcPos(node, lo, hi, depth) {
+    if (!node) return;
+    const mid = (lo+hi)/2;
+    positions[node.val] = {x: mid*W, y: depth*70+40};
+    height = Math.max(height, depth);
+    calcPos(node.left, lo, (lo+hi)/2, depth+1);
+    calcPos(node.right, (lo+hi)/2, hi, depth+1);
+  }
+  calcPos(root, 0, 1, 0);
+  svg.setAttribute('height', (height+1)*70+30);
+  // edges
+  function drawEdges(node) {
+    if (!node) return;
+    ['left','right'].forEach(side => {
+      if (node[side]) {
+        const p = positions[node.val], c = positions[node[side].val];
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',p.x); line.setAttribute('y1',p.y);
+        line.setAttribute('x2',c.x); line.setAttribute('y2',c.y);
+        line.setAttribute('class','tree-edge');
+        svg.appendChild(line);
+        drawEdges(node[side]);
+      }
+    });
+  }
+  drawEdges(root);
+  // nodes
+  function drawNodes(node) {
+    if (!node) return;
+    const p = positions[node.val];
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','tree-node');
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',p.x); c.setAttribute('cy',p.y); c.setAttribute('r',20);
+    const isHL = highlight.includes(node.val);
+    const isFnd = node.val === found;
+    c.setAttribute('fill', isFnd ? '#f59e0b' : isHL ? '#10b981' : '#7c3aed');
+    c.setAttribute('stroke', '#2a2a40'); c.setAttribute('stroke-width','2');
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',p.x); t.setAttribute('y',p.y+5); t.setAttribute('text-anchor','middle');
+    t.textContent = node.val;
+    g.appendChild(c); g.appendChild(t);
+    svg.appendChild(g);
+    drawNodes(node.left); drawNodes(node.right);
+  }
+  drawNodes(root);
+}
+
+// ═══════════════════════════════════════════
+//  GRAPH
+// ═══════════════════════════════════════════
+const graphNodes = [
+  {id:'A',x:300,y:60},{id:'B',x:160,y:160},{id:'C',x:440,y:160},
+  {id:'D',x:90,y:270}, {id:'E',x:240,y:270},{id:'F',x:380,y:270},{id:'G',x:520,y:270}
+];
+const graphEdges = [
+  {u:'A',v:'B'},{u:'A',v:'C'},{u:'B',v:'D'},
+  {u:'B',v:'E'},{u:'C',v:'F'},{u:'C',v:'G'},{u:'E',v:'F'}
+];
+const adjList = {};
+graphNodes.forEach(n => adjList[n.id]=[]);
+graphEdges.forEach(e => { adjList[e.u].push(e.v); adjList[e.v].push(e.u); });
+
+let visitedNodes=new Set(), traversalOrder=[], edgeState={};
+function resetGraph() {
+  visitedNodes=new Set(); traversalOrder=[]; edgeState={};
+  drawGraph();
+  document.getElementById('graph-log').textContent='Click BFS or DFS to begin traversal from node A.';
+}
+function drawGraph(cur=null) {
+  const svg = document.getElementById('graph-svg');
+  svg.innerHTML = '';
+  const W = svg.parentElement.clientWidth || 600;
+  const scale = W / 620;
+  graphEdges.forEach(e => {
+    const u = graphNodes.find(n=>n.id===e.u), v = graphNodes.find(n=>n.id===e.v);
+    const key = `${e.u}-${e.v}`;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',u.x*scale); line.setAttribute('y1',u.y);
+    line.setAttribute('x2',v.x*scale); line.setAttribute('y2',v.y);
+    line.setAttribute('class', 'g-edge' + (edgeState[key]||edgeState[`${e.v}-${e.u}`] ? ' traversed' : ''));
+    line.setAttribute('stroke-width', edgeState[key]||edgeState[`${e.v}-${e.u}`] ? '3' : '2');
+    svg.appendChild(line);
+  });
+  graphNodes.forEach(n => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','g-node');
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',n.x*scale); c.setAttribute('cy',n.y); c.setAttribute('r',22);
+    const isCur = n.id===cur, isVis = visitedNodes.has(n.id);
+    c.setAttribute('fill', isCur ? '#f59e0b' : isVis ? '#10b981' : '#7c3aed');
+    c.setAttribute('stroke','#2a2a40'); c.setAttribute('stroke-width','2');
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',n.x*scale); t.setAttribute('y',n.y+5); t.setAttribute('text-anchor','middle');
+    t.textContent = n.id;
+    g.appendChild(c); g.appendChild(t);
+    svg.appendChild(g);
+  });
+}
+async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+async function runBFS() {
+  resetGraph(); await sleep(100);
+  const queue=['A']; visitedNodes.add('A');
+  const order=[];
+  while(queue.length) {
+    const v = queue.shift();
+    order.push(v); drawGraph(v);
+    document.getElementById('graph-log').textContent=`BFS visiting: ${v}  |  Order so far: ${order.join(' → ')}`;
+    await sleep(700);
+    for(const w of adjList[v]) {
+      if(!visitedNodes.has(w)) {
+        visitedNodes.add(w); queue.push(w);
+        edgeState[`${v}-${w}`]=true;
+      }
+    }
+    drawGraph(v);
+  }
+  drawGraph(); document.getElementById('graph-log').textContent=`BFS complete: ${order.join(' → ')}`;
+}
+async function runDFS() {
+  resetGraph(); await sleep(100);
+  const stack=['A']; const order=[];
+  while(stack.length) {
+    const v = stack.pop();
+    if(visitedNodes.has(v)) continue;
+    visitedNodes.add(v); order.push(v);
+    drawGraph(v);
+    document.getElementById('graph-log').textContent=`DFS visiting: ${v}  |  Order so far: ${order.join(' → ')}`;
+    await sleep(700);
+    for(const w of [...adjList[v]].reverse()) {
+      if(!visitedNodes.has(w)) { stack.push(w); edgeState[`${v}-${w}`]=true; }
+    }
+    drawGraph(v);
+  }
+  drawGraph(); document.getElementById('graph-log').textContent=`DFS complete: ${order.join(' → ')}`;
+}
+drawGraph();
+
+// ═══════════════════════════════════════════
+//  QUIZ
+// ═══════════════════════════════════════════
+const questions = [
+  { q:"What does LIFO stand for?", opts:["Last In First Out","Last In For Output","List Input First Output","Linked Interface First Out"], ans:0, exp:"Stack uses LIFO — the last element pushed is the first popped." },
+  { q:"Which data structure uses FIFO ordering?", opts:["Stack","Queue","Tree","Graph"], ans:1, exp:"Queue: first enqueued item is first dequeued." },
+  { q:"Time complexity of accessing an element in an array by index?", opts:["O(n)","O(log n)","O(1)","O(n²)"], ans:2, exp:"Arrays support O(1) random access via direct index calculation." },
+  { q:"In-order traversal of a BST produces?", opts:["Random order","Reverse sorted order","Sorted ascending order","Level order"], ans:2, exp:"LNR (Left-Node-Right) on a BST always yields sorted ascending output." },
+  { q:"Which traversal is used to get prefix notation from an expression tree?", opts:["In-order","Post-order","Pre-order","Level-order"], ans:2, exp:"Pre-order (NLR) visits root first — giving prefix/Polish notation." },
+  { q:"What data structure does BFS use internally?", opts:["Stack","Queue","Heap","Linked List"], ans:1, exp:"BFS uses a Queue to process nodes level by level." },
+  { q:"What data structure does DFS use internally?", opts:["Queue","Stack","Tree","Array"], ans:1, exp:"DFS uses a Stack (explicit or via recursion call stack)." },
+  { q:"Dijkstra's algorithm requires that all edge weights are?", opts:["Negative","Zero","Non-negative","Integers only"], ans:2, exp:"Dijkstra fails with negative weights — use Bellman-Ford instead." },
+  { q:"Which MST algorithm sorts edges first?", opts:["Prim's","Dijkstra's","Kruskal's","Floyd-Warshall"], ans:2, exp:"Kruskal's: sort all edges by weight then greedily add edges without forming cycles." },
+  { q:"A complete binary tree with height h has a maximum of how many nodes?", opts:["2h","2h+1","2^(h+1) - 1","h²"], ans:2, exp:"A perfect binary tree of height h has 2^(h+1) - 1 nodes." },
+  { q:"In a min-heap stored as an array, where is the left child of node at index k?", opts:["k-1","2k","2k+1","2k+2"], ans:2, exp:"Left child of index k is at 2k+1; right child at 2k+2." },
+  { q:"What is the time complexity of insertion in a singly linked list at the front?", opts:["O(n)","O(log n)","O(1)","O(n²)"], ans:2, exp:"Insert at front: create node, set next=head, update head. All O(1)." },
+  { q:"A graph with N vertices where every vertex connects to every other vertex is called?", opts:["Sparse graph","Complete graph","Regular graph","Weighted graph"], ans:1, exp:"Complete graph: N(N-1)/2 edges (undirected) or N(N-1) edges (directed)." },
+  { q:"Postfix expression for (A+B)*C is?", opts:["A B + C *","A B C + *","+ A B * C","* + A B C"], ans:0, exp:"(A+B)*C → A B + C * (operators follow their operands)." },
+  { q:"Which of the following is NOT a property of a BST?", opts:["Left child < parent","Right child > parent","In-order gives sorted sequence","All leaves at same level"], ans:3, exp:"BSTs don't require leaves at same level — that's a perfect binary tree." },
+  { q:"What is the height of a BST built from sorted input [1,2,3,4,5]?", opts:["2","3","4","5"], ans:2, exp:"Inserting sorted data creates a skewed (degenerate) tree with height n-1 = 4." },
+  { q:"Huffman encoding uses which data structure to build the tree?", opts:["Stack","Queue","Max-Heap","Min-Heap"], ans:3, exp:"Huffman uses a min-heap to always combine the two lowest-frequency symbols." },
+  { q:"What does BFS return on an unweighted graph?", opts:["DFS spanning tree","Shortest path tree","Minimum spanning tree","Topological order"], ans:1, exp:"BFS explores level by level, giving shortest paths in unweighted graphs." },
+  { q:"A doubly linked list node contains:", opts:["data only","data + next","data + prev","data + prev + next"], ans:3, exp:"DLL nodes hold data, a prev pointer, and a next pointer for bidirectional traversal." },
+  { q:"Which traversal is needed to reconstruct a binary tree uniquely along with in-order?", opts:["Level-order only","Pre-order or Post-order","In-order alone","BFS"], ans:1, exp:"In-order + Pre-order OR In-order + Post-order uniquely define a binary tree." }
+];
+
+let quizAnswered = 0, quizCorrect = 0;
+function buildQuiz() {
+  quizAnswered = 0; quizCorrect = 0;
+  document.getElementById('quiz-score').textContent = '0';
+  document.getElementById('quiz-total').textContent = '0';
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = questions.map((q,qi) => `
+    <div class="quiz-q" id="qblock-${qi}">
+      <p><span style="color:var(--accent1);font-family:monospace">Q${qi+1}.</span> ${q.q}</p>
+      <div class="quiz-options">
+        ${q.opts.map((o,oi) => `<button class="quiz-opt" onclick="answerQ(${qi},${oi})" id="qopt-${qi}-${oi}">${o}</button>`).join('')}
+      </div>
+      <div id="qfb-${qi}" class="quiz-feedback" style="display:none"></div>
+    </div>`).join('');
+}
+function answerQ(qi, oi) {
+  const q = questions[qi];
+  const opts = document.querySelectorAll(`#qblock-${qi} .quiz-opt`);
+  opts.forEach(o => o.disabled = true);
+  opts[q.ans].classList.add('correct');
+  const fb = document.getElementById(`qfb-${qi}`);
+  fb.style.display = 'block';
+  quizAnswered++;
+  if (oi === q.ans) {
+    quizCorrect++;
+    fb.className = 'quiz-feedback ok';
+    fb.textContent = `✓ Correct! ${q.exp}`;
+  } else {
+    opts[oi].classList.add('wrong');
+    fb.className = 'quiz-feedback nope';
+    fb.textContent = `✗ Incorrect. ${q.exp}`;
+  }
+  document.getElementById('quiz-score').textContent = quizCorrect;
+  document.getElementById('quiz-total').textContent = quizAnswered;
+}
+function resetQuiz() { buildQuiz(); }
+buildQuiz();
+</script>
+</body>
+</html>
