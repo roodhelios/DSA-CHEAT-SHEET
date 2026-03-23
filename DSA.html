@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;--bg4:#222636;
+  --border:#252938;--border2:#333857;
+  --text:#dde2f0;--text2:#8892b0;--text3:#4a5278;
+  --accent:#7c9eff;--accent2:#b48eff;
+  --green:#2ecc71;--gbg:#0a2016;
+  --orange:#f39c12;--obg:#241600;
+  --red:#e74c3c;--rbg:#200808;
+  --cyan:#1abc9c;--purple:#9b59b6;
+  --mono:'JetBrains Mono',monospace;
+  --head:'Syne',sans-serif;
+  --body:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.65;min-height:100vh}
+
+/* LAYOUT */
+.shell{display:flex;min-height:100vh}
+.sidebar{width:270px;min-width:270px;background:var(--bg2);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.main{flex:1;overflow-x:hidden}
+
+/* SIDEBAR */
+.logo{padding:22px 18px 14px;border-bottom:1px solid var(--border)}
+.logo h1{font-family:var(--head);font-size:17px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo p{font-size:11px;color:var(--text3);margin-top:2px}
+
+.prog-wrap{padding:14px 18px;border-bottom:1px solid var(--border)}
+.prog-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;justify-content:space-between}
+.prog-label span:last-child{color:var(--accent);font-weight:600}
+.prog-bg{height:3px;background:var(--bg4);border-radius:2px}
+.prog-fill{height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .4s}
+
+.nav-sec{padding:10px 0}
+.nav-sec-lbl{padding:5px 18px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3)}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 18px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text2);border-left:2px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(124,158,255,.08);color:var(--accent);border-left-color:var(--accent)}
+.nav-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.nav-txt{flex:1}
+.nav-cnt{font-size:10px;padding:1px 5px;border-radius:10px;background:var(--bg4);color:var(--text3);font-weight:600}
+.nav-item.active .nav-cnt{background:rgba(124,158,255,.15);color:var(--accent)}
+.nav-ck{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--border2);font-size:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.nav-ck.done{background:var(--green);border-color:var(--green);color:#000}
+
+/* HEADER */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);padding:26px 36px 22px}
+.breadcrumb{font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.breadcrumb span{cursor:pointer;transition:color .15s}.breadcrumb span:hover{color:var(--accent)}
+.hdr-title{font-family:var(--head);font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.15}
+.hdr-sub{color:var(--text2);font-size:13.5px;margin-top:6px;max-width:660px;line-height:1.5}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.chip{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:.3px}
+.ce{background:var(--gbg);color:var(--green)}
+.cm{background:var(--obg);color:var(--orange)}
+.ch{background:var(--rbg);color:var(--red)}
+.ci{background:rgba(124,158,255,.1);color:var(--accent)}
+
+/* CONTENT */
+.content{padding:28px 36px;max-width:1100px}
+
+/* PAGE */
+.page{display:none}.page.active{display:block}
+
+/* FILTER BAR */
+.fbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.fbtn{padding:4px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3);font-size:11.5px;cursor:pointer;transition:all .15s;font-family:var(--body)}
+.fbtn:hover{border-color:var(--border2);color:var(--text)}
+.fbtn.active{background:rgba(124,158,255,.1);border-color:var(--accent);color:var(--accent)}
+.fsearch{flex:1;min-width:180px;max-width:280px;padding:5px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--body);outline:none;transition:border-color .15s}
+.fsearch:focus{border-color:var(--accent)}
+.fsearch::placeholder{color:var(--text3)}
+
+/* QUESTION CARD */
+.qgrid{display:grid;gap:10px}
+.qcard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.qcard:hover{border-color:var(--border2)}
+.qcard.solved{border-left:3px solid var(--green)}
+
+.qhdr{padding:14px 16px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;gap:10px}
+.qnum{font-size:10px;color:var(--text3);font-family:var(--mono);min-width:24px;margin-top:2px}
+.qinfo{flex:1;min-width:0}
+.qname{font-weight:600;font-size:14px;margin-bottom:3px}
+.qmeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.dbadge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.4px}
+.dE{background:var(--gbg);color:var(--green)}
+.dM{background:var(--obg);color:var(--orange)}
+.dH{background:var(--rbg);color:var(--red)}
+.qcmplx{font-family:var(--mono);font-size:10.5px;color:var(--text3)}
+.qpat{font-size:10.5px;color:var(--accent2);background:rgba(180,142,255,.08);padding:1px 6px;border-radius:4px}
+.qtoggle{width:22px;height:22px;background:var(--bg4);border:none;border-radius:5px;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;flex-shrink:0;margin-top:1px}
+.qtoggle:hover{background:var(--border2);color:var(--text)}
+
+/* EXPANDED BODY */
+.qbody{border-top:1px solid var(--border);display:none}
+.qbody.open{display:block}
+
+/* TABS inside question */
+.qtabs{display:flex;border-bottom:1px solid var(--border);padding:0 16px;background:var(--bg3)}
+.qtab{padding:8px 13px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11.5px;font-family:var(--body);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+.qtab:hover{color:var(--text)}
+.qtab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.qpanel{display:none;padding:18px 16px}.qpanel.active{display:block}
+
+/* Problem statement area */
+.prob-stmt{font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:14px}
+.prob-stmt strong{color:var(--text)}
+
+/* Examples */
+.examples{display:grid;gap:8px;margin-bottom:14px}
+.example{background:var(--bg);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.ex-hdr{padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);display:flex;justify-content:space-between}
+.ex-hdr span:last-child{color:var(--accent2)}
+.ex-body{padding:10px 12px;font-family:var(--mono);font-size:12px;line-height:1.7}
+.ex-in{color:var(--text2)}.ex-out{color:var(--green)}.ex-exp{color:var(--text3);font-style:italic;margin-top:4px;font-size:11px}
+.ex-label{color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Constraints */
+.constraints{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:10px 13px;margin-bottom:14px}
+.constraints-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px}
+.constraints ul{margin:0;padding-left:16px;font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.8}
+
+/* Test cases */
+.testcases{display:grid;gap:6px}
+.tc{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 13px;font-family:var(--mono);font-size:12px}
+.tc-row{display:flex;gap:8px;align-items:flex-start;line-height:1.6}
+.tc-key{color:var(--text3);min-width:70px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding-top:1px}
+.tc-val{color:var(--text2)}.tc-out{color:var(--green)}.tc-note{color:var(--text3);font-style:italic;font-size:11px}
+
+/* Hint + Approach boxes */
+.ibox{border-radius:7px;padding:12px 14px;margin-bottom:10px;border-left:2px solid;font-size:13px;line-height:1.65}
+.ibox-hint{background:rgba(124,158,255,.05);border-color:var(--accent);color:var(--text2)}
+.ibox-warn{background:rgba(243,156,18,.05);border-color:var(--orange);color:var(--text2)}
+.ibox-tip{background:rgba(46,204,113,.05);border-color:var(--green);color:var(--text2)}
+.ibox-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.ibox-hint .ibox-lbl{color:var(--accent)}
+.ibox-warn .ibox-lbl{color:var(--orange)}
+.ibox-tip .ibox-lbl{color:var(--green)}
+
+/* Code */
+.codeblock{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow-x:auto;position:relative;margin-bottom:10px}
+.codeblock pre{padding:14px 16px;font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--text);white-space:pre}
+.code-lang{position:absolute;top:7px;right:9px;font-size:9px;color:var(--text3);font-family:var(--mono);background:var(--bg2);padding:2px 5px;border-radius:3px}
+.kw{color:#c792ea}.fn{color:#82aaff}.st{color:#c3e88d}.cm{color:#4a5568;font-style:italic}.nm{color:#f78c6c}.op{color:#89ddff}.tp{color:#ffcb6b}.dk{color:#e06c75}
+
+/* Complexity pills */
+.cmplx-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.cpill{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:10px 12px}
+.cpill .lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.cpill .val{font-family:var(--mono);font-size:13px;color:var(--cyan);font-weight:700}
+
+/* Solve button */
+.solve-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--gbg);border:1px solid rgba(46,204,113,.25);border-radius:6px;color:var(--green);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--body);margin-top:6px}
+.solve-btn:hover{background:rgba(46,204,113,.1)}
+.solve-btn.done{background:var(--green);color:#000;border-color:var(--green)}
+
+/* Dashboard cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:16px 18px}
+.stat-n{font-family:var(--head);font-size:30px;font-weight:800;line-height:1}
+.stat-l{font-size:11px;color:var(--text3);margin-top:3px}
+.stat-n.green{color:var(--green)}.stat-n.orange{color:var(--orange)}.stat-n.red{color:var(--red)}.stat-n.accent{color:var(--accent)}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-ttl{font-family:var(--head);font-size:14px;font-weight:700}
+.card-body{padding:16px 18px}
+.text-m{color:var(--text2);font-size:13px;line-height:1.6}
+
+/* Section label */
+.sec-lbl{font-family:var(--head);font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Study plan */
+.week-row{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:16px 18px;display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;cursor:pointer;transition:border-color .2s}
+.week-row:hover{border-color:var(--border2)}
+.week-n{font-family:var(--head);font-size:24px;font-weight:800;color:var(--border2)}
+.week-ttl{font-weight:600;font-size:13.5px;margin-bottom:3px}
+.week-desc{font-size:12px;color:var(--text2);line-height:1.4}
+.week-cnt{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(124,158,255,.08);padding:3px 9px;border-radius:20px;white-space:nowrap}
+
+/* Pattern table */
+.ptable{width:100%;border-collapse:collapse;font-size:12.5px}
+.ptable th{padding:9px 12px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);border-bottom:1px solid var(--border);font-weight:700}
+.ptable td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.025);vertical-align:top;line-height:1.5}
+.ptable tr:hover td{background:rgba(255,255,255,.015)}
+.pat-name{font-weight:700;color:var(--accent);white-space:nowrap}
+.pat-when{color:var(--text2)}
+.pat-ex{color:var(--text3);font-style:italic;font-size:11.5px}
+
+/* Cheatsheet grid */
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cs-card{background:var(--bg2);border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.cs-hdr{padding:11px 14px;font-weight:700;font-size:12.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.cs-body{padding:12px 14px}
+.cs-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.025);font-size:12px}
+.cs-row:last-child{border-bottom:none}
+.cs-lbl{color:var(--text2)}.cs-val{font-family:var(--mono);color:var(--cyan);font-size:11.5px}
+
+/* Flashcards */
+.fc-wrap{perspective:1000px;max-width:580px;margin:0 auto}
+.fc{width:100%;height:260px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.fc.flipped{transform:rotateY(180deg)}
+.fc-front,.fc-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center}
+.fc-front{background:var(--bg2);border:1px solid var(--border)}
+.fc-back{background:var(--bg3);border:1px solid var(--border2);transform:rotateY(180deg)}
+.fc-hint{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.fc-q{font-family:var(--head);font-size:19px;font-weight:800;line-height:1.35}
+.fc-ans{font-size:13px;color:var(--text2);line-height:1.6}
+.fc-mono{font-family:var(--mono);color:var(--cyan);font-size:15px;font-weight:700;margin-bottom:8px}
+.fc-btns{display:flex;gap:10px;justify-content:center;margin-top:18px}
+.fc-btn{padding:8px 20px;border-radius:7px;border:1px solid;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--body)}
+.fc-again{background:var(--rbg);border-color:rgba(231,76,60,.25);color:var(--red)}
+.fc-good{background:var(--gbg);border-color:rgba(46,204,113,.25);color:var(--green)}
+.fc-ctr{text-align:center;font-size:11px;color:var(--text3);margin-top:10px}
+
+/* Quiz */
+.quiz-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px;max-width:680px;margin:0 auto}
+.quiz-meta{font-size:10px;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:1px}
+.quiz-q{font-family:var(--head);font-size:18px;font-weight:800;line-height:1.4;margin-bottom:20px}
+.quiz-opts{display:grid;gap:8px}
+.qopt{padding:13px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;text-align:left;font-family:var(--body)}
+.qopt:hover:not([disabled]){border-color:var(--accent);color:var(--text);background:rgba(124,158,255,.06)}
+.qopt.correct{background:var(--gbg);border-color:var(--green);color:var(--green)}
+.qopt.wrong{background:var(--rbg);border-color:var(--red);color:var(--red)}
+.quiz-exp{margin-top:16px;padding:14px;background:var(--bg3);border-radius:7px;font-size:13px;color:var(--text2);line-height:1.6;display:none}
+.quiz-exp.show{display:block}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.btn-p{padding:9px 20px;background:var(--accent);border:none;border-radius:7px;color:white;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--body);transition:all .15s}
+.btn-p:hover{background:#6a8ef0;transform:translateY(-1px)}
+.btn-g{padding:9px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text2);font-size:12.5px;cursor:pointer;font-family:var(--body);transition:all .15s}
+.btn-g:hover{border-color:var(--border2);color:var(--text)}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+select.fsearch{cursor:pointer}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <h1>DSA Mastery</h1>
+    <p>Complete Interview Prep</p>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-label"><span>Progress</span><span id="prog-pct">0%</span></div>
+    <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:5px;display:flex;justify-content:space-between"><span id="prog-done">0 solved</span><span id="prog-total">0 total</span></div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-sec-lbl">Study Tools</div>
+    <div class="nav-item active" onclick="nav('dashboard')"><span class="nav-icon">⚡</span><span class="nav-txt">Dashboard</span></div>
+    <div class="nav-item" onclick="nav('plan')"><span class="nav-icon">📅</span><span class="nav-txt">8-Week Plan</span></div>
+    <div class="nav-item" onclick="nav('cheatsheet')"><span class="nav-icon">📋</span><span class="nav-txt">Cheat Sheet</span></div>
+    <div class="nav-item" onclick="nav('flashcards')"><span class="nav-icon">🃏</span><span class="nav-txt">Flashcards</span></div>
+    <div class="nav-item" onclick="nav('quiz')"><span class="nav-icon">🧠</span><span class="nav-txt">Quiz</span></div>
+  </div>
+  <div class="nav-sec" id="cat-nav"></div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="hdr">
+    <div class="hdr-title">DSA Interview Mastery 🎯</div>
+    <div class="hdr-sub">Full problem statements · Examples with I/O · Test cases · Complete Python solutions · Interactive quizzes. Everything you need to pass top tech interviews.</div>
+    <div class="chips"><span class="chip ce">Easy</span><span class="chip cm">Medium</span><span class="chip ch">Hard</span><span class="chip ci">13 Categories</span><span class="chip ci">Full Answers</span><span class="chip ci">Test Cases</span></div>
+  </div>
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-n accent" id="d-total">0</div><div class="stat-l">Total Solved</div></div>
+      <div class="stat"><div class="stat-n green" id="d-easy">0</div><div class="stat-l">Easy Solved</div></div>
+      <div class="stat"><div class="stat-n orange" id="d-med">0</div><div class="stat-l">Medium Solved</div></div>
+      <div class="stat"><div class="stat-n red" id="d-hard">0</div><div class="stat-l">Hard Solved</div></div>
+    </div>
+    <div class="sec-lbl">Categories</div>
+    <div id="dash-cats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:28px"></div>
+    <div class="sec-lbl">How This App Works</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="card"><div class="card-hdr"><div class="card-ttl">① Read the Problem</div></div><div class="card-body"><p class="text-m">Each question shows the full problem statement, 2–3 worked examples with input/output, constraints, and edge case test cases — exactly like LeetCode.</p></div></div>
+      <div class="card"><div class="card-hdr"><div class="card-ttl">② Try It Yourself</div></div><div class="card-body"><p class="text-m">Read the problem and hint tab first. Try to solve it. Then check the Approach and Full Code tabs. The gap between attempt and answer is where learning happens.</p></div></div>
+      <div class="card"><div class="card-hdr"><div class="card-ttl">③ Mark + Review</div></div><div class="card-body"><p class="text-m">Mark questions solved. After 5–7 days, cold-resolve them. Use Flashcards for pattern drilling and Quiz for complexity testing. Progress saves automatically.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDY PLAN -->
+<div class="page" id="page-plan">
+  <div class="hdr">
+    <div class="hdr-title">8-Week Battle Plan 📅</div>
+    <div class="hdr-sub">5 days/week, 60–90 min/day. Consistency over intensity. A missed day is fine — a missed week is not.</div>
+  </div>
+  <div class="content">
+    <div class="sec-lbl">Weekly Schedule</div>
+    <div style="display:grid;gap:10px;margin-bottom:28px" id="plan-weeks"></div>
+    <div class="sec-lbl">Daily Workflow (for every problem)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="card"><div class="card-hdr"><div class="card-ttl">Before writing code</div></div><div class="card-body">
+        <div class="ibox ibox-tip"><div class="ibox-lbl">Step 1 — Read</div>Restate the problem in one sentence. Identify: input type, output type, constraints, edge cases.</div>
+        <div class="ibox ibox-tip"><div class="ibox-lbl">Step 2 — Pattern</div>Name the pattern before touching code: "This is sliding window because the constraint is on a contiguous subarray."</div>
+        <div class="ibox ibox-tip"><div class="ibox-lbl">Step 3 — Outline</div>Write 3–5 pseudocode comments. State expected time/space complexity.</div>
+      </div></div>
+      <div class="card"><div class="card-hdr"><div class="card-ttl">After writing code</div></div><div class="card-body">
+        <div class="ibox ibox-hint"><div class="ibox-lbl">Step 4 — Trace</div>Manually trace through Example 1 step by step. Verify output matches.</div>
+        <div class="ibox ibox-hint"><div class="ibox-lbl">Step 5 — Edge Cases</div>Test: empty input, single element, all same, negative numbers, maximum constraints.</div>
+        <div class="ibox ibox-warn"><div class="ibox-lbl">Step 6 — Explain</div>Explain your solution aloud as if teaching. If you can't explain WHY each line exists, you don't understand it. Schedule cold-resolve in 5–7 days.</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHEATSHEET -->
+<div class="page" id="page-cheatsheet">
+  <div class="hdr">
+    <div class="hdr-title">Pattern Cheat Sheet 📋</div>
+    <div class="hdr-sub">Pattern recognition is the core skill. See the shape → know the solution.</div>
+  </div>
+  <div class="content">
+    <div class="sec-lbl">Pattern Recognition Guide</div>
+    <div class="card" style="margin-bottom:22px"><div class="card-body" style="padding:0"><table class="ptable"><thead><tr><th>Pattern</th><th>Use When…</th><th>Time</th><th>Examples</th></tr></thead><tbody id="pat-tbody"></tbody></table></div></div>
+    <div class="sec-lbl">Complexity Quick Reference</div>
+    <div class="cs-grid" id="cs-grid"></div>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="page" id="page-flashcards">
+  <div class="hdr">
+    <div class="hdr-title">Flashcards 🃏</div>
+    <div class="hdr-sub">Click to flip. Rate yourself honestly. "Again" cards loop back.</div>
+  </div>
+  <div class="content">
+    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:24px;flex-wrap:wrap">
+      <select id="fc-cat" class="fsearch" style="max-width:200px"><option value="all">All Categories</option></select>
+      <select id="fc-diff" class="fsearch" style="max-width:150px"><option value="all">All Difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
+      <button class="btn-p" onclick="startFC()">Start Session</button>
+    </div>
+    <div id="fc-area"><div style="text-align:center;color:var(--text3);padding:50px">Select filters and click Start Session</div></div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="page" id="page-quiz">
+  <div class="hdr">
+    <div class="hdr-title">Quiz 🧠</div>
+    <div class="hdr-sub">Test pattern recognition and complexity reasoning.</div>
+  </div>
+  <div class="content"><div id="quiz-area"></div></div>
+</div>
+
+<!-- CATEGORY PAGES injected here -->
+<div id="cat-pages"></div>
+
+</main>
+</div>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════════════════════════════
+const CATS = [
+{id:'arrays',icon:'▦',title:'Arrays',color:'#7c9eff',
+ intro:'Arrays are the foundation. Master two-pointer, sliding window, prefix sums, and hash map patterns. Most array problems have an O(n) or O(n log n) optimal solution.',
+ qs:[
+  {name:'Two Sum',diff:'Easy',time:'O(n)',space:'O(n)',pat:'Hash Map',
+   stmt:'Given an array of integers <strong>nums</strong> and a target integer <strong>target</strong>, return the <strong>indices</strong> of the two numbers that add up to target. Exactly one solution exists. You may not use the same element twice.',
+   examples:[
+    {input:'nums = [2,7,11,15], target = 9',output:'[0,1]',exp:'nums[0] + nums[1] = 2 + 7 = 9'},
+    {input:'nums = [3,2,4], target = 6',output:'[1,2]',exp:'nums[1] + nums[2] = 2 + 4 = 6'},
+    {input:'nums = [3,3], target = 6',output:'[0,1]',exp:'nums[0] + nums[1] = 3 + 3 = 6'},
+   ],
+   constraints:['2 ≤ nums.length ≤ 10⁴','−10⁹ ≤ nums[i] ≤ 10⁹','Only one valid answer exists'],
+   tests:[
+    {input:'[2,7,11,15], target=9',output:'[0,1]',note:'Basic case'},
+    {input:'[3,3], target=6',output:'[0,1]',note:'Duplicates — must not store before checking'},
+    {input:'[1,2,3,4], target=7',output:'[2,3]',note:'Answer at end'},
+    {input:'[-3,4,3,90], target=0',output:'[0,2]',note:'Negative numbers'},
+   ],
+   hint:'For each number x, you need target−x. Store {value → index} in a hash map. Check if complement exists BEFORE adding current element.',
+   approach:'Iterate with enumerate. At each index i, compute complement = target − nums[i]. If complement is in the map: return [map[complement], i]. Otherwise, store nums[i] → i and continue.',
+   pitfall:['Nested loops O(n²) — correct but not optimal','Storing THEN checking — breaks for [3,3] target 6 (you\'d find same index twice)','Returning values instead of indices'],
+   code:`<span class="kw">def</span> <span class="fn">two_sum</span>(nums, target):
+    seen = {}  <span class="cm"># value → index</span>
+    <span class="kw">for</span> i, num <span class="kw">in</span> <span class="fn">enumerate</span>(nums):
+        complement = target - num
+        <span class="kw">if</span> complement <span class="kw">in</span> seen:
+            <span class="kw">return</span> [seen[complement], i]
+        seen[num] = i  <span class="cm"># store AFTER checking</span>
+    <span class="kw">return</span> []`},
+
+  {name:'Best Time to Buy and Sell Stock',diff:'Easy',time:'O(n)',space:'O(1)',pat:'Greedy',
+   stmt:'You are given an array <strong>prices</strong> where prices[i] is the stock price on day i. You want to <strong>maximize profit</strong> by choosing a single day to buy and a later day to sell. Return the maximum profit. If no profit is possible, return 0.',
+   examples:[
+    {input:'prices = [7,1,5,3,6,4]',output:'5',exp:'Buy on day 2 (price=1), sell on day 5 (price=6). Profit = 6−1 = 5'},
+    {input:'prices = [7,6,4,3,1]',output:'0',exp:'Prices only decrease. No transaction = profit 0'},
+    {input:'prices = [1,2]',output:'1',exp:'Buy day 0, sell day 1'},
+   ],
+   constraints:['1 ≤ prices.length ≤ 10⁵','0 ≤ prices[i] ≤ 10⁴'],
+   tests:[
+    {input:'[7,1,5,3,6,4]',output:'5',note:'Standard case'},
+    {input:'[7,6,4,3,1]',output:'0',note:'All decreasing → 0, not negative'},
+    {input:'[1]',output:'0',note:'Single element — no transaction possible'},
+    {input:'[1,2,3,4,5]',output:'4',note:'Buy day 0 sell day 4'},
+    {input:'[2,4,1,7]',output:'6',note:'Buy after initial peak'},
+   ],
+   hint:'Track the minimum price seen so far. At each price, compute profit = current − min_price. Update global max profit.',
+   approach:'min_price = infinity, max_profit = 0. For each price: update min_price = min(min_price, price). Then update max_profit = max(max_profit, price − min_price).',
+   pitfall:['Returning negative profit (return max(0, profit))','Two pointer approach: sell must come AFTER buy','Trying all pairs O(n²)'],
+   code:`<span class="kw">def</span> <span class="fn">max_profit</span>(prices):
+    min_price = <span class="fn">float</span>(<span class="st">'inf'</span>)
+    max_profit = <span class="nm">0</span>
+    <span class="kw">for</span> price <span class="kw">in</span> prices:
+        min_price = <span class="fn">min</span>(min_price, price)
+        max_profit = <span class="fn">max</span>(max_profit, price - min_price)
+    <span class="kw">return</span> max_profit`},
+
+  {name:'Maximum Subarray',diff:'Easy',time:'O(n)',space:'O(1)',pat:"Kadane's Algorithm",
+   stmt:'Given an integer array <strong>nums</strong>, find the subarray with the largest sum and return its sum. A subarray is a contiguous part of an array.',
+   examples:[
+    {input:'nums = [-2,1,-3,4,-1,2,1,-5,4]',output:'6',exp:'Subarray [4,−1,2,1] has the largest sum = 6'},
+    {input:'nums = [1]',output:'1',exp:'Single element'},
+    {input:'nums = [5,4,-1,7,8]',output:'23',exp:'Entire array: 5+4-1+7+8 = 23'},
+   ],
+   constraints:['1 ≤ nums.length ≤ 10⁵','−10⁴ ≤ nums[i] ≤ 10⁴'],
+   tests:[
+    {input:'[-2,1,-3,4,-1,2,1,-5,4]',output:'6',note:'Classic case'},
+    {input:'[-1,-2,-3]',output:'-1',note:'All negative → return least negative'},
+    {input:'[1]',output:'1',note:'Single element'},
+    {input:'[0,0,0]',output:'0',note:'All zeros'},
+   ],
+   hint:'If the running sum goes negative, it only hurts future elements. Reset to zero and start fresh. Key: max_sum must initialize to nums[0], not 0 (fails all-negative case).',
+   approach:'curr = max_sum = nums[0]. For each subsequent num: curr = max(num, curr + num). If curr > max_sum: update max_sum. Return max_sum.',
+   pitfall:['Initializing max_sum = 0 (fails all-negative arrays)','Resetting curr to 0 instead of nums[i] (also wrong for all-negative)'],
+   code:`<span class="kw">def</span> <span class="fn">max_subarray</span>(nums):
+    curr = max_sum = nums[<span class="nm">0</span>]
+    <span class="kw">for</span> num <span class="kw">in</span> nums[<span class="nm">1</span>:]:
+        curr = <span class="fn">max</span>(num, curr + num)
+        max_sum = <span class="fn">max</span>(max_sum, curr)
+    <span class="kw">return</span> max_sum`},
+
+  {name:'Product of Array Except Self',diff:'Medium',time:'O(n)',space:'O(1)',pat:'Prefix & Postfix',
+   stmt:'Given an integer array <strong>nums</strong>, return an array <strong>answer</strong> where answer[i] equals the product of all elements except nums[i]. You must solve it in O(n) without using division.',
+   examples:[
+    {input:'nums = [1,2,3,4]',output:'[24,12,8,6]',exp:'answer[0]=2*3*4=24, answer[1]=1*3*4=12, answer[2]=1*2*4=8, answer[3]=1*2*3=6'},
+    {input:'nums = [-1,1,0,-3,3]',output:'[0,0,9,0,0]',exp:'Zero causes many zeros; only position of zero gets non-zero'},
+   ],
+   constraints:['2 ≤ nums.length ≤ 10⁵','−30 ≤ nums[i] ≤ 30','The product fits in a 32-bit integer'],
+   tests:[
+    {input:'[1,2,3,4]',output:'[24,12,8,6]',note:'Standard'},
+    {input:'[0,1,2]',output:'[2,0,0]',note:'One zero'},
+    {input:'[0,0,1]',output:'[0,0,0]',note:'Two zeros → all zeros'},
+    {input:'[-1,-2,-3]',output:'[6,3,2]',note:'Negatives'},
+   ],
+   hint:'Pass 1 (left→right): result[i] = product of everything LEFT of i. Pass 2 (right→left): multiply result[i] by running product of everything RIGHT of i.',
+   approach:'result = [1]*n. prefix=1, scan left to right: result[i]=prefix, prefix*=nums[i]. postfix=1, scan right to left: result[i]*=postfix, postfix*=nums[i].',
+   pitfall:['Using division (fails when array contains zero)','Using O(n) extra arrays when you can do it in-place'],
+   code:`<span class="kw">def</span> <span class="fn">product_except_self</span>(nums):
+    n = <span class="fn">len</span>(nums)
+    res = [<span class="nm">1</span>] * n
+    prefix = <span class="nm">1</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        res[i] = prefix
+        prefix *= nums[i]
+    postfix = <span class="nm">1</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n - <span class="nm">1</span>, -<span class="nm">1</span>, -<span class="nm">1</span>):
+        res[i] *= postfix
+        postfix *= nums[i]
+    <span class="kw">return</span> res`},
+
+  {name:'Container With Most Water',diff:'Medium',time:'O(n)',space:'O(1)',pat:'Two Pointers',
+   stmt:'You are given integer array <strong>height</strong> of length n. There are n vertical lines. Find two lines that together with the x-axis form a container that holds the most water. Return the maximum amount of water.',
+   examples:[
+    {input:'height = [1,8,6,2,5,4,8,3,7]',output:'49',exp:'Lines at index 1 (h=8) and 8 (h=7). Width=7, height=min(8,7)=7. Area=49'},
+    {input:'height = [1,1]',output:'1',exp:'Area = min(1,1) * 1 = 1'},
+   ],
+   constraints:['n = height.length ≥ 2','0 ≤ height[i] ≤ 10⁴'],
+   tests:[
+    {input:'[1,8,6,2,5,4,8,3,7]',output:'49',note:'Classic'},
+    {input:'[1,1]',output:'1',note:'Minimum case'},
+    {input:'[4,3,2,1,4]',output:'16',note:'Same height endpoints'},
+    {input:'[1,2,1]',output:'2',note:'Move shorter pointer'},
+   ],
+   hint:'Two pointers at both ends. Area = min(height[l], height[r]) * (r−l). Moving the taller side inward can only decrease area — always move the shorter side.',
+   approach:'l=0, r=n-1. best=0. While l<r: best=max(best, min(h[l],h[r])*(r-l)). if h[l]<h[r]: l++ else r--.',
+   pitfall:['Moving the taller side (misses potential larger area)','Forgetting to update best before moving pointer'],
+   code:`<span class="kw">def</span> <span class="fn">max_area</span>(height):
+    l, r = <span class="nm">0</span>, <span class="fn">len</span>(height) - <span class="nm">1</span>
+    best = <span class="nm">0</span>
+    <span class="kw">while</span> l < r:
+        best = <span class="fn">max</span>(best, <span class="fn">min</span>(height[l], height[r]) * (r - l))
+        <span class="kw">if</span> height[l] < height[r]:
+            l += <span class="nm">1</span>
+        <span class="kw">else</span>:
+            r -= <span class="nm">1</span>
+    <span class="kw">return</span> best`},
+
+  {name:'Trapping Rain Water',diff:'Hard',time:'O(n)',space:'O(1)',pat:'Two Pointers',
+   stmt:'Given <strong>n</strong> non-negative integers representing an elevation map where the width of each bar is 1, compute how much water can be trapped after raining.',
+   examples:[
+    {input:'height = [0,1,0,2,1,0,1,3,2,1,2,1]',output:'6',exp:'Water is trapped in the valleys. Total 6 units.'},
+    {input:'height = [4,2,0,3,2,5]',output:'9',exp:'9 units of water trapped'},
+   ],
+   constraints:['n == height.length','1 ≤ n ≤ 2×10⁴','0 ≤ height[i] ≤ 10⁵'],
+   tests:[
+    {input:'[0,1,0,2,1,0,1,3,2,1,2,1]',output:'6',note:'Classic'},
+    {input:'[4,2,0,3,2,5]',output:'9',note:''},
+    {input:'[3,0,3]',output:'3',note:'Simple valley'},
+    {input:'[1,2,3]',output:'0',note:'Monotone increasing → no water'},
+    {input:'[3,3,3]',output:'0',note:'Flat → no water'},
+   ],
+   hint:'Water at position i = min(maxLeft, maxRight) − height[i]. Two pointers: whichever side has smaller max is the binding constraint — process that side.',
+   approach:'l=0, r=n-1, leftMax=rightMax=0, water=0. While l<r: if height[l]≤height[r]: update leftMax, water+=leftMax-height[l], l++. Else: update rightMax, water+=rightMax-height[r], r--.',
+   pitfall:['Using O(n) precomputed arrays (valid but not optimal)','Confusing leftMax update — must take max with current height'],
+   code:`<span class="kw">def</span> <span class="fn">trap</span>(height):
+    l, r = <span class="nm">0</span>, <span class="fn">len</span>(height) - <span class="nm">1</span>
+    left_max = right_max = water = <span class="nm">0</span>
+    <span class="kw">while</span> l < r:
+        <span class="kw">if</span> height[l] <= height[r]:
+            left_max = <span class="fn">max</span>(left_max, height[l])
+            water += left_max - height[l]
+            l += <span class="nm">1</span>
+        <span class="kw">else</span>:
+            right_max = <span class="fn">max</span>(right_max, height[r])
+            water += right_max - height[r]
+            r -= <span class="nm">1</span>
+    <span class="kw">return</span> water`},
+
+  {name:'3Sum',diff:'Medium',time:'O(n²)',space:'O(1)',pat:'Sort + Two Pointers',
+   stmt:'Given an integer array <strong>nums</strong>, return all triplets [nums[i], nums[j], nums[k]] where i≠j≠k and nums[i]+nums[j]+nums[k]=0. The answer must not contain duplicate triplets.',
+   examples:[
+    {input:'nums = [-1,0,1,2,-1,-4]',output:'[[-1,-1,2],[-1,0,1]]',exp:'Two unique triplets that sum to 0'},
+    {input:'nums = [0,1,1]',output:'[]',exp:'No valid triplet'},
+    {input:'nums = [0,0,0]',output:'[[0,0,0]]',exp:'Only one unique triplet'},
+   ],
+   constraints:['3 ≤ nums.length ≤ 3000','−10⁵ ≤ nums[i] ≤ 10⁵'],
+   tests:[
+    {input:'[-1,0,1,2,-1,-4]',output:'[[-1,-1,2],[-1,0,1]]',note:'Classic'},
+    {input:'[0,0,0,0]',output:'[[0,0,0]]',note:'All zeros — only one unique triplet'},
+    {input:'[1,2,3]',output:'[]',note:'No triplet sums to 0'},
+    {input:'[-4,-2,-2,-2,0,1,2,2,2,3,3,4,4,6,6]',output:'many',note:'Many duplicates to skip'},
+   ],
+   hint:'Sort first. Fix one element (index i), use two pointers for the other two. Skip duplicates at both the outer loop and after finding a match.',
+   approach:'Sort. For i in range(n): skip if nums[i]>0 (sorted, no solution possible) or duplicate. l=i+1,r=n-1. Sum==0: append, skip dups on both sides. Sum<0: l++. Sum>0: r--.',
+   pitfall:['Skipping duplicate i values: if i>0 and nums[i]==nums[i-1]: continue','After match: while nums[l]==nums[l+1]: l++ to skip dups'],
+   code:`<span class="kw">def</span> <span class="fn">three_sum</span>(nums):
+    nums.sort()
+    res = []
+    <span class="kw">for</span> i, a <span class="kw">in</span> <span class="fn">enumerate</span>(nums):
+        <span class="kw">if</span> a > <span class="nm">0</span>: <span class="kw">break</span>
+        <span class="kw">if</span> i > <span class="nm">0</span> <span class="kw">and</span> a == nums[i - <span class="nm">1</span>]: <span class="kw">continue</span>
+        l, r = i + <span class="nm">1</span>, <span class="fn">len</span>(nums) - <span class="nm">1</span>
+        <span class="kw">while</span> l < r:
+            s = a + nums[l] + nums[r]
+            <span class="kw">if</span> s < <span class="nm">0</span>:
+                l += <span class="nm">1</span>
+            <span class="kw">elif</span> s > <span class="nm">0</span>:
+                r -= <span class="nm">1</span>
+            <span class="kw">else</span>:
+                res.append([a, nums[l], nums[r]])
+                <span class="kw">while</span> l < r <span class="kw">and</span> nums[l] == nums[l+<span class="nm">1</span>]: l += <span class="nm">1</span>
+                <span class="kw">while</span> l < r <span class="kw">and</span> nums[r] == nums[r-<span class="nm">1</span>]: r -= <span class="nm">1</span>
+                l += <span class="nm">1</span>; r -= <span class="nm">1</span>
+    <span class="kw">return</span> res`},
+
+  {name:'Merge Intervals',diff:'Medium',time:'O(n log n)',space:'O(n)',pat:'Sort + Greedy',
+   stmt:'Given an array of <strong>intervals</strong> where intervals[i] = [start_i, end_i], merge all overlapping intervals and return the resulting array.',
+   examples:[
+    {input:'intervals = [[1,3],[2,6],[8,10],[15,18]]',output:'[[1,6],[8,10],[15,18]]',exp:'[1,3] and [2,6] overlap → [1,6]'},
+    {input:'intervals = [[1,4],[4,5]]',output:'[[1,5]]',exp:'Touching intervals are considered overlapping'},
+   ],
+   constraints:['1 ≤ intervals.length ≤ 10⁴','0 ≤ start_i ≤ end_i ≤ 10⁴'],
+   tests:[
+    {input:'[[1,3],[2,6],[8,10],[15,18]]',output:'[[1,6],[8,10],[15,18]]',note:'Classic'},
+    {input:'[[1,4],[4,5]]',output:'[[1,5]]',note:'Touching boundary'},
+    {input:'[[1,4],[0,4]]',output:'[[0,4]]',note:'Fully contained'},
+    {input:'[[1,4],[2,3]]',output:'[[1,4]]',note:'Inner swallowed by outer'},
+   ],
+   hint:'Sort by start time. Then for each interval: if it overlaps with the last merged interval (curr.start ≤ last.end), extend last.end = max(last.end, curr.end). Otherwise append.',
+   approach:'Sort intervals. result = [intervals[0]]. For each [start, end] in intervals[1:]: if start ≤ result[-1][1]: result[-1][1] = max(result[-1][1], end). Else: result.append([start, end]).',
+   pitfall:['Not sorting first','Taking max of ends — a smaller interval fully contained in the last one would shrink the end'],
+   code:`<span class="kw">def</span> <span class="fn">merge</span>(intervals):
+    intervals.sort()
+    res = [intervals[<span class="nm">0</span>]]
+    <span class="kw">for</span> start, end <span class="kw">in</span> intervals[<span class="nm">1</span>:]:
+        <span class="kw">if</span> start <= res[-<span class="nm">1</span>][<span class="nm">1</span>]:
+            res[-<span class="nm">1</span>][<span class="nm">1</span>] = <span class="fn">max</span>(res[-<span class="nm">1</span>][<span class="nm">1</span>], end)
+        <span class="kw">else</span>:
+            res.append([start, end])
+    <span class="kw">return</span> res`},
+ ]},
+
+{id:'linked-lists',icon:'⛓',title:'Linked Lists',color:'#1abc9c',
+ intro:'Linked list problems test pointer manipulation. Always draw a diagram. The fast/slow pointer solves cycles, midpoints, and k-th from end. Use a dummy head to simplify edge cases.',
+ qs:[
+  {name:'Reverse a Linked List',diff:'Easy',time:'O(n)',space:'O(1)',pat:'Pointer Manipulation',
+   stmt:'Given the <strong>head</strong> of a singly linked list, reverse the list and return the reversed list.',
+   examples:[
+    {input:'head = [1,2,3,4,5]',output:'[5,4,3,2,1]',exp:''},
+    {input:'head = [1,2]',output:'[2,1]',exp:''},
+    {input:'head = []',output:'[]',exp:'Empty list'},
+   ],
+   constraints:['0 ≤ n ≤ 5000','−5000 ≤ Node.val ≤ 5000'],
+   tests:[
+    {input:'[1→2→3→4→5]',output:'[5→4→3→2→1]',note:'Standard'},
+    {input:'[1]',output:'[1]',note:'Single node'},
+    {input:'[]',output:'[]',note:'Empty'},
+    {input:'[1→2]',output:'[2→1]',note:'Two nodes'},
+   ],
+   hint:'Three variables: prev=None, curr=head, next. Each step: save next, flip curr.next to prev, advance both. When curr is None, prev is the new head.',
+   approach:'prev=None, curr=head. While curr: nxt=curr.next, curr.next=prev, prev=curr, curr=nxt. Return prev.',
+   pitfall:['Losing reference to next before overwriting curr.next','Returning curr instead of prev at end (curr is None when loop ends)'],
+   code:`<span class="kw">def</span> <span class="fn">reverse_list</span>(head):
+    prev, curr = <span class="kw">None</span>, head
+    <span class="kw">while</span> curr:
+        nxt = curr.next      <span class="cm"># 1. save next</span>
+        curr.next = prev     <span class="cm"># 2. flip pointer</span>
+        prev = curr          <span class="cm"># 3. advance prev</span>
+        curr = nxt           <span class="cm"># 4. advance curr</span>
+    <span class="kw">return</span> prev`},
+
+  {name:'Linked List Cycle',diff:'Easy',time:'O(n)',space:'O(1)',pat:"Floyd's Algorithm",
+   stmt:'Given the head of a linked list, determine if the linked list has a cycle in it. A cycle means some node can be reached again by following next pointers.',
+   examples:[
+    {input:'head = [3,2,0,-4], pos=1',output:'true',exp:'Tail connects back to node at index 1 (value 2)'},
+    {input:'head = [1,2], pos=0',output:'true',exp:'Tail connects to head'},
+    {input:'head = [1], pos=-1',output:'false',exp:'No cycle (pos=-1 means tail connects to null)'},
+   ],
+   constraints:['0 ≤ n ≤ 10⁴','pos = -1 or valid index'],
+   tests:[
+    {input:'[1→2→3→2...] (cycle)',output:'true',note:''},
+    {input:'[1→2→3→None]',output:'false',note:'No cycle'},
+    {input:'[1] (self-loop)',output:'true',note:''},
+    {input:'[] (empty)',output:'false',note:''},
+   ],
+   hint:'Slow pointer moves 1 step, fast moves 2 steps. If they ever meet, there\'s a cycle. If fast reaches None, no cycle. Think of it like two runners on a circular track.',
+   approach:'slow=fast=head. While fast and fast.next: slow=slow.next, fast=fast.next.next. If slow==fast: return True. Return False.',
+   pitfall:['Checking fast only (not fast.next) before fast.next.next — causes NoneType error'],
+   code:`<span class="kw">def</span> <span class="fn">has_cycle</span>(head):
+    slow = fast = head
+    <span class="kw">while</span> fast <span class="kw">and</span> fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        <span class="kw">if</span> slow <span class="kw">is</span> fast:
+            <span class="kw">return True</span>
+    <span class="kw">return False</span>`},
+
+  {name:'Merge Two Sorted Lists',diff:'Easy',time:'O(m+n)',space:'O(1)',pat:'Two Pointers',
+   stmt:'You are given the heads of two sorted linked lists <strong>list1</strong> and <strong>list2</strong>. Merge the two lists into one sorted list. Return the head of the merged list.',
+   examples:[
+    {input:'list1=[1,2,4], list2=[1,3,4]',output:'[1,1,2,3,4,4]',exp:''},
+    {input:'list1=[], list2=[]',output:'[]',exp:'Both empty'},
+    {input:'list1=[], list2=[0]',output:'[0]',exp:'One empty'},
+   ],
+   constraints:['0 ≤ n, m ≤ 50','−100 ≤ Node.val ≤ 100','Both lists are sorted'],
+   tests:[
+    {input:'[1,2,4] + [1,3,4]',output:'[1,1,2,3,4,4]',note:''},
+    {input:'[] + []',output:'[]',note:'Both empty'},
+    {input:'[] + [0]',output:'[0]',note:'One empty'},
+    {input:'[1] + [1]',output:'[1,1]',note:'Equal values'},
+   ],
+   hint:'Use a dummy head node to simplify the logic — no special case for the first node. Compare heads of both lists, attach the smaller one, advance that pointer.',
+   approach:'dummy=ListNode(0), curr=dummy. While both lists: attach smaller, advance. Attach remainder. Return dummy.next.',
+   pitfall:['Not using dummy head (forces awkward head handling)','Forgetting to attach the remaining list at the end'],
+   code:`<span class="kw">def</span> <span class="fn">merge_two_lists</span>(l1, l2):
+    dummy = curr = ListNode(<span class="nm">0</span>)
+    <span class="kw">while</span> l1 <span class="kw">and</span> l2:
+        <span class="kw">if</span> l1.val <= l2.val:
+            curr.next = l1; l1 = l1.next
+        <span class="kw">else</span>:
+            curr.next = l2; l2 = l2.next
+        curr = curr.next
+    curr.next = l1 <span class="kw">or</span> l2  <span class="cm"># attach remainder</span>
+    <span class="kw">return</span> dummy.next`},
+
+  {name:'Remove Nth Node From End',diff:'Medium',time:'O(n)',space:'O(1)',pat:'Fast & Slow Pointers',
+   stmt:'Given the head of a linked list, remove the n-th node from the end of the list and return its head.',
+   examples:[
+    {input:'head=[1,2,3,4,5], n=2',output:'[1,2,3,5]',exp:'Remove 4th node (2nd from end)'},
+    {input:'head=[1], n=1',output:'[]',exp:'Remove only node'},
+    {input:'head=[1,2], n=1',output:'[1]',exp:'Remove last'},
+   ],
+   constraints:['1 ≤ n ≤ list length','1 ≤ sz ≤ 30'],
+   tests:[
+    {input:'[1,2,3,4,5], n=2',output:'[1,2,3,5]',note:''},
+    {input:'[1], n=1',output:'[]',note:'Remove only node'},
+    {input:'[1,2], n=2',output:'[2]',note:'Remove head'},
+    {input:'[1,2], n=1',output:'[1]',note:'Remove tail'},
+   ],
+   hint:'Two pointers n+1 apart. When right hits None, left.next is the target. Use a dummy head to handle removing the actual head cleanly.',
+   approach:'dummy→head. left=dummy, right=head. Advance right n times. Then advance both until right is None. left.next = left.next.next.',
+   pitfall:['Off-by-one: advance n steps vs n+1 steps (advance n+1 from dummy, or n from head with left starting at dummy)','Not using dummy (fails when removing head)'],
+   code:`<span class="kw">def</span> <span class="fn">remove_nth_from_end</span>(head, n):
+    dummy = ListNode(<span class="nm">0</span>, head)
+    left, right = dummy, head
+    <span class="kw">while</span> n > <span class="nm">0</span>:
+        right = right.next
+        n -= <span class="nm">1</span>
+    <span class="kw">while</span> right:
+        left = left.next
+        right = right.next
+    left.next = left.next.next
+    <span class="kw">return</span> dummy.next`},
+
+  {name:'LRU Cache',diff:'Medium',time:'O(1)',space:'O(capacity)',pat:'Hash Map + DLL',
+   stmt:'Design a data structure that follows the <strong>Least Recently Used (LRU)</strong> cache constraint. Implement <strong>get(key)</strong> and <strong>put(key, value)</strong>, both in O(1). When capacity is reached, evict the least recently used key.',
+   examples:[
+    {input:'LRUCache(2), put(1,1), put(2,2), get(1), put(3,3), get(2), put(4,4), get(1), get(3), get(4)',output:'get(1)=1, get(2)=-1, get(1)=1, get(3)=3, get(4)=4',exp:'After put(3): key 2 evicted (LRU). After put(4): key 1 was used recently, key 3 evicted.'},
+   ],
+   constraints:['1 ≤ capacity ≤ 3000','0 ≤ key, value ≤ 10⁴','At most 2×10⁵ get/put calls'],
+   tests:[
+    {input:'capacity=1, put(1,1), put(2,2), get(1)',output:'-1',note:'Capacity 1: put(2) evicts key 1'},
+    {input:'capacity=2, put(1,1), get(1), put(2,2), put(3,3), get(1)',output:'get(1)=1 first time, -1 after eviction',note:''},
+   ],
+   hint:'Hash map for O(1) key lookup + doubly linked list to track recency. Move accessed node to front (most recent). Evict from the back (least recent). Use dummy head and tail nodes.',
+   approach:'Map: key→node. DLL: head=most recent, tail=least recent (dummies). get(): if key exists, move to front, return val. put(): if exists, update+move front. If new, add front. If over cap, evict tail.prev.',
+   pitfall:['Using OrderedDict works but less educational','Forgetting to delete from map when evicting','Not handling update-existing key (must move to front too)'],
+   code:`<span class="kw">class</span> <span class="tp">Node</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, k=<span class="nm">0</span>, v=<span class="nm">0</span>):
+        self.key, self.val = k, v
+        self.prev = self.next = <span class="kw">None</span>
+
+<span class="kw">class</span> <span class="tp">LRUCache</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, cap):
+        self.cap = cap; self.map = {}
+        self.head, self.tail = Node(), Node()
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    <span class="kw">def</span> <span class="fn">_remove</span>(self, n):
+        n.prev.next, n.next.prev = n.next, n.prev
+
+    <span class="kw">def</span> <span class="fn">_add_front</span>(self, n):
+        n.next = self.head.next; n.prev = self.head
+        self.head.next.prev = n; self.head.next = n
+
+    <span class="kw">def</span> <span class="fn">get</span>(self, key):
+        <span class="kw">if</span> key <span class="kw">in</span> self.map:
+            self._remove(self.map[key])
+            self._add_front(self.map[key])
+            <span class="kw">return</span> self.map[key].val
+        <span class="kw">return</span> -<span class="nm">1</span>
+
+    <span class="kw">def</span> <span class="fn">put</span>(self, key, val):
+        <span class="kw">if</span> key <span class="kw">in</span> self.map:
+            self._remove(self.map[key])
+        node = Node(key, val)
+        self.map[key] = node; self._add_front(node)
+        <span class="kw">if</span> <span class="fn">len</span>(self.map) > self.cap:
+            lru = self.tail.prev
+            self._remove(lru); <span class="kw">del</span> self.map[lru.key]`},
+ ]},
+
+{id:'trees',icon:'🌳',title:'Trees',color:'#9b59b6',
+ intro:'Define what your recursive function RETURNS before writing it — this insight solves 80% of tree problems. DFS for path/structural problems. BFS for level-by-level processing.',
+ qs:[
+  {name:'Maximum Depth of Binary Tree',diff:'Easy',time:'O(n)',space:'O(h)',pat:'DFS Recursion',
+   stmt:'Given the root of a binary tree, return its maximum depth. Maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.',
+   examples:[
+    {input:'root = [3,9,20,null,null,15,7]',output:'3',exp:'Longest path: 3→20→15 or 3→20→7 = 3 levels'},
+    {input:'root = [1,null,2]',output:'2',exp:''},
+   ],
+   constraints:['0 ≤ nodes ≤ 10⁴','−100 ≤ Node.val ≤ 100'],
+   tests:[
+    {input:'[3,9,20,null,null,15,7]',output:'3',note:''},
+    {input:'[]',output:'0',note:'Empty tree'},
+    {input:'[1]',output:'1',note:'Single node'},
+    {input:'[1,null,2,null,3]',output:'3',note:'Skewed tree'},
+   ],
+   hint:'If node is None, return 0. Otherwise return 1 + max(depth(left), depth(right)). The function returns the height of the subtree rooted at each node.',
+   approach:'Base case: if not root, return 0. Recursive case: return 1 + max(maxDepth(root.left), maxDepth(root.right)).',
+   pitfall:['Returning 0 for leaf nodes (should return 1 — they have depth 1)','Forgetting the +1 for the current node'],
+   code:`<span class="kw">def</span> <span class="fn">max_depth</span>(root):
+    <span class="kw">if not</span> root:
+        <span class="kw">return</span> <span class="nm">0</span>
+    left  = max_depth(root.left)
+    right = max_depth(root.right)
+    <span class="kw">return</span> <span class="nm">1</span> + <span class="fn">max</span>(left, right)`},
+
+  {name:'Invert Binary Tree',diff:'Easy',time:'O(n)',space:'O(h)',pat:'DFS Recursion',
+   stmt:'Given the root of a binary tree, invert it (mirror it), and return its root.',
+   examples:[
+    {input:'root = [4,2,7,1,3,6,9]',output:'[4,7,2,9,6,3,1]',exp:'Swap left and right subtrees at every node'},
+    {input:'root = [2,1,3]',output:'[2,3,1]',exp:''},
+   ],
+   constraints:['0 ≤ n ≤ 100','−100 ≤ Node.val ≤ 100'],
+   tests:[
+    {input:'[4,2,7,1,3,6,9]',output:'[4,7,2,9,6,3,1]',note:''},
+    {input:'[]',output:'[]',note:'Empty'},
+    {input:'[1]',output:'[1]',note:'Single node'},
+   ],
+   hint:'Swap left and right children at the current node, then recursively invert both subtrees.',
+   approach:'If not root: return None. Swap: root.left, root.right = root.right, root.left. Recurse on both children. Return root.',
+   pitfall:['Inverting children before swapping (results in duplicate work)'],
+   code:`<span class="kw">def</span> <span class="fn">invert_tree</span>(root):
+    <span class="kw">if not</span> root:
+        <span class="kw">return None</span>
+    root.left, root.right = root.right, root.left
+    invert_tree(root.left)
+    invert_tree(root.right)
+    <span class="kw">return</span> root`},
+
+  {name:'Validate BST',diff:'Medium',time:'O(n)',space:'O(h)',pat:'DFS with Bounds',
+   stmt:'Given the root of a binary tree, determine if it is a valid binary search tree (BST). A valid BST: left subtree has only values < node.val. Right subtree has only values > node.val. Both subtrees must also be valid BSTs.',
+   examples:[
+    {input:'root = [2,1,3]',output:'true',exp:'1 < 2 < 3 ✓'},
+    {input:'root = [5,1,4,null,null,3,6]',output:'false',exp:'Root is 5 but right child is 4 < 5. Invalid.'},
+   ],
+   constraints:['1 ≤ n ≤ 10⁴','−2³¹ ≤ Node.val ≤ 2³¹−1'],
+   tests:[
+    {input:'[2,1,3]',output:'true',note:''},
+    {input:'[5,1,4,null,null,3,6]',output:'false',note:'Right child 4 < root 5'},
+    {input:'[5,4,6,null,null,3,7]',output:'false',note:'3 is in right subtree but 3 < 5 (root)'},
+    {input:'[2,2,2]',output:'false',note:'Duplicates not allowed in BST'},
+   ],
+   hint:'Pass min and max bounds through recursion. Every node must satisfy min < node.val < max. Left subtree: max becomes node.val. Right subtree: min becomes node.val.',
+   approach:'dfs(node, lo=-inf, hi=+inf): if not node: return True. if not (lo < node.val < hi): return False. return dfs(left, lo, node.val) and dfs(right, node.val, hi).',
+   pitfall:['Only comparing with immediate parent — misses violations across levels: [5,4,6,null,null,3,7] passes parent check but 3 < 5'],
+   code:`<span class="kw">def</span> <span class="fn">is_valid_bst</span>(root):
+    <span class="kw">def</span> <span class="fn">dfs</span>(node, lo, hi):
+        <span class="kw">if not</span> node: <span class="kw">return True</span>
+        <span class="kw">if not</span> (lo < node.val < hi): <span class="kw">return False</span>
+        <span class="kw">return</span> (dfs(node.left, lo, node.val) <span class="kw">and</span>
+                dfs(node.right, node.val, hi))
+    <span class="kw">return</span> dfs(root, <span class="fn">float</span>(<span class="st">'-inf'</span>), <span class="fn">float</span>(<span class="st">'inf'</span>))`},
+
+  {name:'Binary Tree Level Order Traversal',diff:'Medium',time:'O(n)',space:'O(n)',pat:'BFS',
+   stmt:'Given the root of a binary tree, return the level order traversal of its nodes\' values (i.e., from left to right, level by level).',
+   examples:[
+    {input:'root = [3,9,20,null,null,15,7]',output:'[[3],[9,20],[15,7]]',exp:'Level 0: [3], Level 1: [9,20], Level 2: [15,7]'},
+    {input:'root = [1]',output:'[[1]]',exp:'Single node'},
+    {input:'root = []',output:'[]',exp:'Empty tree'},
+   ],
+   constraints:['0 ≤ n ≤ 2000','−1000 ≤ Node.val ≤ 1000'],
+   tests:[
+    {input:'[3,9,20,null,null,15,7]',output:'[[3],[9,20],[15,7]]',note:''},
+    {input:'[]',output:'[]',note:'Empty'},
+    {input:'[1]',output:'[[1]]',note:'Single'},
+    {input:'[1,2,3,4,5]',output:'[[1],[2,3],[4,5]]',note:''},
+   ],
+   hint:'Use a deque. The key trick: snapshot len(queue) before the inner loop. This tells you how many nodes are on the current level.',
+   approach:'deque([root]). While queue: level=[]. For _ in range(len(queue)): pop left, append val, add children. Append level to result.',
+   pitfall:['Not snapshotting len(queue) — new children added during loop would be included in same level'],
+   code:`<span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">def</span> <span class="fn">level_order</span>(root):
+    <span class="kw">if not</span> root: <span class="kw">return</span> []
+    res, q = [], deque([root])
+    <span class="kw">while</span> q:
+        level = []
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(q)):  <span class="cm"># snapshot!</span>
+            node = q.popleft()
+            level.append(node.val)
+            <span class="kw">if</span> node.left:  q.append(node.left)
+            <span class="kw">if</span> node.right: q.append(node.right)
+        res.append(level)
+    <span class="kw">return</span> res`},
+
+  {name:'Binary Tree Maximum Path Sum',diff:'Hard',time:'O(n)',space:'O(h)',pat:'DFS + Global State',
+   stmt:'A path in a binary tree is any sequence of nodes where each pair of adjacent nodes has an edge. The path does not need to go through the root. Given root, return the maximum path sum.',
+   examples:[
+    {input:'root = [1,2,3]',output:'6',exp:'Path: 2→1→3 = 6'},
+    {input:'root = [-10,9,20,null,null,15,7]',output:'42',exp:'Path: 15→20→7 = 42'},
+   ],
+   constraints:['1 ≤ n ≤ 3×10⁴','−1000 ≤ Node.val ≤ 1000'],
+   tests:[
+    {input:'[1,2,3]',output:'6',note:'2+1+3'},
+    {input:'[-10,9,20,null,null,15,7]',output:'42',note:'15+20+7'},
+    {input:'[-3]',output:'-3',note:'Single negative node'},
+    {input:'[-1,-2,-3]',output:'-1',note:'All negative — return max single node'},
+   ],
+   hint:'At each node: max path THROUGH it = node.val + max(0,left) + max(0,right). But we can only pass ONE branch up to parent. So return node.val + max(0, left, right) upward.',
+   approach:'Global res=[root.val]. dfs(node) returns best single-arm gain. Inside: compute full path = val+max(0,left)+max(0,right), update res. Return val+max(0,left,right).',
+   pitfall:['Returning two-arm sum to parent (path would bend — invalid)','Not clamping negative branches to 0'],
+   code:`<span class="kw">def</span> <span class="fn">max_path_sum</span>(root):
+    res = [root.val]
+    <span class="kw">def</span> <span class="fn">dfs</span>(node):
+        <span class="kw">if not</span> node: <span class="kw">return</span> <span class="nm">0</span>
+        left  = <span class="fn">max</span>(dfs(node.left),  <span class="nm">0</span>)
+        right = <span class="fn">max</span>(dfs(node.right), <span class="nm">0</span>)
+        <span class="cm"># path going through this node</span>
+        res[<span class="nm">0</span>] = <span class="fn">max</span>(res[<span class="nm">0</span>], node.val + left + right)
+        <span class="cm"># only ONE arm can go up to parent</span>
+        <span class="kw">return</span> node.val + <span class="fn">max</span>(left, right)
+    dfs(root)
+    <span class="kw">return</span> res[<span class="nm">0</span>]`},
+ ]},
+
+{id:'dp',icon:'💎',title:'Dynamic Programming',color:'#e67e22',
+ intro:'The discipline: define dp[i] in plain English BEFORE writing code. Write the recurrence. Then implement. Start with top-down memoization, then optimize to bottom-up tabulation.',
+ qs:[
+  {name:'Climbing Stairs',diff:'Easy',time:'O(n)',space:'O(1)',pat:'1D DP / Fibonacci',
+   stmt:'You are climbing a staircase. It takes <strong>n</strong> steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?',
+   examples:[
+    {input:'n = 2',output:'2',exp:'Two ways: 1+1 or 2'},
+    {input:'n = 3',output:'3',exp:'Three ways: 1+1+1, 1+2, 2+1'},
+   ],
+   constraints:['1 ≤ n ≤ 45'],
+   tests:[
+    {input:'n=1',output:'1',note:'Only one way: step 1'},
+    {input:'n=2',output:'2',note:''},
+    {input:'n=3',output:'3',note:''},
+    {input:'n=5',output:'8',note:'It\'s the Fibonacci sequence!'},
+   ],
+   hint:'To reach step n, you came from step n-1 (1 step) OR step n-2 (2 steps). So ways(n) = ways(n-1) + ways(n-2). This is exactly Fibonacci.',
+   approach:'dp[1]=1, dp[2]=2. For i≥3: dp[i]=dp[i-1]+dp[i-2]. Optimize: only keep last two values.',
+   pitfall:['Initializing incorrectly: dp[0]=1, dp[1]=1 also works but needs care with indexing'],
+   code:`<span class="kw">def</span> <span class="fn">climb_stairs</span>(n):
+    <span class="kw">if</span> n <= <span class="nm">2</span>: <span class="kw">return</span> n
+    a, b = <span class="nm">1</span>, <span class="nm">2</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>, n + <span class="nm">1</span>):
+        a, b = b, a + b  <span class="cm"># slide forward</span>
+    <span class="kw">return</span> b`},
+
+  {name:'House Robber',diff:'Medium',time:'O(n)',space:'O(1)',pat:'1D DP',
+   stmt:'You are a robber planning to rob houses along a street. You cannot rob two adjacent houses (alerts police). Given <strong>nums</strong> representing the amount of money in each house, return the maximum amount you can rob.',
+   examples:[
+    {input:'nums = [1,2,3,1]',output:'4',exp:'Rob house 1 (1) then house 3 (3). Total = 4'},
+    {input:'nums = [2,7,9,3,1]',output:'12',exp:'Rob house 1 (2), house 3 (9), house 5 (1). Total = 12'},
+   ],
+   constraints:['1 ≤ nums.length ≤ 100','0 ≤ nums[i] ≤ 400'],
+   tests:[
+    {input:'[1,2,3,1]',output:'4',note:''},
+    {input:'[2,7,9,3,1]',output:'12',note:''},
+    {input:'[1]',output:'1',note:'Single house'},
+    {input:'[2,1]',output:'2',note:'Rob first'},
+    {input:'[1,1,1,1]',output:'2',note:'Alternate'},
+   ],
+   hint:'dp[i] = max money robbing up to house i. Either rob house i (skip i-1): nums[i]+dp[i-2], or skip house i: dp[i-1]. Take the max.',
+   approach:'prev2=0, prev1=0. For each num: curr=max(prev1, num+prev2). Slide: prev2=prev1, prev1=curr. Return prev1.',
+   pitfall:['Using dp array when two variables suffice','Wrong base cases for single or two houses'],
+   code:`<span class="kw">def</span> <span class="fn">rob</span>(nums):
+    prev2 = prev1 = <span class="nm">0</span>
+    <span class="kw">for</span> n <span class="kw">in</span> nums:
+        curr = <span class="fn">max</span>(prev1, n + prev2)
+        prev2, prev1 = prev1, curr
+    <span class="kw">return</span> prev1`},
+
+  {name:'Coin Change',diff:'Medium',time:'O(n·amount)',space:'O(amount)',pat:'Unbounded Knapsack',
+   stmt:'You are given an integer array <strong>coins</strong> representing coins of different denominations and an integer <strong>amount</strong>. Return the fewest number of coins to make up that amount. If it is impossible, return -1.',
+   examples:[
+    {input:'coins=[1,5,10,25], amount=41',output:'3',exp:'25 + 10 + 5 + 1? No: 25+10+5+1=41 is 4 coins. Best: 25+16? No. 25+10+5+1=41→4 coins. Actually: 25+10+5+1=41 is 4. Wait: 25+16 impossible with given coins. The answer for this example would be: 41=25+10+5+1=4 coins.'},
+    {input:'coins=[1,2,5], amount=11',output:'3',exp:'5+5+1=11'},
+    {input:'coins=[2], amount=3',output:'-1',exp:'Cannot make 3 with only 2s'},
+   ],
+   constraints:['1 ≤ coins.length ≤ 12','1 ≤ coins[i] ≤ 2³¹−1','0 ≤ amount ≤ 10⁴'],
+   tests:[
+    {input:'coins=[1,2,5], amount=11',output:'3',note:'5+5+1'},
+    {input:'coins=[2], amount=3',output:'-1',note:'Impossible'},
+    {input:'coins=[1], amount=0',output:'0',note:'Amount 0 → 0 coins'},
+    {input:'coins=[1,5,10,25], amount=30',output:'2',note:'25+5 = 2 coins'},
+   ],
+   hint:'dp[i] = minimum coins to make amount i. dp[0]=0. For each amount i, try each coin c ≤ i: dp[i] = min(dp[i], 1 + dp[i-c]).',
+   approach:'dp = [infinity] * (amount+1), dp[0]=0. For i in 1..amount: for each coin: if coin≤i: dp[i]=min(dp[i], 1+dp[i-coin]). Return dp[amount] if not inf else -1.',
+   pitfall:['dp[0] must be 0, not 1','Returning 0 when amount unreachable (should return -1)'],
+   code:`<span class="kw">def</span> <span class="fn">coin_change</span>(coins, amount):
+    dp = [<span class="fn">float</span>(<span class="st">'inf'</span>)] * (amount + <span class="nm">1</span>)
+    dp[<span class="nm">0</span>] = <span class="nm">0</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, amount + <span class="nm">1</span>):
+        <span class="kw">for</span> c <span class="kw">in</span> coins:
+            <span class="kw">if</span> c <= i:
+                dp[i] = <span class="fn">min</span>(dp[i], <span class="nm">1</span> + dp[i - c])
+    <span class="kw">return</span> dp[amount] <span class="kw">if</span> dp[amount] != <span class="fn">float</span>(<span class="st">'inf'</span>) <span class="kw">else</span> -<span class="nm">1</span>`},
+
+  {name:'Longest Common Subsequence',diff:'Medium',time:'O(m·n)',space:'O(m·n)',pat:'2D DP',
+   stmt:'Given two strings <strong>text1</strong> and <strong>text2</strong>, return the length of their longest common subsequence. A subsequence is a sequence that can be derived by deleting some characters without changing the relative order.',
+   examples:[
+    {input:'text1="abcde", text2="ace"',output:'3',exp:'LCS is "ace"'},
+    {input:'text1="abc", text2="abc"',output:'3',exp:'LCS is "abc"'},
+    {input:'text1="abc", text2="def"',output:'0',exp:'No common characters'},
+   ],
+   constraints:['1 ≤ text1.length, text2.length ≤ 1000','Only lowercase letters'],
+   tests:[
+    {input:'"abcde","ace"',output:'3',note:'"ace"'},
+    {input:'"abc","abc"',output:'3',note:'Identical'},
+    {input:'"abc","def"',output:'0',note:'No common'},
+    {input:'"bl","yby"',output:'1',note:'"b"'},
+   ],
+   hint:'dp[i][j] = LCS of text1[:i] and text2[:j]. If chars match: dp[i-1][j-1]+1. Else: max(dp[i-1][j], dp[i][j-1]) — take the better of skipping from either string.',
+   approach:'dp = (m+1)×(n+1) zeros. For i in 1..m, j in 1..n: if text1[i-1]==text2[j-1]: dp[i][j]=dp[i-1][j-1]+1. Else: dp[i][j]=max(dp[i-1][j],dp[i][j-1]).',
+   pitfall:['1-indexed dp vs 0-indexed strings (i-1 offset)'],
+   code:`<span class="kw">def</span> <span class="fn">lcs</span>(text1, text2):
+    m, n = <span class="fn">len</span>(text1), <span class="fn">len</span>(text2)
+    dp = [[<span class="nm">0</span>]*(n+<span class="nm">1</span>) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(m+<span class="nm">1</span>)]
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, m+<span class="nm">1</span>):
+        <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, n+<span class="nm">1</span>):
+            <span class="kw">if</span> text1[i-<span class="nm">1</span>] == text2[j-<span class="nm">1</span>]:
+                dp[i][j] = dp[i-<span class="nm">1</span>][j-<span class="nm">1</span>] + <span class="nm">1</span>
+            <span class="kw">else</span>:
+                dp[i][j] = <span class="fn">max</span>(dp[i-<span class="nm">1</span>][j], dp[i][j-<span class="nm">1</span>])
+    <span class="kw">return</span> dp[m][n]`},
+ ]},
+
+{id:'backtracking',icon:'↩',title:'Backtracking',color:'#e74c3c',
+ intro:'Template: choose → recurse → unchoose. Always append a COPY of the path. Prune early when possible. Sort input first to make duplicate-skipping easy.',
+ qs:[
+  {name:'Subsets',diff:'Medium',time:'O(n·2ⁿ)',space:'O(n)',pat:'Include/Exclude',
+   stmt:'Given an integer array <strong>nums</strong> of unique elements, return all possible subsets (the power set). The solution must not contain duplicate subsets.',
+   examples:[
+    {input:'nums = [1,2,3]',output:'[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]',exp:'All 2³=8 subsets'},
+    {input:'nums = [0]',output:'[[],[0]]',exp:'2 subsets'},
+   ],
+   constraints:['1 ≤ nums.length ≤ 10','All elements unique','−10 ≤ nums[i] ≤ 10'],
+   tests:[
+    {input:'[1,2,3]',output:'8 subsets including []',note:''},
+    {input:'[0]',output:'[[],[0]]',note:''},
+    {input:'[1,2]',output:'[[],[1],[2],[1,2]]',note:''},
+   ],
+   hint:'At each step, append a copy of the current path. Then try including each remaining element. After recursing, remove the last element (backtrack).',
+   approach:'res=[]. dfs(start=0, path=[]): append path[:]. For i in range(start,n): path.append(nums[i]), dfs(i+1,path), path.pop().',
+   pitfall:['Appending path instead of path[:] (reference — all results change when path changes)','Starting inner loop from 0 instead of start (produces duplicates)'],
+   code:`<span class="kw">def</span> <span class="fn">subsets</span>(nums):
+    res, path = [], []
+    <span class="kw">def</span> <span class="fn">dfs</span>(start):
+        res.append(path[:])  <span class="cm"># copy!</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(start, <span class="fn">len</span>(nums)):
+            path.append(nums[i])
+            dfs(i + <span class="nm">1</span>)
+            path.pop()  <span class="cm"># backtrack</span>
+    dfs(<span class="nm">0</span>)
+    <span class="kw">return</span> res`},
+
+  {name:'Combination Sum',diff:'Medium',time:'O(n^(t/m))',space:'O(t/m)',pat:'Backtracking',
+   stmt:'Given an array of distinct integers <strong>candidates</strong> and a target, return all unique combinations that sum to target. The same number may be used unlimited times.',
+   examples:[
+    {input:'candidates=[2,3,6,7], target=7',output:'[[2,2,3],[7]]',exp:'2+2+3=7 and 7=7'},
+    {input:'candidates=[2,3,5], target=8',output:'[[2,2,2,2],[2,3,3],[3,5]]',exp:'Three combinations'},
+   ],
+   constraints:['1 ≤ candidates.length ≤ 30','All unique. 2 ≤ candidates[i] ≤ 40','1 ≤ target ≤ 500'],
+   tests:[
+    {input:'[2,3,6,7], target=7',output:'[[2,2,3],[7]]',note:''},
+    {input:'[2,3,5], target=8',output:'[[2,2,2,2],[2,3,3],[3,5]]',note:''},
+    {input:'[2], target=1',output:'[]',note:'Impossible'},
+   ],
+   hint:'Sort candidates. dfs(start, remain). For each i from start: if candidates[i]>remain: break (pruning!). Add, recurse with SAME i (reuse allowed), remove.',
+   approach:'Sort. dfs(start, remain): if remain==0: record. For i from start: if cand[i]>remain: break. Add, dfs(i, remain-cand[i]), remove.',
+   pitfall:['Using i+1 instead of i (prevents reuse)','Not sorting + pruning (correct but slower)'],
+   code:`<span class="kw">def</span> <span class="fn">combination_sum</span>(candidates, target):
+    candidates.sort()
+    res, path = [], []
+    <span class="kw">def</span> <span class="fn">dfs</span>(start, remain):
+        <span class="kw">if</span> remain == <span class="nm">0</span>:
+            res.append(path[:])
+            <span class="kw">return</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(start, <span class="fn">len</span>(candidates)):
+            <span class="kw">if</span> candidates[i] > remain: <span class="kw">break</span>
+            path.append(candidates[i])
+            dfs(i, remain - candidates[i])
+            path.pop()
+    dfs(<span class="nm">0</span>, target)
+    <span class="kw">return</span> res`},
+
+  {name:'N-Queens',diff:'Hard',time:'O(n!)',space:'O(n)',pat:'Backtracking + Sets',
+   stmt:'The n-queens puzzle: place n queens on an n×n chessboard so no two queens attack each other. Return all distinct solutions. Each solution is represented as a list of strings.',
+   examples:[
+    {input:'n = 4',output:'[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]',exp:'Two solutions for 4-queens'},
+    {input:'n = 1',output:'[["Q"]]',exp:'Trivially one queen'},
+   ],
+   constraints:['1 ≤ n ≤ 9'],
+   tests:[
+    {input:'n=1',output:'[["Q"]]',note:''},
+    {input:'n=2',output:'[]',note:'No solution exists for n=2'},
+    {input:'n=3',output:'[]',note:'No solution for n=3'},
+    {input:'n=4',output:'2 solutions',note:''},
+   ],
+   hint:'Place one queen per row. Use 3 sets to track attacks: cols, diag1 (row−col, constant for / diagonals), diag2 (row+col, constant for \\ diagonals). O(1) conflict check.',
+   approach:'For each row, try each col. Skip if col, row-col, or row+col in attack sets. Place, recurse to next row, remove.',
+   pitfall:['Using 2D boolean grid (O(n) check instead of O(1))','Forgetting to remove from diagonal sets on backtrack'],
+   code:`<span class="kw">def</span> <span class="fn">solve_n_queens</span>(n):
+    cols, d1, d2 = <span class="fn">set</span>(), <span class="fn">set</span>(), <span class="fn">set</span>()
+    board = [<span class="st">'.'</span> * n] * n
+    res = []
+    <span class="kw">def</span> <span class="fn">dfs</span>(row):
+        <span class="kw">if</span> row == n:
+            res.append(board[:])
+            <span class="kw">return</span>
+        <span class="kw">for</span> col <span class="kw">in</span> <span class="fn">range</span>(n):
+            <span class="kw">if</span> col <span class="kw">in</span> cols <span class="kw">or</span> row-col <span class="kw">in</span> d1 <span class="kw">or</span> row+col <span class="kw">in</span> d2:
+                <span class="kw">continue</span>
+            cols.add(col); d1.add(row-col); d2.add(row+col)
+            board[row] = <span class="st">'.'</span>*col + <span class="st">'Q'</span> + <span class="st">'.'</span>*(n-col-<span class="nm">1</span>)
+            dfs(row + <span class="nm">1</span>)
+            cols.discard(col); d1.discard(row-col); d2.discard(row+col)
+    dfs(<span class="nm">0</span>)
+    <span class="kw">return</span> res`},
+ ]},
+
+{id:'strings',icon:'Ss',title:'Strings',color:'#1abc9c',
+ intro:'String problems often reduce to sliding window or hash map. Python string concat in loops is O(n²) — use list + "".join(). Know that s.isalnum() and s.lower() are your best friends.',
+ qs:[
+  {name:'Valid Palindrome',diff:'Easy',time:'O(n)',space:'O(1)',pat:'Two Pointers',
+   stmt:'A phrase is a palindrome if, after converting all uppercase letters to lowercase and removing all non-alphanumeric characters, it reads the same forward and backward. Given a string s, return true if it is a palindrome.',
+   examples:[
+    {input:'s = "A man, a plan, a canal: Panama"',output:'true',exp:'After cleaning: "amanaplanacanalpanama" — palindrome'},
+    {input:'s = "race a car"',output:'false',exp:'After cleaning: "raceacar" — not palindrome'},
+    {input:'s = " "',output:'true',exp:'Empty after cleaning → palindrome'},
+   ],
+   constraints:['1 ≤ s.length ≤ 2×10⁵','s consists of printable ASCII'],
+   tests:[
+    {input:'"A man, a plan, a canal: Panama"',output:'true',note:''},
+    {input:'"race a car"',output:'false',note:''},
+    {input:'"  "',output:'true',note:'Only spaces → empty → true'},
+    {input:'"a"',output:'true',note:'Single char'},
+   ],
+   hint:'Two pointers from both ends. Skip non-alphanumeric characters. Compare lowercased characters.',
+   approach:'l=0, r=len-1. While l<r: skip non-alnum on left, skip non-alnum on right. If s[l].lower()!=s[r].lower(): False. l++, r--.',
+   pitfall:['Forgetting .lower() before comparison','Not skipping non-alnum before comparing'],
+   code:`<span class="kw">def</span> <span class="fn">is_palindrome</span>(s):
+    l, r = <span class="nm">0</span>, <span class="fn">len</span>(s) - <span class="nm">1</span>
+    <span class="kw">while</span> l < r:
+        <span class="kw">while</span> l < r <span class="kw">and not</span> s[l].isalnum(): l += <span class="nm">1</span>
+        <span class="kw">while</span> l < r <span class="kw">and not</span> s[r].isalnum(): r -= <span class="nm">1</span>
+        <span class="kw">if</span> s[l].lower() != s[r].lower():
+            <span class="kw">return False</span>
+        l += <span class="nm">1</span>; r -= <span class="nm">1</span>
+    <span class="kw">return True</span>`},
+
+  {name:'Longest Substring Without Repeating Characters',diff:'Medium',time:'O(n)',space:'O(k)',pat:'Sliding Window',
+   stmt:'Given a string <strong>s</strong>, find the length of the longest substring without repeating characters.',
+   examples:[
+    {input:'s = "abcabcbb"',output:'3',exp:'"abc" is the answer'},
+    {input:'s = "bbbbb"',output:'1',exp:'"b" is the answer'},
+    {input:'s = "pwwkew"',output:'3',exp:'"wke" is the answer'},
+   ],
+   constraints:['0 ≤ s.length ≤ 5×10⁴','s consists of English letters, digits, symbols, spaces'],
+   tests:[
+    {input:'"abcabcbb"',output:'3',note:'"abc"'},
+    {input:'"bbbbb"',output:'1',note:'"b"'},
+    {input:'"pwwkew"',output:'3',note:'"wke"'},
+    {input:'""',output:'0',note:'Empty string'},
+    {input:'" "',output:'1',note:'Space is a valid char'},
+   ],
+   hint:'Sliding window with a map storing last-seen index of each character. When a repeat is found, jump left pointer to max(left, last_seen[c]+1). The max check avoids using stale entries.',
+   approach:'char_idx={}, left=best=0. For right,c in enumerate(s): if c in char_idx and char_idx[c]>=left: left=char_idx[c]+1. char_idx[c]=right. best=max(best, right-left+1).',
+   pitfall:['Setting left=last_seen+1 without max(left,...) — stale entry from before current window would jump left backward'],
+   code:`<span class="kw">def</span> <span class="fn">length_of_longest_substring</span>(s):
+    seen = {}
+    left = best = <span class="nm">0</span>
+    <span class="kw">for</span> right, c <span class="kw">in</span> <span class="fn">enumerate</span>(s):
+        <span class="kw">if</span> c <span class="kw">in</span> seen <span class="kw">and</span> seen[c] >= left:
+            left = seen[c] + <span class="nm">1</span>
+        seen[c] = right
+        best = <span class="fn">max</span>(best, right - left + <span class="nm">1</span>)
+    <span class="kw">return</span> best`},
+
+  {name:'Minimum Window Substring',diff:'Hard',time:'O(|s|+|t|)',space:'O(|t|)',pat:'Sliding Window',
+   stmt:'Given strings s and t, return the minimum window substring of s that contains every character in t (including duplicates). If no such window exists, return "".',
+   examples:[
+    {input:'s="ADOBECODEBANC", t="ABC"',output:'"BANC"',exp:'Minimum window containing A, B, C'},
+    {input:'s="a", t="a"',output:'"a"',exp:''},
+    {input:'s="a", t="aa"',output:'""',exp:'t needs two a\'s but s has only one'},
+   ],
+   constraints:['1 ≤ s.length, t.length ≤ 10⁵'],
+   tests:[
+    {input:'s="ADOBECODEBANC",t="ABC"',output:'"BANC"',note:''},
+    {input:'s="a",t="b"',output:'""',note:'t not in s'},
+    {input:'s="aa",t="aa"',output:'"aa"',note:'Duplicates in t'},
+   ],
+   hint:'Two frequency counters. "have" counts characters from t that meet their required frequency. When have==need, shrink from left. Track minimum valid window.',
+   approach:'need=Counter(t), window={}, have=0, want=len(need). Expand right. When c in need and window[c]==need[c]: have++. While have==want: update result, shrink left.',
+   pitfall:['Counting all window chars vs only chars in t','When shrinking: only decrement "have" if window[s[l]] drops below need[s[l]]'],
+   code:`<span class="kw">from</span> collections <span class="kw">import</span> Counter
+
+<span class="kw">def</span> <span class="fn">min_window</span>(s, t):
+    need = Counter(t)
+    win, have, want = {}, <span class="nm">0</span>, <span class="fn">len</span>(need)
+    res, res_len = [-<span class="nm">1</span>,-<span class="nm">1</span>], <span class="fn">float</span>(<span class="st">'inf'</span>)
+    l = <span class="nm">0</span>
+    <span class="kw">for</span> r, c <span class="kw">in</span> <span class="fn">enumerate</span>(s):
+        win[c] = win.get(c,<span class="nm">0</span>) + <span class="nm">1</span>
+        <span class="kw">if</span> c <span class="kw">in</span> need <span class="kw">and</span> win[c] == need[c]:
+            have += <span class="nm">1</span>
+        <span class="kw">while</span> have == want:
+            <span class="kw">if</span> r-l+<span class="nm">1</span> < res_len:
+                res, res_len = [l,r], r-l+<span class="nm">1</span>
+            win[s[l]] -= <span class="nm">1</span>
+            <span class="kw">if</span> s[l] <span class="kw">in</span> need <span class="kw">and</span> win[s[l]] < need[s[l]]:
+                have -= <span class="nm">1</span>
+            l += <span class="nm">1</span>
+    l,r = res
+    <span class="kw">return</span> s[l:r+<span class="nm">1</span>] <span class="kw">if</span> res_len != <span class="fn">float</span>(<span class="st">'inf'</span>) <span class="kw">else</span> <span class="st">""</span>`},
+ ]},
+
+{id:'graphs',icon:'🕸',title:'Graphs',color:'#2ecc71',
+ intro:'BFS = shortest path in unweighted graphs. DFS = connectivity, cycles, paths. Always maintain a visited set. Adjacency list is the default representation.',
+ qs:[
+  {name:'Number of Islands',diff:'Medium',time:'O(m·n)',space:'O(m·n)',pat:'DFS on Grid',
+   stmt:'Given an m×n 2D binary grid of "1" (land) and "0" (water), return the number of islands. An island is surrounded by water and formed by connecting adjacent lands horizontally or vertically.',
+   examples:[
+    {input:'grid = [["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]',output:'1',exp:'All land cells are connected — one island'},
+    {input:'grid = [["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]',output:'3',exp:'Three separate islands'},
+   ],
+   constraints:['1 ≤ m, n ≤ 300','grid[i][j] is "0" or "1"'],
+   tests:[
+    {input:'all "1"s',output:'1',note:'One big island'},
+    {input:'all "0"s',output:'0',note:'No islands'},
+    {input:'single "1" cell',output:'1',note:''},
+    {input:'checkerboard pattern',output:'many',note:'Diagonal cells not connected'},
+   ],
+   hint:'For each unvisited land cell ("1"), DFS to mark all connected land cells as visited. Count how many times you start a new DFS.',
+   approach:'visited=set(). count=0. For each (r,c): if "1" and not visited: count++, dfs(r,c). dfs marks all 4-directional neighbors recursively.',
+   pitfall:['Visiting diagonals (only 4-directional, not 8)','Modifying grid directly (works but mutates input)','Bounds checking before recursing'],
+   code:`<span class="kw">def</span> <span class="fn">num_islands</span>(grid):
+    rows, cols = <span class="fn">len</span>(grid), <span class="fn">len</span>(grid[<span class="nm">0</span>])
+    visited = <span class="fn">set</span>()
+    count = <span class="nm">0</span>
+    <span class="kw">def</span> <span class="fn">dfs</span>(r, c):
+        <span class="kw">if</span> (r,c) <span class="kw">in</span> visited: <span class="kw">return</span>
+        <span class="kw">if not</span> (<span class="nm">0</span> <= r < rows <span class="kw">and</span> <span class="nm">0</span> <= c < cols): <span class="kw">return</span>
+        <span class="kw">if</span> grid[r][c] != <span class="st">"1"</span>: <span class="kw">return</span>
+        visited.add((r,c))
+        dfs(r+<span class="nm">1</span>,c); dfs(r-<span class="nm">1</span>,c)
+        dfs(r,c+<span class="nm">1</span>); dfs(r,c-<span class="nm">1</span>)
+    <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">range</span>(rows):
+        <span class="kw">for</span> c <span class="kw">in</span> <span class="fn">range</span>(cols):
+            <span class="kw">if</span> grid[r][c] == <span class="st">"1"</span> <span class="kw">and</span> (r,c) <span class="kw">not in</span> visited:
+                count += <span class="nm">1</span>; dfs(r, c)
+    <span class="kw">return</span> count`},
+
+  {name:'Course Schedule',diff:'Medium',time:'O(V+E)',space:'O(V+E)',pat:'Topological Sort / Cycle Detection',
+   stmt:'There are numCourses courses (0 to n-1). You are given prerequisites[i]=[a,b] meaning you must take course b before a. Return true if you can finish all courses.',
+   examples:[
+    {input:'numCourses=2, prerequisites=[[1,0]]',output:'true',exp:'Take 0 first, then 1'},
+    {input:'numCourses=2, prerequisites=[[1,0],[0,1]]',output:'false',exp:'Cycle: 0 needs 1, 1 needs 0'},
+   ],
+   constraints:['1 ≤ numCourses ≤ 2000','0 ≤ prerequisites.length ≤ 5000'],
+   tests:[
+    {input:'n=2, [[1,0]]',output:'true',note:'Simple dependency'},
+    {input:'n=2, [[1,0],[0,1]]',output:'false',note:'Direct cycle'},
+    {input:'n=1, []',output:'true',note:'Single course no deps'},
+    {input:'n=3, [[0,1],[0,2],[1,2]]',output:'true',note:'DAG'},
+   ],
+   hint:'Model as directed graph. Cycle = impossible. DFS with 3 states: 0=unvisited, 1=currently visiting (in stack), 2=fully processed. If we visit state-1 node again: cycle found.',
+   approach:'Build adj list. state array of 0/1/2. For each node: dfs(v): if state[v]==1: cycle! if state[v]==2: safe. Mark 1, recurse neighbors, mark 2.',
+   pitfall:['Using just visited boolean — can\'t distinguish "currently exploring" from "done"'],
+   code:`<span class="kw">def</span> <span class="fn">can_finish</span>(n, prereqs):
+    adj = [[] <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n)]
+    <span class="kw">for</span> a, b <span class="kw">in</span> prereqs:
+        adj[b].append(a)
+    state = [<span class="nm">0</span>] * n  <span class="cm"># 0=fresh 1=visiting 2=done</span>
+    <span class="kw">def</span> <span class="fn">dfs</span>(v):
+        <span class="kw">if</span> state[v] == <span class="nm">1</span>: <span class="kw">return False</span>  <span class="cm"># cycle!</span>
+        <span class="kw">if</span> state[v] == <span class="nm">2</span>: <span class="kw">return True</span>
+        state[v] = <span class="nm">1</span>
+        <span class="kw">for</span> nei <span class="kw">in</span> adj[v]:
+            <span class="kw">if not</span> dfs(nei): <span class="kw">return False</span>
+        state[v] = <span class="nm">2</span>
+        <span class="kw">return True</span>
+    <span class="kw">return all</span>(dfs(v) <span class="kw">for</span> v <span class="kw">in</span> <span class="fn">range</span>(n))`},
+ ]},
+
+{id:'heaps',icon:'⛏',title:'Heaps',color:'#f39c12',
+ intro:'Python heapq is MIN-heap only. Negate values for max-heap. Use heaps when you need repeated access to the min/max or k-th element.',
+ qs:[
+  {name:'Kth Largest Element in Array',diff:'Medium',time:'O(n log k)',space:'O(k)',pat:'Min-Heap of Size K',
+   stmt:'Given an integer array nums and integer k, return the k-th largest element in the array. Note: k-th largest, not k-th distinct.',
+   examples:[
+    {input:'nums=[3,2,1,5,6,4], k=2',output:'5',exp:'Sorted desc: [6,5,4,3,2,1]. 2nd = 5'},
+    {input:'nums=[3,2,3,1,2,4,5,5,6], k=4',output:'4',exp:'Sorted desc: [6,5,5,4,3,3,2,2,1]. 4th = 4'},
+   ],
+   constraints:['1 ≤ k ≤ nums.length ≤ 10⁵','−10⁴ ≤ nums[i] ≤ 10⁴'],
+   tests:[
+    {input:'[3,2,1,5,6,4], k=2',output:'5',note:''},
+    {input:'[1], k=1',output:'1',note:''},
+    {input:'[5,5,5], k=2',output:'5',note:'Duplicates'},
+   ],
+   hint:'Maintain a min-heap of size k. When size exceeds k, pop the smallest. The top of the heap (smallest of the k largest) is your answer.',
+   approach:'heap=[]. For each num: heappush(num). If len>k: heappop(). Return heap[0].',
+   pitfall:['Using max-heap (O(n log n)) when min-heap of k suffices (O(n log k))','Confusing k-th largest vs smallest'],
+   code:`<span class="kw">import</span> heapq
+
+<span class="kw">def</span> <span class="fn">find_kth_largest</span>(nums, k):
+    heap = []
+    <span class="kw">for</span> num <span class="kw">in</span> nums:
+        heapq.heappush(heap, num)
+        <span class="kw">if</span> <span class="fn">len</span>(heap) > k:
+            heapq.heappop(heap)
+    <span class="kw">return</span> heap[<span class="nm">0</span>]  <span class="cm"># smallest of k largest</span>`},
+
+  {name:'Find Median from Data Stream',diff:'Hard',time:'O(log n)',space:'O(n)',pat:'Two Heaps',
+   stmt:'Design a data structure that: addNum(num) adds an integer to the data structure. findMedian() returns the median of all elements. For even count: return average of two middle values.',
+   examples:[
+    {input:'addNum(1), addNum(2), findMedian(), addNum(3), findMedian()',output:'1.5, 2.0',exp:'After [1,2]: median=(1+2)/2=1.5. After [1,2,3]: median=2.0'},
+   ],
+   constraints:['−10⁵ ≤ num ≤ 10⁵','At most 5×10⁴ calls','findMedian called at least once'],
+   tests:[
+    {input:'add(1),add(2),find()',output:'1.5',note:'Even count'},
+    {input:'add(1),add(2),add(3),find()',output:'2.0',note:'Odd count'},
+    {input:'add(6),find()',output:'6.0',note:'Single element'},
+   ],
+   hint:'Two heaps: max-heap (negated) for lower half, min-heap for upper half. Balance so sizes differ by at most 1. Median = top of larger heap, or average of both tops.',
+   approach:'small=max-heap (negated). large=min-heap. addNum: push to small, then balance (move tops). findMedian: if sizes equal: avg, else top of larger.',
+   pitfall:['Python has no max-heap — negate values in small heap'],
+   code:`<span class="kw">import</span> heapq
+<span class="kw">class</span> <span class="tp">MedianFinder</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.small = []  <span class="cm"># max-heap (negated)</span>
+        self.large = []  <span class="cm"># min-heap</span>
+
+    <span class="kw">def</span> <span class="fn">addNum</span>(self, num):
+        heapq.heappush(self.small, -num)
+        <span class="cm"># ensure max(small) <= min(large)</span>
+        <span class="kw">if</span> self.small <span class="kw">and</span> self.large <span class="kw">and</span> -self.small[<span class="nm">0</span>] > self.large[<span class="nm">0</span>]:
+            heapq.heappush(self.large, -heapq.heappop(self.small))
+        <span class="cm"># balance sizes</span>
+        <span class="kw">if</span> <span class="fn">len</span>(self.small) > <span class="fn">len</span>(self.large) + <span class="nm">1</span>:
+            heapq.heappush(self.large, -heapq.heappop(self.small))
+        <span class="kw">elif</span> <span class="fn">len</span>(self.large) > <span class="fn">len</span>(self.small):
+            heapq.heappush(self.small, -heapq.heappop(self.large))
+
+    <span class="kw">def</span> <span class="fn">findMedian</span>(self):
+        <span class="kw">if</span> <span class="fn">len</span>(self.small) > <span class="fn">len</span>(self.large):
+            <span class="kw">return</span> <span class="fn">float</span>(-self.small[<span class="nm">0</span>])
+        <span class="kw">return</span> (-self.small[<span class="nm">0</span>] + self.large[<span class="nm">0</span>]) / <span class="nm">2</span>`},
+ ]},
+];
+
+// ═══════════════════════ STATE ═══════════════════════════════════════════════
+let solved = JSON.parse(localStorage.getItem('dsa2_solved') || '{}');
+let fcState={cards:[],cur:0,again:[]};
+let quizState={qs:[],cur:0,score:0,answered:false};
+
+function isSolved(c,i){return !!solved[c+'_'+i]}
+function toggleSolve(cid,qi){
+  const k=cid+'_'+qi;
+  if(solved[k]) delete solved[k]; else solved[k]=true;
+  localStorage.setItem('dsa2_solved',JSON.stringify(solved));
+  const card=document.getElementById('qc-'+cid+'-'+qi);
+  const btn=document.getElementById('sb-'+cid+'-'+qi);
+  if(card){card.classList.toggle('solved',!!solved[k])}
+  if(btn){btn.className=solved[k]?'solve-btn done':'solve-btn';btn.textContent=solved[k]?'✓ Solved':'Mark Solved'}
+  updateProg();
+}
+
+function updateProg(){
+  const total=CATS.reduce((s,c)=>s+c.qs.length,0);
+  const done=Object.keys(solved).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-done').textContent=done+' solved';
+  document.getElementById('prog-total').textContent=total+' total';
+  document.getElementById('d-total').textContent=done;
+  let e=0,m=0,h=0;
+  Object.keys(solved).forEach(k=>{
+    const [cid,qi]=k.split('_');
+    const cat=CATS.find(c=>c.id===cid);
+    if(!cat)return;
+    const q=cat.qs[+qi];
+    if(!q)return;
+    if(q.diff==='Easy')e++;else if(q.diff==='Medium')m++;else h++;
+  });
+  document.getElementById('d-easy').textContent=e;
+  document.getElementById('d-med').textContent=m;
+  document.getElementById('d-hard').textContent=h;
+  CATS.forEach(cat=>{
+    const ck=document.getElementById('nck-'+cat.id);
+    if(ck)ck.classList.toggle('done',cat.qs.every((_,i)=>isSolved(cat.id,i)));
+  });
+  buildDashCats();
+}
+
+// ═══════════════════════ NAV ═══════════════════════════════════════════════
+function nav(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const p=document.getElementById('page-'+id);
+  if(p)p.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');
+  });
+}
+
+// ═══════════════════════ SIDEBAR ═══════════════════════════════════════════
+function buildSidebar(){
+  const el=document.getElementById('cat-nav');
+  el.innerHTML='<div class="nav-sec-lbl">Categories</div>';
+  CATS.forEach(cat=>{
+    const d=document.createElement('div');
+    d.className='nav-item';
+    d.onclick=()=>nav('cat-'+cat.id);
+    d.innerHTML=`<span class="nav-icon">${cat.icon}</span><span class="nav-txt">${cat.title}</span><span class="nav-cnt">${cat.qs.length}</span><div class="nav-ck" id="nck-${cat.id}"></div>`;
+    el.appendChild(d);
+  });
+}
+
+// ═══════════════════════ CATEGORY PAGES ═══════════════════════════════════
+function buildCatPages(){
+  const container=document.getElementById('cat-pages');
+  CATS.forEach(cat=>{
+    const pg=document.createElement('div');
+    pg.className='page';
+    pg.id='page-cat-'+cat.id;
+    const dc={Easy:0,Medium:0,Hard:0};
+    cat.qs.forEach(q=>dc[q.diff]++);
+    pg.innerHTML=`
+    <div class="hdr">
+      <div class="breadcrumb"><span onclick="nav('dashboard')">Home</span> › <span>${cat.title}</span></div>
+      <div class="hdr-title">${cat.icon} ${cat.title}</div>
+      <div class="hdr-sub">${cat.intro}</div>
+      <div class="chips"><span class="chip ce">${dc.Easy} Easy</span><span class="chip cm">${dc.Medium} Medium</span><span class="chip ch">${dc.Hard} Hard</span></div>
+    </div>
+    <div class="content">
+      <div class="fbar">
+        <button class="fbtn active" onclick="filterQ(this,'${cat.id}','all')">All</button>
+        <button class="fbtn" onclick="filterQ(this,'${cat.id}','Easy')">Easy</button>
+        <button class="fbtn" onclick="filterQ(this,'${cat.id}','Medium')">Medium</button>
+        <button class="fbtn" onclick="filterQ(this,'${cat.id}','Hard')">Hard</button>
+        <button class="fbtn" onclick="filterQ(this,'${cat.id}','unsolved')">Unsolved</button>
+      </div>
+      <div class="qgrid" id="qg-${cat.id}">
+        ${cat.qs.map((q,i)=>buildQCard(cat,q,i)).join('')}
+      </div>
+    </div>`;
+    container.appendChild(pg);
+  });
+}
+
+function buildQCard(cat,q,i){
+  const sl=isSolved(cat.id,i)?'solved':'';
+  return `<div class="qcard ${sl}" id="qc-${cat.id}-${i}">
+  <div class="qhdr" onclick="toggleQ('${cat.id}',${i})">
+    <span class="qnum">${i+1}.</span>
+    <div class="qinfo">
+      <div class="qname">${q.name}</div>
+      <div class="qmeta">
+        <span class="dbadge d${q.diff[0]}">${q.diff}</span>
+        <span class="qcmplx">${q.time} · ${q.space}</span>
+        <span class="qpat">${q.pat}</span>
+      </div>
+    </div>
+    <button class="qtoggle" id="qt-arr-${cat.id}-${i}">▼</button>
+  </div>
+  <div class="qbody" id="qb-${cat.id}-${i}">
+    <div class="qtabs">
+      <button class="qtab active" onclick="qTab(event,'${cat.id}',${i},'prob')">📋 Problem</button>
+      <button class="qtab" onclick="qTab(event,'${cat.id}',${i},'tests')">🧪 Test Cases</button>
+      <button class="qtab" onclick="qTab(event,'${cat.id}',${i},'hint')">💡 Hint</button>
+      <button class="qtab" onclick="qTab(event,'${cat.id}',${i},'approach')">🗺 Approach</button>
+      <button class="qtab" onclick="qTab(event,'${cat.id}',${i},'code')">💻 Solution</button>
+    </div>
+    <div class="qpanel active" id="qp-${cat.id}-${i}-prob">
+      <p class="prob-stmt">${q.stmt}</p>
+      <div class="examples">
+        ${q.examples.map((ex,ei)=>`
+        <div class="example">
+          <div class="ex-hdr"><span>Example ${ei+1}</span>${ex.exp?`<span>${ex.exp}</span>`:''}</div>
+          <div class="ex-body">
+            <div class="ex-row"><span class="ex-label">Input:</span><br><span class="ex-in">${ex.input}</span></div>
+            <div class="ex-row" style="margin-top:6px"><span class="ex-label">Output:</span><br><span class="ex-out">${ex.output}</span></div>
+          </div>
+        </div>`).join('')}
+      </div>
+      ${q.constraints?`<div class="constraints"><div class="constraints-lbl">Constraints</div><ul>${q.constraints.map(c=>`<li>${c}</li>`).join('')}</ul></div>`:''}
+    </div>
+    <div class="qpanel" id="qp-${cat.id}-${i}-tests">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;font-style:italic">Test these cases to verify your solution works correctly:</div>
+      <div class="testcases">
+        ${q.tests.map(t=>`<div class="tc">
+          <div class="tc-row"><span class="tc-key">Input</span><span class="tc-val">${t.input}</span></div>
+          <div class="tc-row"><span class="tc-key">Expected</span><span class="tc-out">${t.output}</span></div>
+          ${t.note?`<div class="tc-row"><span class="tc-key">Why</span><span class="tc-note">${t.note}</span></div>`:''}
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="qpanel" id="qp-${cat.id}-${i}-hint">
+      <div class="ibox ibox-hint"><div class="ibox-lbl">Pattern: ${q.pat}</div>${q.hint}</div>
+      <div class="ibox ibox-warn"><div class="ibox-lbl">Common Pitfalls</div><ul style="margin:0;padding-left:16px;font-size:12.5px;line-height:1.8">${q.pitfall.map(p=>`<li>${p}</li>`).join('')}</ul></div>
+    </div>
+    <div class="qpanel" id="qp-${cat.id}-${i}-approach">
+      <div class="ibox ibox-tip"><div class="ibox-lbl">Step-by-Step</div>${q.approach}</div>
+      <div class="cmplx-row">
+        <div class="cpill"><div class="lbl">Time Complexity</div><div class="val">${q.time}</div></div>
+        <div class="cpill"><div class="lbl">Space Complexity</div><div class="val">${q.space}</div></div>
+      </div>
+    </div>
+    <div class="qpanel" id="qp-${cat.id}-${i}-code">
+      <div class="codeblock"><div class="code-lang">Python</div><pre>${q.code}</pre></div>
+    </div>
+    <button class="solve-btn ${isSolved(cat.id,i)?'done':''}" id="sb-${cat.id}-${i}" onclick="toggleSolve('${cat.id}',${i})">${isSolved(cat.id,i)?'✓ Solved':'Mark Solved'}</button>
+  </div>
+</div>`;
+}
+
+function toggleQ(cid,i){
+  const body=document.getElementById('qb-'+cid+'-'+i);
+  const arr=document.getElementById('qt-arr-'+cid+'-'+i);
+  const open=body.classList.toggle('open');
+  arr.textContent=open?'▲':'▼';
+}
+
+function qTab(e,cid,i,tab){
+  e.stopPropagation();
+  const body=document.getElementById('qb-'+cid+'-'+i);
+  body.querySelectorAll('.qtab').forEach(t=>t.classList.remove('active'));
+  body.querySelectorAll('.qpanel').forEach(p=>p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('qp-'+cid+'-'+i+'-'+tab).classList.add('active');
+}
+
+function filterQ(btn,cid,diff){
+  const cat=CATS.find(c=>c.id===cid);
+  document.querySelectorAll(`#qg-${cid} .fbtn`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  cat.qs.forEach((q,i)=>{
+    const el=document.getElementById('qc-'+cid+'-'+i);
+    if(!el)return;
+    const show=diff==='all'||q.diff===diff||(diff==='unsolved'&&!isSolved(cid,i));
+    el.style.display=show?'':'none';
+  });
+}
+
+// ═══════════════════════ DASHBOARD CATS ═══════════════════════════════════
+function buildDashCats(){
+  const el=document.getElementById('dash-cats');
+  if(!el)return;
+  el.innerHTML=CATS.map(cat=>{
+    const tot=cat.qs.length;
+    const done=cat.qs.filter((_,i)=>isSolved(cat.id,i)).length;
+    const pct=tot?Math.round(done/tot*100):0;
+    return `<div class="card" onclick="nav('cat-${cat.id}')" style="cursor:pointer;border-left:3px solid ${cat.color}">
+      <div class="card-hdr"><div class="card-ttl">${cat.icon} ${cat.title}</div><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${done}/${tot}</span></div>
+      <div class="card-body" style="padding-top:4px">
+        <div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:${cat.color}"></div></div>
+        <div style="font-size:10px;color:var(--text3);margin-top:5px">${pct}% complete</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════ STUDY PLAN ═══════════════════════════════════════
+const PLAN=[
+  {w:'W1',t:'Arrays & Strings',c:'10–12 problems',d:'Two-pointer, sliding window, hash map. 80% easy. Goal: see the pattern in <60 seconds.'},
+  {w:'W2',t:'Linked Lists & Hashing',c:'10–12 problems',d:'Fast/slow pointer cold. LRU Cache from scratch. Hash complement pattern without looking.'},
+  {w:'W3',t:'Stacks, Queues & Binary Search',c:'10–12 problems',d:'Monotonic stack intuition. Binary search on answer space, not just indices.'},
+  {w:'W4',t:'Trees (BT + BST)',c:'10–12 problems',d:'Define function return value before writing. All traversals from memory.'},
+  {w:'W5',t:'Graphs & Heaps',c:'10–12 problems',d:'DFS/BFS/Union-Find. Dijkstra. Two-heap pattern for stream median.'},
+  {w:'W6',t:'Dynamic Programming',c:'8–10 problems',d:'dp[i] = ??? in English first. 1D then 2D. Recurrence before code.'},
+  {w:'W7',t:'Greedy + Backtracking',c:'8–10 problems',d:'Greedy: prove it works. Backtracking: always undo. N-Queens cold.'},
+  {w:'W8',t:'Mock Interviews + Review',c:'10 mixed + 3 system design',d:'Timed 45-min sessions. Verbal complexity explanations. Cold-resolve all ✗ problems.'},
+];
+function buildPlan(){
+  const el=document.getElementById('plan-weeks');
+  if(!el)return;
+  el.innerHTML=PLAN.map(w=>`<div class="week-row"><div class="week-n">${w.w}</div><div><div class="week-ttl">${w.t}</div><div class="week-desc">${w.d}</div></div><div class="week-cnt">${w.c}</div></div>`).join('');
+}
+
+// ═══════════════════════ CHEATSHEET ═══════════════════════════════════════
+const PATTERNS=[
+  ['Two Pointers','Sorted array, find pair/triplet, shrink window','O(n)','Two Sum (sorted), 3Sum, Container Water'],
+  ['Sliding Window','Subarray/substring with condition, max/min window','O(n)','Longest Substr, Min Window, Max Sum K'],
+  ['Binary Search','Sorted or monotone yes/no answer space','O(log n)','Rotated Array, First Bad Version, Capacity'],
+  ['Hash Map','O(1) lookup, complement, frequency count','O(n)/O(n)','Two Sum, Group Anagrams, Subarray=K'],
+  ['BFS','Shortest path (unweighted), level-by-level','O(V+E)','Word Ladder, Rotting Oranges, BT Levels'],
+  ['DFS Recursion','Tree problems, connectivity, path enumeration','O(V+E)','Max Depth, Path Sum, N-Queens'],
+  ['Backtracking','Enumerate valid combinations/permutations','O(branches^depth)','Subsets, Permutations, Sudoku'],
+  ['Monotonic Stack','Next greater/smaller, histogram problems','O(n)','Daily Temps, Largest Rectangle'],
+  ['Min/Max Heap','k-th element, merge streams, priority access','O(n log k)','Kth Largest, Merge K Lists, Median'],
+  ['Union-Find','Dynamic connectivity, cycle detection','O(α(n))','Redundant Connection, # Components'],
+  ['1D DP','Linear sequence, overlapping subproblems','O(n)/O(1)','Climbing Stairs, House Robber, Coin Change'],
+  ['2D DP','Two sequences or grid, 2D state space','O(m·n)','LCS, Edit Distance, Unique Paths'],
+  ['Prefix Sum','Subarray range queries after O(n) build','O(1) query','Subarray Sum=K, Range Sum, Product Except Self'],
+  ['Topological Sort','Dependency ordering, DAG cycle detection','O(V+E)','Course Schedule, Alien Dictionary'],
+];
+const COMPLEXITIES=[
+  {title:'Sorting',rows:[['QuickSort','O(n log n) avg / O(n²) worst','O(log n)'],['MergeSort','O(n log n)','O(n)'],['HeapSort','O(n log n)','O(1)'],['Counting Sort','O(n+k)','O(k)']]},
+  {title:'Data Structures',rows:[['Array get/set','O(1)','—'],['Hash Map (avg)','O(1)','O(n)'],['BST (balanced)','O(log n)','O(n)'],['Heap push/pop','O(log n)','O(n)'],['Trie insert','O(L)','O(n·L)']]},
+  {title:'Graph Algorithms',rows:[['BFS / DFS','O(V+E)','O(V)'],['Dijkstra','O((V+E) log V)','O(V+E)'],['Bellman-Ford','O(V·E)','O(V)'],['Union-Find','O(α(n))','O(n)']]},
+  {title:'DP Patterns',rows:[['1D (Fibonacci)','O(n)','O(1) optimized'],['2D (LCS,Edit)','O(m·n)','O(min(m,n))'],['Knapsack 0/1','O(n·W)','O(W)'],['Unbounded Knap.','O(n·W)','O(W)']]},
+];
+function buildCheatsheet(){
+  const tb=document.getElementById('pat-tbody');
+  if(!tb)return;
+  tb.innerHTML=PATTERNS.map(p=>`<tr><td><span class="pat-name">${p[0]}</span></td><td><span class="pat-when">${p[1]}</span></td><td><code style="font-family:var(--mono);font-size:11px;color:var(--cyan)">${p[2]}</code></td><td><span class="pat-ex">${p[3]}</span></td></tr>`).join('');
+  const cg=document.getElementById('cs-grid');
+  if(!cg)return;
+  cg.innerHTML=COMPLEXITIES.map(cs=>`<div class="cs-card"><div class="cs-hdr">${cs.title}</div><div class="cs-body">${cs.rows.map(r=>`<div class="cs-row"><span class="cs-lbl">${r[0]}</span><span class="cs-val">${r[1]}</span></div>`).join('')}</div></div>`).join('');
+}
+
+// ═══════════════════════ FLASHCARDS ═══════════════════════════════════════
+function buildFCSelects(){
+  const sel=document.getElementById('fc-cat');
+  CATS.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.title;sel.appendChild(o);});
+}
+function startFC(){
+  const cat=document.getElementById('fc-cat').value;
+  const diff=document.getElementById('fc-diff').value;
+  let cards=[];
+  CATS.forEach(c=>{
+    if(cat!=='all'&&c.id!==cat)return;
+    c.qs.forEach((q,i)=>{
+      if(diff!=='all'&&q.diff!==diff)return;
+      cards.push({cid:c.id,i,q});
+    });
+  });
+  cards=cards.sort(()=>Math.random()-0.5);
+  fcState={cards,cur:0,again:[]};
+  renderFC();
+}
+function renderFC(){
+  const el=document.getElementById('fc-area');
+  if(!fcState.cards.length){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px">No cards match filter.</div>';return;}
+  if(fcState.cur>=fcState.cards.length){
+    const a=fcState.again.length;
+    el.innerHTML=`<div style="text-align:center;padding:50px"><div style="font-family:var(--head);font-size:28px;font-weight:800;color:var(--green);margin-bottom:10px">Session Done!</div><p style="color:var(--text2);margin-bottom:20px">${fcState.cards.length-a}/${fcState.cards.length} marked good${a?`. ${a} need review.`:''}</p><button class="btn-p" onclick="fcReview()">Review Again Cards</button><button class="btn-g" style="margin-left:8px" onclick="startFC()">New Session</button></div>`;
+    return;
+  }
+  const {cid,i,q}=fcState.cards[fcState.cur];
+  el.innerHTML=`<div class="fc-wrap">
+  <div class="fc" id="fc-card" onclick="this.classList.toggle('flipped')">
+    <div class="fc-front">
+      <div class="fc-hint">Click to reveal answer</div>
+      <div class="fc-q">${q.name}</div>
+      <div style="margin-top:10px"><span class="dbadge d${q.diff[0]}">${q.diff}</span></div>
+    </div>
+    <div class="fc-back">
+      <div class="fc-hint">Pattern & Approach</div>
+      <div class="fc-mono">${q.pat}</div>
+      <div class="fc-ans">${q.hint}</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3)">${q.time} / ${q.space}</div>
+    </div>
+  </div>
+  <div class="fc-btns">
+    <button class="fc-btn fc-again" onclick="fcRate(false)">Again ✗</button>
+    <button class="fc-btn fc-good" onclick="fcRate(true)">Good ✓</button>
+  </div>
+  <div class="fc-ctr">${fcState.cur+1} / ${fcState.cards.length}</div>
+</div>`;
+}
+function fcRate(good){
+  if(!good)fcState.again.push(fcState.cards[fcState.cur]);
+  fcState.cur++;renderFC();
+}
+function fcReview(){
+  fcState.cards=fcState.again.sort(()=>Math.random()-0.5);
+  fcState.cur=0;fcState.again=[];renderFC();
+}
+
+// ═══════════════════════ QUIZ ═══════════════════════════════════════════════
+const QZ=[
+  {q:'Which data structure gives O(1) lookup for the complement in Two Sum?',opts:['Array (binary search)','Hash map','Sorted array + two pointers','Set'],ans:1,exp:'Hash map stores value→index. Checking if complement exists is O(1) average. This turns the O(n²) brute force into O(n).'},
+  {q:'Kadane\'s algorithm initializes max_sum to nums[0], not 0. Why?',opts:['Optimization only','Avoids division by zero','Correctness: all-negative arrays must return a value, not 0','Python convention'],ans:2,exp:'If all elements are negative, e.g. [-3,-1,-2], the answer is -1. If we initialize to 0, we\'d return 0 which is wrong — 0 requires an empty subarray and the problem asks for non-empty.'},
+  {q:'In Floyd\'s cycle detection, what does it mean when slow == fast?',opts:['They\'ve both reached the end','A cycle definitely exists','fast has lapped slow once','The list has odd length'],ans:1,exp:'If a cycle exists, fast gains one step per round on slow (on the cycle portion). They must eventually meet. If fast reaches null first, no cycle. Equality = cycle confirmed.'},
+  {q:'Why do we use a dummy head node when removing the nth node from end?',opts:['Saves memory','Simplifies the head-removal edge case','Makes it O(n) instead of O(n²)','Required by the problem'],ans:1,exp:'Without a dummy, removing the actual head node requires a special case: "if n == len(list): return head.next". The dummy node means left.next always points to the node we want to remove, even when that node is the original head.'},
+  {q:'Validate BST: why can\'t you just compare each node to its parent?',opts:['You can — it\'s equivalent','Misses violations across levels: [5,4,6,null,null,3,7] looks ok locally but 3 is in right subtree yet 3 < 5','Too slow','Python doesn\'t support it'],ans:1,exp:'The tree [5,4,6,null,null,3,7]: node 3 is a right-grandchild of 5. Comparing 3 to its parent 6 passes (3<6). But BST rule says ALL nodes in right subtree must be > root (5). 3 < 5 violates this. You must pass bounds through recursion.'},
+  {q:'BFS guarantees shortest path in unweighted graphs. Why does DFS not?',opts:['DFS is slower','DFS might find a longer path first and never backtrack to a shorter one','DFS uses more memory','DFS only works on trees'],ans:1,exp:'DFS explores as deep as possible before backtracking. It might find a path of length 5 before it finds the length-2 path. BFS explores all nodes at distance k before any at distance k+1, so the first time it reaches a destination is guaranteed shortest.'},
+  {q:'Coin Change uses "unbounded knapsack" pattern. What makes it unbounded?',opts:['Coins have no value limit','The same coin can be used multiple times','The amount can be very large','There\'s no item weight'],ans:1,exp:'In 0/1 knapsack, each item is used at most once. In unbounded knapsack, items can be reused. Coins are unlimited — you can use coin "5" as many times as needed. This changes the inner loop: we recurse/iterate allowing reuse of the same index.'},
+  {q:'In N-Queens, the diagonal (row-col) is constant for which direction?',opts:['The \\ diagonal (top-left to bottom-right)','The / diagonal (bottom-left to top-right)','Both','Neither'],ans:1,exp:'Move diagonally in / direction: row increases by 1, col decreases by 1. So row-col stays constant. Move in \\ direction: both increase. So row+col stays constant. Storing these in sets gives O(1) conflict check without scanning the board.'},
+  {q:'Why must we append path[:] instead of path in backtracking?',opts:['path[:] is faster','path is a mutable reference — all results will point to the same list and reflect its final (empty) state','path[:] sorts the elements','To avoid duplicates'],ans:1,exp:'In Python, lists are passed by reference. If you append path, all entries in res point to the same list object. When backtracking pops elements, all your recorded results get mutated. path[:] creates a snapshot copy.'},
+  {q:'Build heap from n elements is O(n), not O(n log n). Why?',opts:['Modern CPUs are fast','The math: sum of (n/2⁰)*0 + (n/2¹)*1 + ... telescopes to O(n)','It\'s an approximation','Only for min-heaps'],ans:1,exp:'Building by inserting n elements one-by-one is O(n log n). But building bottom-up (heapify from leaves) is O(n). Most work is done on leaf nodes which have height 0 (no sifting needed). The sum across all levels = O(2n) = O(n).'},
+  {q:'The sliding window for minimum window substring shrinks from left when "have == want". What does "have" count?',opts:['Total characters in current window','Distinct characters from t that have met their required frequency','Number of characters from t present anywhere in s','Window length divided by t length'],ans:1,exp:'"want" = len(Counter(t)) = number of distinct characters needed. "have" increments only when a character\'s count in the window EXACTLY matches its count in t (first time it\'s fully satisfied). When have==want, we have all required characters in sufficient quantity.'},
+  {q:'What\'s the space complexity of DFS on a tree with n nodes?',opts:['O(n) always','O(log n) always','O(h) where h is height — O(log n) balanced, O(n) skewed','O(1)'],ans:2,exp:'The call stack depth equals the height of the tree. For a balanced tree, height = O(log n). For a skewed tree (all nodes in one line), height = O(n) = O(n) space. This is why iterative DFS (explicit stack) is sometimes preferred for very deep trees.'},
+];
+
+function startQuiz(){
+  const qs=[...QZ].sort(()=>Math.random()-0.5).slice(0,10);
+  quizState={qs,cur:0,score:0,answered:false};
+  renderQuiz();
+}
+function renderQuiz(){
+  const el=document.getElementById('quiz-area');
+  if(quizState.cur>=quizState.qs.length){
+    const s=quizState.score,t=quizState.qs.length;
+    el.innerHTML=`<div class="quiz-card" style="text-align:center">
+      <div style="font-size:48px;margin-bottom:12px">${s>=8?'🏆':s>=6?'✅':'📚'}</div>
+      <div style="font-family:var(--head);font-size:32px;font-weight:800;margin-bottom:8px">${s}/${t}</div>
+      <div style="color:var(--text2);margin-bottom:22px">${s>=8?'Excellent! Strong pattern intuition.':s>=6?'Good. Review the ones you missed.':'Keep drilling — come back after more practice.'}</div>
+      <button class="btn-p" onclick="startQuiz()">Try Again</button>
+    </div>`;
+    return;
+  }
+  const q=quizState.qs[quizState.cur];
+  el.innerHTML=`<div class="quiz-card">
+  <div class="quiz-meta">Question ${quizState.cur+1} of ${quizState.qs.length} · Score: ${quizState.score}</div>
+  <div class="quiz-q">${q.q}</div>
+  <div class="quiz-opts">${q.opts.map((o,i)=>`<button class="qopt" onclick="ansQ(${i})" id="qo${i}">${o}</button>`).join('')}</div>
+  <div class="quiz-exp" id="qexp">${q.exp}</div>
+  <div class="quiz-nav"><div></div><button class="btn-p hidden" id="qnxt" onclick="nextQ()">Next →</button></div>
+</div>`;
+}
+function ansQ(idx){
+  if(quizState.answered)return;
+  quizState.answered=true;
+  const q=quizState.qs[quizState.cur];
+  for(let i=0;i<q.opts.length;i++){
+    const b=document.getElementById('qo'+i);
+    b.disabled=true;
+    if(i===q.ans)b.classList.add('correct');
+    else if(i===idx&&idx!==q.ans)b.classList.add('wrong');
+  }
+  if(idx===q.ans)quizState.score++;
+  document.getElementById('qexp').classList.add('show');
+  document.getElementById('qnxt').classList.remove('hidden');
+}
+function nextQ(){quizState.cur++;quizState.answered=false;renderQuiz();}
+
+// ═══════════════════════ INIT ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  buildSidebar();
+  buildCatPages();
+  buildDashCats();
+  buildPlan();
+  buildCheatsheet();
+  buildFCSelects();
+  updateProg();
+  startQuiz();
+});
+</script>
+</body>
+</html>
